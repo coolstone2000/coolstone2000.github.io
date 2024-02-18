@@ -108,7 +108,7 @@ author:
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "I am an **amazing** person."
   location         : "서울특별시 마포구"
-  email            :
+  email            : "chanega@naver.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
@@ -116,18 +116,12 @@ author:
     - label: "Website"
       icon: "fas fa-fw fa-link"
       # url: "https://your-website.com"
-    - label: "Twitter"
-      icon: "fab fa-fw fa-twitter-square"
-      # url: "https://twitter.com/"
-    - label: "Facebook"
-      icon: "fab fa-fw fa-facebook-square"
-      # url: "https://facebook.com/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       # url: "https://github.com/"
-    - label: "Instagram"
+    - label: "cool_stone_2000"
       icon: "fab fa-fw fa-instagram"
-      # url: "https://instagram.com/"
+      # url: "https://www.instagram.com/cool_stone_2000/"
 
 # Site Footer
 footer:
