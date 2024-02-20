@@ -20,11 +20,7 @@ title                    : "쿨스톤의 잡다한것"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "정석찬"
-<<<<<<< HEAD
-description              : "An amazing website."
-=======
 description              : "공부용 블로그"
->>>>>>> ac38bd32c2b937ac448834d7856c12a3a1a1d82e
 url                      : "https://coolstone2000.github.io"
 baseurl                  : # the subpath of your site, e.g. "/blog"
 repository               : # GitHub username/repo-name e.g. "mmistakes/minimal-mistakes"
@@ -290,8 +286,5 @@ defaults:
       related: true
       show_date: true
 
-<<<<<<< HEAD
 date_format: "%Y-%m-%d"
-=======
-date_format: "%Y-%m-%d"
->>>>>>> ac38bd32c2b937ac448834d7856c12a3a1a1d82e
+
