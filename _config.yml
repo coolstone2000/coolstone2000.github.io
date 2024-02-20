@@ -113,7 +113,7 @@ author:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"
       url: "mailto:chanega@naver.com"
-    - label: "Website"
+    - label: "CV"
       icon: "fas fa-fw fa-link"
       url: "https://your-website.com"
     - label: "GitHub"
@@ -240,7 +240,7 @@ tag_archive:
   path: /tags/
 # https://github.com/jekyll/jekyll-archives
 jekyll-archives:
- enabled:
+  enabled:
    - categories
    - tags
   layouts:
