@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-02-20-CV.md",
+                "file": "markdown_lang/md.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-02-20-CV.md",
+                "file": "markdown_lang/md.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-02-20-CV.md",
+                "file": "markdown_lang/md.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-02-20-CV.md"
+                "file": "markdown_lang/md.md"
               }
             }
           }
@@ -148,8 +148,10 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
-    "images/기본형_심볼-01.jpg",
     "_posts/2024-02-20-CV.md",
+    "markdown_lang/md.md",
+    "markdown_lang",
+    "images/기본형_심볼-01.jpg",
     "기본형_심볼-01.jpg",
     "images",
     "무제 폴더"
