@@ -18,6 +18,16 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "0a919f147e056089",
+            "type": "leaf",
+            "state": {
+              "type": "release-notes",
+              "state": {
+                "currentVersion": "1.6.5"
+              }
+            }
           }
         ]
       }
@@ -146,12 +156,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "fea4a49a98bf1788",
+  "active": "0cf32b41cd913593",
   "lastOpenFiles": [
+    "_posts/2024-07-27-ML.md",
+    "_posts/2024-07-27-",
+    "images/기본형_심볼-01.jpg",
     "_posts/2024-02-20-CV.md",
     "markdown_lang/md.md",
     "markdown_lang",
-    "images/기본형_심볼-01.jpg",
     "기본형_심볼-01.jpg",
     "images",
     "무제 폴더"
