@@ -4,6 +4,7 @@ title: "제목"
 categories: 카테고리
 tags: 태그
 toc: true
+toc_sticky: true
 author_profile: false
 sidebar:
     nav: "docs"
