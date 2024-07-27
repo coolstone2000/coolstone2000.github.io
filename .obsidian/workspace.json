@@ -13,19 +13,9 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "markdown_lang/md.md",
+                "file": "_posts/2024-02-20-CV.md",
                 "mode": "source",
                 "source": false
-              }
-            }
-          },
-          {
-            "id": "0a919f147e056089",
-            "type": "leaf",
-            "state": {
-              "type": "release-notes",
-              "state": {
-                "currentVersion": "1.6.5"
               }
             }
           }
@@ -95,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "markdown_lang/md.md",
+                "file": "_posts/2024-02-20-CV.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -112,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "markdown_lang/md.md",
+                "file": "_posts/2024-02-20-CV.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -135,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "markdown_lang/md.md"
+                "file": "_posts/2024-02-20-CV.md"
               }
             }
           }
@@ -156,13 +146,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "0cf32b41cd913593",
+  "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "_includes/mathjax-support.html",
     "_posts/2024-07-27-ML.md",
-    "_posts/2024-07-27-",
-    "images/기본형_심볼-01.jpg",
     "_posts/2024-02-20-CV.md",
     "markdown_lang/md.md",
+    "_posts/2024-07-27-",
+    "images/기본형_심볼-01.jpg",
     "markdown_lang",
     "기본형_심볼-01.jpg",
     "images",

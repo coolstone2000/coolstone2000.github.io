@@ -276,6 +276,7 @@ defaults:
       toc_sticky: true
       toc_label: 목차
       toc_icon: "fas fa-th-list"
+      use_math: true
 
 date_format: "%Y-%m-%d"
 
