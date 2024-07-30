@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-07-27-ML.md",
+                "file": "_posts/2024-02-20-CV.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-07-27-ML.md",
+                "file": "_posts/2024-02-20-CV.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-07-27-ML.md",
+                "file": "_posts/2024-02-20-CV.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-07-27-ML.md"
+                "file": "_posts/2024-02-20-CV.md"
               }
             }
           }
@@ -148,10 +148,11 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "_posts/2024-07-27-ML.md",
+    "_posts/2024-07-27-ML_lect2.md",
     "_posts/2024-07-30-ML_lect3.md",
     "_posts/2024-07-30-ML_lect3",
     "_posts/2024-02-20-CV.md",
-    "_posts/2024-07-27-ML.md",
     "_includes/mathjax-support.html",
     "markdown_lang/md.md",
     "_posts/2024-07-27-",
