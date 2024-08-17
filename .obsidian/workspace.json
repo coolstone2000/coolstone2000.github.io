@@ -18,8 +18,21 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "ea7a682bd1e32aaa",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "_posts/2024-07-27-ML_lect2.md",
+                "mode": "source",
+                "source": false
+              }
+            }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -146,7 +159,7 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "fea4a49a98bf1788",
+  "active": "ea7a682bd1e32aaa",
   "lastOpenFiles": [
     "_posts/2024-02-20-CV.md",
     "_posts/2024-07-27-ML.md",
