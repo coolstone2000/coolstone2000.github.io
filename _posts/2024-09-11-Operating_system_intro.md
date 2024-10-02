@@ -98,3 +98,140 @@ D
 분명 CPU는 하나지만 프로그램 4개가 동시에 실행되는 것 처럼 보이는 환상(illusion)을 만들어 낸다. 이렇게 하나의 CPU가 무한개의 CPU가 존재하는 것처럼 변환하여 동시에 많은 수의 프로그램을 실행시키는 것을 CPU 가상화(virtualizing the CPU)하고 한다. 이렇게 프로그램을 실행, 정지, 탐색을 하기 위해서는 API가 필요하다는 것을 알 수 있고 이런 작업 들을 하기위한 운영체제의 정책(policy)에 맞는 기본적인 기법을 다루는 법에 대해서 배우게 될 것이다.
 
 # 메모리 가상화(Memory virtualization)
+물리적 메모리(physical memory)는 바이트의 베열로 메모리를 읽고 쓰기 위해서는 주소와 데이터가 있어야 한다.
+메모리는 프로그램이 실행되는 동안 항상 접근되는데 메모리 접근 하는 프로그램을 만들어 어떻게 되는지 보면 다음과 같다. 
+
+```c
+ #include <unistd.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include“common.h ”
+ int
+ main(int argc, char *argv[])
+ {
+    int *p = malloc(sizeof(int)); // a1
+    assert(p != NULL);
+    printf(“(%d) memory address of p: %08x\n ”,
+        getpid() , (unsigned) p); // a2
+    *p = 0; // a3
+    while (1) {
+        Spin(1);
+        *p = *p + 1;
+        printf(“(%d) p: %d\n ”, getpid() , *p); // a4
+    }
+    return 0;
+}
+```
+(a1)행에서는 메모리를 할당받고, (a2)행에서 그 할당 받은 메모리를 출력한다. (a3)행에서 그 메모리 첫 슬롯에 숫자 0을 넣고 1초 대기 후 그 주소의 데이터 값을 1씩 증가시키는 코드이다.
+
+```
+prompt> ./mem
+(2134) memory address of p: 00200000
+(2134) p: 1
+(2134) p: 2
+(2134) p: 3
+(2134) p: 4
+(2134) p: 5
+∧C
+```
+코드를 한 번씩만 진행하면 메모리의 주소는 00200000로 하나하나씩 결과를 출력하고 있다.
+
+```
+prompt> ./mem &; ./mem &
+[1] 24113
+[2] 24114
+(24113) memory address of p: 00200000
+(24114) memory address of p: 00200000
+(24113) p: 1
+(24114) p: 1
+(24114) p: 2
+(24113) p: 2
+(24113) p: 3
+(24114) p: 3
+(24113) p: 4
+(24114) p: 4
+. . .
+```
+이것은 프로그램을 여러번 실행 시켰을 때이다. 주소는 0020000으로 같아서 물리적으로 같은 메모리가 쓰이지만 각각의 메모리를 사용하고 있는 것 처럼 보인다. 이것은 운영체제가 메모리 가상화(virtualizing memory)를 하기 때문이다. 그래서 각 프로세스는 자신만의 가상 주소 공간(virtual address space)를 가지게 된다.
+
+# 병행성(Concurrency)
+프로그램이 한번에 많은 일을 하거나 동시에 발생하는 문제들을 뱅행성 문제라고 한다. 이 문제는 운영체제 자체에서 발생하고 멀티 쓰레드에서도 나타난다.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include "common.h"
+
+volatile int counter = 0;
+int loops;
+
+void *worker(void *arg) {
+	int i;
+	for (i = 0; i < loops; i++) {
+		counter = counter + 1;
+	}
+	pthread_exit(NULL);
+}
+
+int main(int argc, char *argv[]) {
+	if (argc != 2) {
+		fprintf(stderr, "usage: threads <loops>\n");
+		exit(1);
+	}
+	loops = atoi(argv[1]);
+	pthread_t p1, p2;
+	printf("Initial value : %d\n", counter);
+	Pthread_create(&p1, NULL, worker, NULL);
+	Pthread_create(&p2, NULL, worker, NULL);
+	Pthread_join(p1, NULL);
+	Pthread_join(p2, NULL);
+	printf("Final value : %d\n", counter);
+	return 0;
+}
+```
+각 쓰레드 p1, p2는 worker()라는 루틴을 루프만큼 실행을 하게 된다. 그래서 이 코드를 1000번의 루프를 가지고 실행을 시키면 counter가 어떻게 될까?
+
+```
+prompt> gcc −o thread thread.c −Wall −pthread
+prompt> ./thread 1000
+Initial value : 0
+Final value : 2000
+```
+2개의 쓰레드가 각 1000번씩 도니까 2000이 된다. 그래서 N번 실행되면 counter가 2000이 된다는 것을 알 수 있다. 그런데 실제로는 그렇지 않다. 만약 loops의 값을 더 큰값으로 하면 어떻게 될 까?
+
+```
+prompt> ./thread 100000 
+Initial value : 0 
+Final value : 143012
+prompt> ./thread 100000 
+Initial value : 0 
+Final value : 137298
+```
+분명 값을 10000으로 줬는데 20000이 되지 않는다. 이상해서 한번을 더 돌려 봐도 143012, 137298과 같은 이상한 숫자가 나온다.
+
+이것은 명령어가 한 번에  하나씩 실행되는 것과 관련이 있다. counter는 총 3개의 명령어로 구성되어 있는데 이 명령어가 원자적(atomically)으로 동시에 3개가 실행되지 않기 때문에 이런 일이 발생하게 된다. 이래서 이 뱅행 프로그램이 올바로 작동하게 하기 위해 어떤 일을 해야하는지 나중에 알아보게 된다.
+
+# 영속성(Persistence)
+
+DRAM과 같은 장치는 데이터가 휘발성(volatile) 방식으로 저장되기 때문에 만약 전원이 끊기거나 고장 나게 된다면 데이터를 영속적으로 저장할 수 있는 하드웨어와 소프트웨어가 필요하다. 하드웨어는 SSD나 HDD같은 저장 장치를 쓰게 되고 이런 디스크를 관리하는 운영체제 소프트웨어를 파일 시스템(file system)이라고 한다.
+
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <assert.h>
+#include <fcntl.h>
+#include <sys/types.h>
+
+int main(int argc, char *argv[])
+{
+    int fd = open("/tmp/file", O_WRONLY | O_CREAT | O_TRUNC, S_IRWXU);
+    assert (fd > -1);
+    int rc = write(fd, "Hello World!\n", 13);
+    assert (rc == 13);
+    close(fd);
+    return 0;
+}
+```
+다음은 "Hello World"를 포함한 파일 /tmp/file을 생성하는 코드이다. 여기서 프로그램은 운영체제를 3번 호출하게 된다. 첫째는 open() 콜로 파일을 생성하고, 둘째는 write() 콜로 파일에 데이터를 쓰고, 셋째는 close() 콜로 파일을 닫는다. 이 시스템 콜(system call)들은 운영체제에서 파일 시스템(file system)에 전달된다. 
+
+데이터를 디스크에 쓰기 위해서 운영체제가 실제로 하는 일이 무엇인지 궁금할 것이지만 그렇게 쉽지 않다. 이것들은 나중에 다루기로 하겠다.
