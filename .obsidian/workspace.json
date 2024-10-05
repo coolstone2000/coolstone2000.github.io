@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-09-11-Operating_system_intro.md",
+                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-09-11-Operating_system_intro.md",
+                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-09-11-Operating_system_intro.md",
+                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-09-11-Operating_system_intro.md"
+                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md"
               }
             }
           }
@@ -161,10 +161,12 @@
   },
   "active": "ea7a682bd1e32aaa",
   "lastOpenFiles": [
+    "_posts/2024-07-27-ML_lect2.md",
+    "_posts/2024-10-05-Operating_system_virtualization_processes.md",
+    "_posts/2024-09-11-Operating_system_intro.md",
+    "_posts/2024-10-05-Operating_system_virtualization.md",
     "_posts/2024-07-26-ML_lect1.md",
     "_posts/2024-0726-ML_lect1.md",
-    "_posts/2024-07-27-ML_lect2.md",
-    "_posts/2024-09-11-Operating_system_intro.md",
     "_posts/2024-09-11-Operating_system_intro",
     "_posts/2024-02-20-CV.md",
     "_posts/2024-07-27-ML.md",
