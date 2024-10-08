@@ -24,7 +24,7 @@ API가 제공하는 기본 기능은 다음과 같다.
 
 # Process Create
 
-<center><img src="/images/OS/pro_crt.png"></center>
+<center><img src="/images/OS/pro_crt.png" width="500" height="700"></center>
 프로그램 실행을 위해 운영체제가 가장 먼저 하는 일은 위의 그림처럼 프로그램 코드와 정적 데이터(static data)를 메모리(프로세스 주소)에다 **탑재(load)**하는 것이다. 초기 운영체제들은 프로그램을 실행하기 전코드와 데이터 모두를 메모리에 탑재 하였는데 이것은 성능을 낮추었다. 이제는 프로그램을 실행할 때 필요한 부분만 메모리에 탑재한다. 이것은 **페이징(paging)**과 **스와핑(swaping)**과 관련있다. 우선 여기서 이해해야 하는 것은 **프로그램의 중요 부분을 디스크에 메모리로 탑재해야 한다는 것**이다.<br>
 메모리로 탑재된 후 운영체제는 **프로그램의 실행시간 스택(run-time stack)을 할당**시켜야 한다. 메인(main)함수의 경우 argc(argument count , 데이터 개수)와 argv(argument variable, 저장주소)를 사용하여 스택을 초기화한다.<br>
 운영체제는 **프로그램의 힙(heap)을 위한 메모리 영역을 할당**한다. 힙(heap)은 동적으로 할당된 데이터를 저장하기 위해 사용된다. malloc()을 호출하여 필요한 공간을 요청하고 free()를 호출하여 사용했던 공간을 반환하여 다른 프로그램이 사용될 수 있도록 한다. 힙은 연결리스트, 해시 테이블, 트리 등 크기가 가변적인 자료 구조를 사용할 수 있게 하고 프로그램이 실행되면 malloc() 라이브러리 API가 메모리를 요청하고 운영체제는 이를 충족하도록 메모리를 할당한다.<br>
@@ -45,3 +45,44 @@ API가 제공하는 기본 기능은 다음과 같다.
 <center><img src="/images/OS/pro_in.png"></center>
 
 
+이러한 결정은 스케줄러를 통해 운영체제가 결정을 내린다.
+
+# Process Data structure
+
+운영체제도 일종의 프로그램이기 때문에 다양한 정보를 유지하기 위한 자료 구조를 가지고 있다. 아래는 xv6 Proc구조를 간단하게 나타낸 것이다.
+```
+// 프로세스를 중단하고 이후에 재개하기 위해 xv6가 저장하고 복원하는 레지스터
+struct context { 
+	int eip; 
+	int esp; 
+	int ebx; 
+	int ecx; 
+	int edx; 
+	int esi; 
+	int edi; 
+	int ebp; 
+}; 
+// 가능한 프로세스 상태
+enum proc_state { UNUSED, EMBRYO, SLEEPING, 
+				RUNNABLE, RUNNING, ZOMBIE }; 
+// 레지스터 문맥과 상태를 포함하여 각 프로세스에 대하여xv6가 추적하는 정보
+struct proc { 
+	char *mem; // 프로세스 메모리 시작 주소
+	uint sz; // 프로세스 메모리의 크기 
+	char *kstack; // 이 프로세스의 커널 스택의 바닥 주소
+	enum proc_state state; // 프로세스 상태
+	int pid; // 프로세스 ID 
+	struct proc *parent; // 부모 프로세스 
+	void *chan; // 0이 아니면, chan에서 수면 
+	int killed; // 0이 아니면 종료됨
+	struct file *ofile[NOFILE]; //열린파일 
+	struct inode *cwd; // 현재 디렉터리
+	struct context context; // 프로세스를 실행시키려면 여기로 교환 
+	struct trapframe *tf; // 현재 인터럽트에 해당하는 트랩 프레임
+};
+```
+레지스터 문맥(register context) 자료구조는 프로세스가 중단되었을 대 해당 프로세스의 레지서터값들을 저장한다. 이 레지스터 값들을 복원하여 운영체제는 프로세스 실행을 재개하고 이 것을 문맥 교환(context switch)라고 한다. 코드를 보면 실행, 즌비, 대기 외에 다른 초기(initial)상태를 가지는 시스템이 잇는 것을 볼 수 있다. 프로세스는 종료되었지만 메모리에 남아 있는 최종(final)상태를 좀비(zombie)라고 부른다. 
+
+# Process API
+
+UNIX 시스템의 프로세스 생성에 대해 실제적인 측면을 알아 볼 것이다. UNIX는 프로세스를 생성하기 위하여 fork()와 exec() 시스템 콜을 사용하고 wait()는 프로세스가 자신이 생성한 프로세스가 종료되기 기다리기 원할 때 사용된다. 
