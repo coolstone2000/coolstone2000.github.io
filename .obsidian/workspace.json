@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md",
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md",
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md",
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-10-05-Operating_system_virtualization_processes.md"
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md"
               }
             }
           }
@@ -148,13 +148,18 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "_posts/2024-10-05-Operating_system_virtualization_processes.md",
+    "images/OS/pro_pop.png",
+    "images/OS/pro_de.png",
+    "images/OS/pro_onepunch.png",
+    "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
+    "_posts/2024-10-09-Operating_sysetem_",
     "images/OS/pro_exec.png",
     "images/OS/pro_fork.png",
     "_posts/2024-07-26-ML_lect1.md",
     "images/ML/ML_pipe.png",
     "images/ML",
     "images/무제 폴더",
-    "_posts/2024-10-05-Operating_system_virtualization_processes.md",
     "images/OS/pro_in.png",
     "images/OS/pro_noin.png",
     "_posts/2024-07-27-ML_lect2.md",
@@ -162,7 +167,6 @@
     "README.md",
     "images/OS",
     "screenshot.png",
-    "screenshot-layouts.png",
     "_posts/2024-09-11-Operating_system_intro.md",
     "_posts/2024-10-05-Operating_system_virtualization.md",
     "_posts/2024-0726-ML_lect1.md",
@@ -174,10 +178,7 @@
     "_includes/mathjax-support.html",
     "markdown_lang/md.md",
     "_posts/2024-07-27-",
-    "images/기본형_심볼-01.jpg",
     "markdown_lang",
-    "기본형_심볼-01.jpg",
-    "images",
-    "무제 폴더"
+    "images"
   ]
 }
