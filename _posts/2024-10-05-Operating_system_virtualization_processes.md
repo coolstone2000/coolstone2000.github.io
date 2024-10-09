@@ -26,9 +26,13 @@ API가 제공하는 기본 기능은 다음과 같다.
 
 <center><img src="/images/OS/pro_crt.png" width="500" height="700"></center>
 프로그램 실행을 위해 운영체제가 가장 먼저 하는 일은 위의 그림처럼 프로그램 코드와 정적 데이터(static data)를 메모리(프로세스 주소)에다 **탑재(load)**하는 것이다. 초기 운영체제들은 프로그램을 실행하기 전코드와 데이터 모두를 메모리에 탑재 하였는데 이것은 성능을 낮추었다. 이제는 프로그램을 실행할 때 필요한 부분만 메모리에 탑재한다. 이것은 **페이징(paging)**과 **스와핑(swaping)**과 관련있다. 우선 여기서 이해해야 하는 것은 **프로그램의 중요 부분을 디스크에 메모리로 탑재해야 한다는 것**이다.<br>
+
 메모리로 탑재된 후 운영체제는 **프로그램의 실행시간 스택(run-time stack)을 할당**시켜야 한다. 메인(main)함수의 경우 argc(argument count , 데이터 개수)와 argv(argument variable, 저장주소)를 사용하여 스택을 초기화한다.<br>
+
 운영체제는 **프로그램의 힙(heap)을 위한 메모리 영역을 할당**한다. 힙(heap)은 동적으로 할당된 데이터를 저장하기 위해 사용된다. malloc()을 호출하여 필요한 공간을 요청하고 free()를 호출하여 사용했던 공간을 반환하여 다른 프로그램이 사용될 수 있도록 한다. 힙은 연결리스트, 해시 테이블, 트리 등 크기가 가변적인 자료 구조를 사용할 수 있게 하고 프로그램이 실행되면 malloc() 라이브러리 API가 메모리를 요청하고 운영체제는 이를 충족하도록 메모리를 할당한다.<br>
+
 운영체제는 입출력과 관계된 초기화 작업을 수행한다. 기본적으로 표준 입력(STDIN), 표준 출력(STDOUT), 표준 에러(STDERR) 장치에 해당하는 세 개의 파일 디스크립터(file descriptor, 리눅스 혹은 유닉스 계열의 시스템에서 프로세스(process)가 파일(file)을 다룰 때 사용하는 개념으로, 프로세스에서 특정 파일에 접근할 때 사용하는 추상적인 값)를 갖는다.<br>
+
 운영체제가 코드와 정적 데이터를 메모리에 탑재하고, 스택과 힙을 생성하고 초기화하고, 입츨력 셋업과 관계된 다른 작업을 마치게 되면 프로그램 실행을 위한 준비를 마치게 된다. 이 이후 CPU에 새로 생성된 프로세스를 넘기고 프로그램이 실행되는 것이다.<br>
 
 # Process Status
@@ -68,7 +72,7 @@ enum proc_state { UNUSED, EMBRYO, SLEEPING,
 // 레지스터 문맥과 상태를 포함하여 각 프로세스에 대하여xv6가 추적하는 정보
 struct proc { 
 	char *mem; // 프로세스 메모리 시작 주소
-	uint sz; // 프로세스 메모리의 크기 
+	uint sz; // 프로세스 메모리의 크기 
 	char *kstack; // 이 프로세스의 커널 스택의 바닥 주소
 	enum proc_state state; // 프로세스 상태
 	int pid; // 프로세스 ID 
@@ -86,3 +90,169 @@ struct proc {
 # Process API
 
 UNIX 시스템의 프로세스 생성에 대해 실제적인 측면을 알아 볼 것이다. UNIX는 프로세스를 생성하기 위하여 fork()와 exec() 시스템 콜을 사용하고 wait()는 프로세스가 자신이 생성한 프로세스가 종료되기 기다리기 원할 때 사용된다. 
+
+## fork() 시스템 콜
+
+```cpp
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+
+int main(int argc,char * argv[]){
+	printf("hello world (pid:%d)\n",(int)getpid());
+    int rc = fork();
+    if(rc < 0){
+    	fprintf(stderr,"fork failed\n");
+        exit(0);
+    }
+    else if(rc == 0){
+    	printf("hello, i am child (pid) : %d\n",(int)getpid());
+    }
+    else{
+    	printf("hello, i am parent of %d (pid:%d)",rc,(int)getpid());
+    }
+   
+}
+```
+이 코드를 실행시키면 다음과 같은 결과를 얻게 된다.
+```
+prompt> ./p1
+hello world (pid:29146)
+hello, I am parent of 29147 (pid:29146)
+hello, I am child (pid:29147)
+prompt>
+```
+우선 프로그램이 시작되면 hello world를 출력하고 뒤에 PID가 같이 써지게 된다. 그리고 fork()함수가 실행되면 프로세스가 복제가 된다. Unix 환경에서 **fork() 함수는 함수를 호출한 프로세스를 복사하는 기능**을 한다. 이때 부모 프로세스와 자식 프로세스가 나뉘어 실행되는데, 원래 진행되던 프로세스는 부모 프로세스(parent), 복사된 프로세스를 자식 프로세스(child) 라고 한다. fork() 함수는 프로세스 id, 즉 pid 를 반환하게 되는데 이때 **부모 프로세스에서는 자식 pid가 반환**되고 **자식 프로세스에서는 0이 반환**된다. 만약 fork() 함수 실행이 **실패하면 -1을 반환**한다. 
+<center><img src="/images/OS/pro_fork.png"></center>
+위의 그림처럼 복제되어 프로세스가 동시에 실행된다. 그렇기 때문에 위의 결과말고도 아래의 결과처럼도 나올 수 있다.
+```
+prompt> ./p1
+hello world (pid:29146)
+hello, I am child (pid:29147)
+hello, I am parent of 29147 (pid:29146)
+prompt>
+```
+그래서 CPU 스케줄러(scheduler)는 실행할 프로세스의 순서를 선택한다. 이는 나중에 배우게 된다.
+
+## wait() 시스템 콜
+
+부모 프로세스가 자식 프로세스의 종료를 대기해야할 경우 wait() 시스템 콜을 사용하게 된다.
+```cpp
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+
+int main(int argc,char * argv[]){
+	printf("hello world (pid:%d)\n",(int)getpid());
+    int rc = fork();
+    if(rc < 0){
+    	fprintf(stderr,"fork failed\n");
+        exit(0);
+    }
+    else if(rc == 0){
+    	printf("hell, i am child (pid:%d)\n",(int)getpid());
+    }
+    else{
+		int wc = wait(NULL);
+        printf("hello, iam parent of %d (wc:%d) (pid:%d)\n",rc,wc,(int)getpid());
+    }
+}
+```
+이 출력의 결과는 다음과 같다.
+```
+prompt> ./p2
+hello world (pid:29266)
+hello, I am child (pid:29267)
+hello, I am parent of 29267 (pid:29266)
+prompt>
+```
+만약 parent가 먼저 선택됐으면 wait()에 의해 잠시 멈추고 child부터 실행을 시킨 후 다시 돌아와서 parent를 실행하게 된다. 즉, 항상 동일한 결과를 출력할 수 있게 만들 수 있다.
+
+## exec() 시스템 콜
+
+fork()는 자신의 복사본을 생성하여 실행하지만 자신의 복사본이 아닌 다른 프로그램을 실행해야 할 때는 exec()를 사용하게 된다. 즉, fork()는 복사하기이고 exec()는 덮어쓰기이다. 
+```cpp
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<sys/wait.h>
+
+int main(int argc,char * argv[]){
+	printf("hello world (pid:%d)\n",(int)getpid());
+    int rc = fork();
+    if(rc < 0){
+    	fprintf(stderr,"fork failed\n");
+        exit(0);
+    }
+    else if(rc == 0){
+    	printf("hello, i am child (pid:%d)\n",(int)getpid());
+    	char *myargs[3];
+        myargs[0] = strdup("wc");
+        myargs[1] = strdup("p3.c");
+        myargs[2] = NULL;
+        execvp(myargs[0],myargs);
+        printf("this should`t print out");
+    }
+    else{
+    	int wc = wait(NULL);
+        printf("hello, i am parent of %d (wc:%d) (pid:%d)\n",rc,wc,(int)getpid());
+    }
+}
+```
+이 코드의 실행 결과는 다음과 같다.
+```
+prompt> ./p3
+hello world (pid:29383)
+hello, I am child (pid:29384)
+      29    107     1030      p3.c
+hello, I am parent of 29384 (pid:29383)
+prompt>
+```
+* strdup함수는 인자를 복사하고 인자를 가리키는 포인터를 반환한다.
+* wc는 문자열의 개수를 세는 명령어, wc p3.c
+<center><img src="/images/OS/pro_exec.png"></center>
+
+## 이런 API가 필요한 이유
+
+쉘은 프롬프트를 표시하고 사용자가 무언가 입력하기를 기다리고 거기에 명령어를 입력하게 된다. 이는 fork()와 exec()를 구분하여 유용한 일을 할 수 있게 된다. 쉘은 명령어를 실행하기 위해 fork를 호출하여 새로운 자식 프로세스를 만든다. 그런 후 exec()를 호출하여 프로그램을 실행시킨 후 wait()로 부터 리턴하고 다시 프롬프트를 출력하고 다음 명령어를 기다린다.
+```cpp
+#include<stdio.h>
+#include<stdlib.h>
+#include<unistd.h>
+#include<string.h>
+#include<fcntl.h>
+#include<sys/wait.h>
+
+int main(int argc,char * argv[]){
+    int rc = fork();
+    if(rc < 0){
+    	fprintf(stderr,"fork failed\n");
+        exit(0);
+    }
+    else if(rc == 0){
+        close(STDOUT_FILENO);	//표준출력 파일 디스크립터 닫기
+        open("./p4.output",O_CREAT|O_WRONLY|O_TRUNC,S_IRWXU);	//p4.output 파일 열기
+
+        char *myargs[3];
+        myargs[0] = strdup("wc");
+        myargs[1] = strdup("p4.c");
+        myargs[2] = NULL;
+        execvp(myargs[0],myargs);
+    }
+    else{
+    	int wc = wait(NULL);
+    }
+}
+```
+이 코드를 실행시키면 다음과 같다.
+```
+prompt> ./p4
+prompt> cat p4.ouput
+      32     109    846   p4.c
+prompt>
+```
+p4를 실행하면, 화면에 아무 일도 일어나지 않는다. 그러나 실제로는 p4는 fork를 호출하여 새로운 자식 프로세스를 생성하고 execvp()를 호출하여 wc프로그램을 실행시킨다. 출력이 p4.output으로 재지정되었기 때문에 화면에는 아무것도 나오지 않는다. 이런 방식은 새 파일에 쓰기를 하는것과 같은 결과를 가진다. 아래의 wc 프로그램의 출력이 newfile.txt로 방향이 재지정되는 것과 같다.
+```
+prompt> wc p3.c > newfile.txt
+```
