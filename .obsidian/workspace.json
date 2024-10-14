@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
+                "file": "_posts/2024-07-27-ML_lect2.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
+                "file": "_posts/2024-07-27-ML_lect2.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
+                "file": "_posts/2024-07-27-ML_lect2.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md"
+                "file": "_posts/2024-07-27-ML_lect2.md"
               }
             }
           }
@@ -148,8 +148,13 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
-    "_posts/2024-10-05-Operating_system_virtualization_processes.md",
+    "images/ML/ML_variance_biased2.png",
+    "images/ML/ML_variance_biased1.png",
+    "images/ML/ML_mean_unbiased.png",
+    "images/ML/ML_variance_MLE.png",
+    "images/ML/ML_mean_MLE.png",
     "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
+    "_posts/2024-10-05-Operating_system_virtualization_processes.md",
     "images/ML/ml_cat.png",
     "_posts/image.png",
     "images/OS/pro_lde.png",
@@ -157,13 +162,9 @@
     "images/OS/pro_de.png",
     "images/OS/pro_onepunch.png",
     "_posts/2024-10-09-Operating_sysetem_",
-    "images/OS/pro_exec.png",
-    "images/OS/pro_fork.png",
     "_posts/2024-07-26-ML_lect1.md",
-    "images/ML/ML_pipe.png",
     "images/ML",
     "images/무제 폴더",
-    "images/OS/pro_in.png",
     "_posts/2024-07-27-ML_lect2.md",
     "README.md",
     "images/OS",
