@@ -146,8 +146,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "fea4a49a98bf1788",
+  "active": "0cf32b41cd913593",
   "lastOpenFiles": [
+    "_posts/2024-07-30-ML_lect3.md",
+    "_posts/2024-07-27-ML_lect2.md",
     "images/ML/ML_variance_biased2.png",
     "images/ML/ML_variance_biased1.png",
     "images/ML/ML_mean_unbiased.png",
@@ -160,12 +162,10 @@
     "images/OS/pro_lde.png",
     "images/OS/pro_pop.png",
     "images/OS/pro_de.png",
-    "images/OS/pro_onepunch.png",
     "_posts/2024-10-09-Operating_sysetem_",
     "_posts/2024-07-26-ML_lect1.md",
     "images/ML",
     "images/무제 폴더",
-    "_posts/2024-07-27-ML_lect2.md",
     "README.md",
     "images/OS",
     "_posts/2024-09-11-Operating_system_intro.md",
@@ -174,7 +174,6 @@
     "_posts/2024-09-11-Operating_system_intro",
     "_posts/2024-02-20-CV.md",
     "_posts/2024-07-27-ML.md",
-    "_posts/2024-07-30-ML_lect3.md",
     "_posts/2024-07-30-ML_lect3",
     "_includes/mathjax-support.html",
     "markdown_lang/md.md",
