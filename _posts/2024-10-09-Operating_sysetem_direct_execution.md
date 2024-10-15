@@ -53,5 +53,41 @@ LED 프로토콜은 두 단계로 진행된다. **부팅**과 **실행**이다. 
 ### 문맥의 저장과 복원
 둘 중 어느 방식이던간에 운영체제가 제어권을 다시 획득하면 중요한 결정을 내려야 한다. **현재 실행중인 프로세스를 계속 실행할 것인가?와 다른 프로세스로 전환할 것인가?**이다. 이 결정을 **스케줄러(scheduler)**를 통해 하게된다.<br>
 만약 다른 프로세스로 전환하기로 결정되면 운영체제는 **문맥 교환(context switch)**를 하게된다. 문맥 교환이란 운영체제가 해야하는 작업은 현재 실행 중인 프로세스의 레지스터 값을 커널 스택 같은 곳에 저장하고 곧 실행될 프로세스의 커널 스택으로부터 레지스터 값을 복원하는 것이 전부이다.<br>
-<center><img src="/images/OS/pro_ctxt_sw.gif" width = "700"></center><br>
-손을 커널 스택이라 생각하면 되고 닭다리가 프로세스라고 생각하면 안먹으면 손에 저장하고 먹으면 실행한다고 생각하면 된다.
+<center><img src="/images/OS/pro_ctxt_sw.gif" width = "500"></center><br>
+손을 커널 스택이라 생각하면 되고 닭다리가 프로세스라고 생각하면 안먹으면 손에 저장하고 먹으면 실행한다고 생각하면 된다. 이렇게 레지스터 값을 저장해 두어 다른 프로세스로 리턴하여 실행을 다시 할 수 있게 된다.<br>
+<center><img src="/images/OS/pro_timer_interrupt.png" width = "700"></center><br>
+이 예시에서 보면 프로세스 A가 실행중이다가 타이머 인터럽트에 의해 중단된다. 하드웨어는 A의 레지스터를 커널 스택에 저장하고 커널 모드에 진입한다. 그리고 A의 레지스터를 A의 proc 구조에 저장하고 proc 구조에 저장되어 있던 B의 레지스터를 복원한 후 B의 커널 스택을 B의 레지스터로 저장하게 된다. 그리고 프로세스 B로 바뀌게 된다. 만약 나중에 시간이 지나면 또 타이머 인터럽트에 걸려 이 과정을 반복할 것이다.<br>
+이 코드는 xv6의 문맥 교환 코드이다.<br>
+```c
+#void swtch(struct context **old, struct context *new);
+#
+#Save current register context in old
+#and then load register context from new.
+.globl swtch
+swtch:
+#Save old registers
+movl 4(%esp), %eax # put old ptr into eax
+popl 0(%eax) # save the old IP
+movl %esp, 4(%eax) # and stack
+movl %ebx, 8(%eax) # and other registers
+movl %ecx, 12(%eax)
+movl %edx, 16(%eax)
+movl %esi, 20(%eax)
+movl %edi, 24(%eax)
+movl %ebp, 28(%eax)
+
+#Load new registers
+movl 4(%esp), %eax # put new ptr into eax
+movl 28(%eax), %ebp # restore other registers
+movl 24(%eax), %edi
+movl 20(%eax), %esi
+movl 16(%eax), %edx
+movl 12(%eax), %ecx
+movl 8(%eax), %ebx
+movl 4(%eax), %esp # stack is switched here
+pushl 0(%eax) # return addr put in place
+ret # finally return into new ctxt
+```
+
+# 병행성이 걱정
+만약 시스템 콜을 처리하는 도중에 타이머 인터럽트가 발생하면 어떻게 될까? 나중에 병행성에 대해 배울 때 알려주겠지만 일단 이것을 해결하는 간단한 해법은 인터럽트를 처리하는 동안 **인터럽트를 불능화**시키는 것이다. 그리고 내부 자료 구조에 동시에 접근하는 것을 방지하는 락(lock) 기법이란 것이 있다. 이런 것이 버그를 만들기도 한다.
