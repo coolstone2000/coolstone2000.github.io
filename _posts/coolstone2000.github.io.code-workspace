@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../../.."
+		}
+	],
+	"settings": {
+		"files.associations": {
+			"new": "cpp",
+			"iostream": "cpp",
+			"ostream": "cpp"
+		}
+	}
+}
