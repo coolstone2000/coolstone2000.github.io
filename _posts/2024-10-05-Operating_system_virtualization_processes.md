@@ -24,7 +24,7 @@ API가 제공하는 기본 기능은 다음과 같다.
 
 ## Process Create
 
-<center><img src="/images/OS/pro_crt.png" width="500" height="700"></center>
+<center><img src="/images/OS/pro_crt.png" width="500" height="700"></center><br>
 프로그램 실행을 위해 운영체제가 가장 먼저 하는 일은 위의 그림처럼 프로그램 코드와 정적 데이터(static data)를 메모리(프로세스 주소)에다 **탑재(load)**하는 것이다. 초기 운영체제들은 프로그램을 실행하기 전코드와 데이터 모두를 메모리에 탑재 하였는데 이것은 성능을 낮추었다. 이제는 프로그램을 실행할 때 필요한 부분만 메모리에 탑재한다. 이것은 **페이징(paging)**과 **스와핑(swaping)**과 관련있다. 우선 여기서 이해해야 하는 것은 **프로그램의 중요 부분을 디스크에 메모리로 탑재해야 한다는 것**이다.<br>
 
 메모리로 탑재된 후 운영체제는 **프로그램의 실행시간 스택(run-time stack)을 할당**시켜야 한다. 메인(main)함수의 경우 argc(argument count , 데이터 개수)와 argv(argument variable, 저장주소)를 사용하여 스택을 초기화한다.<br>
@@ -43,10 +43,10 @@ API가 제공하는 기본 기능은 다음과 같다.
 * 대기(Blocked): 다른 프로세스를 기다리는 동안 수행을 중단시키는 연산
 
 입출력이 없을때 프로세스는 다음과 같다.<br>
-<center><img src="/images/OS/pro_noin.png"></center>
+<center><img src="/images/OS/pro_noin.png"></center><br>
 
 그에 반해 입출력이 있을 때 프로세스는 다음과 같다.<br>
-<center><img src="/images/OS/pro_in.png"></center>
+<center><img src="/images/OS/pro_in.png"></center><br>
 
 
 이러한 결정은 스케줄러를 통해 운영체제가 결정을 내린다.
@@ -55,7 +55,7 @@ API가 제공하는 기본 기능은 다음과 같다.
 
 운영체제도 일종의 프로그램이기 때문에 다양한 정보를 유지하기 위한 자료 구조를 가지고 있다. 아래는 xv6 Proc구조를 간단하게 나타낸 것이다.
 ```
-// 프로세스를 중단하고 이후에 재개하기 위해 xv6가 저장하고 복원하는 레지스터
+// 프로세스를 중단하고 이후에 재개하기 위해 xv6가 저장하고 복원하는 레지스터
 struct context { 
 	int eip; 
 	int esp; 
@@ -123,7 +123,7 @@ hello, I am child (pid:29147)
 prompt>
 ```
 우선 프로그램이 시작되면 hello world를 출력하고 뒤에 PID가 같이 써지게 된다. 그리고 fork()함수가 실행되면 프로세스가 복제가 된다. Unix 환경에서 **fork() 함수는 함수를 호출한 프로세스를 복사하는 기능**을 한다. 이때 부모 프로세스와 자식 프로세스가 나뉘어 실행되는데, 원래 진행되던 프로세스는 부모 프로세스(parent), 복사된 프로세스를 자식 프로세스(child) 라고 한다. fork() 함수는 프로세스 id, 즉 pid 를 반환하게 되는데 이때 **부모 프로세스에서는 자식 pid가 반환**되고 **자식 프로세스에서는 0이 반환**된다. 만약 fork() 함수 실행이 **실패하면 -1을 반환**한다. 
-<center><img src="/images/OS/pro_fork.png"></center>
+<center><img src="/images/OS/pro_fork.png"></center><br>
 위의 그림처럼 복제되어 프로세스가 동시에 실행된다. 그렇기 때문에 위의 결과말고도 아래의 결과처럼도 나올 수 있다.
 ```
 prompt> ./p1
@@ -211,7 +211,7 @@ prompt>
 ```
 * strdup함수는 인자를 복사하고 인자를 가리키는 포인터를 반환한다.
 * wc는 문자열의 개수를 세는 명령어, wc p3.c
-<center><img src="/images/OS/pro_exec.png"></center>
+<center><img src="/images/OS/pro_exec.png"></center><br>
 
 ## 이런 API가 필요한 이유
 

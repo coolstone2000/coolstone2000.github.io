@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-07-30-ML_lect3.md",
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-07-30-ML_lect3.md",
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-07-30-ML_lect3.md",
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-07-30-ML_lect3.md"
+                "file": "_posts/2024-10-09-Operating_sysetem_direct_execution.md"
               }
             }
           }
@@ -148,11 +148,11 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "_posts/2024-07-30-ML_lect3.md",
     "_posts/2024-07-27-ML_lect2.md",
     "images/ML/ML_flowchart.png",
     "images/ML/ML_lr_r_modle_ex.png",
     "images/ML/ML_lr_hs_r.png",
-    "_posts/2024-07-30-ML_lect3.md",
     "images/ML/ML_variance_biased2.png",
     "images/ML/ML_variance_biased1.png",
     "images/ML/ML_mean_unbiased.png",
