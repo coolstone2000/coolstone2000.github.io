@@ -148,6 +148,7 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "images/OS/MFLQ_lottery.png",
     "images/OS/MLFQ_diff_ts.png",
     "images/OS/MLFQ_rule4.png",
     "images/OS/MLFQ_boost.png",
@@ -160,7 +161,6 @@
     "_posts/2024-10-16-Operating_system_MLFQ.md",
     "images/OS/sch_io2.png",
     "images/OS/sch_io1.png",
-    "images/OS/sloth.gif",
     "_posts/2024-07-30-ML_lect3.md",
     "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
     "_posts/coolstone2000.github.io.code-workspace",

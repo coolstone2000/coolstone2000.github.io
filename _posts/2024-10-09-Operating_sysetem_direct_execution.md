@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "Operating sysetem - Virtualization_processes"
+title: "Operating sysetem - Direct execution"
 categories: Operating_system
 tags: OS
 toc: true
