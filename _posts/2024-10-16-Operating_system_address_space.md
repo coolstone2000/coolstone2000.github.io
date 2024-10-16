@@ -35,6 +35,9 @@ author_profile: false
 <center><img src="/images/OS/add_mem_structure.png" width = "500"></center><br>
 <center><img src="/images/OS/add_mem_space.png" width = "500"></center><br>
 Text와 Data는 크기가 변하지 않는다. 이것은 아래의 그림에서 프로그램 코드와 같다. 그래서 주소 0부터 시작하여 들어가게 되고 정적이고 추가 메모리를 필요로 하지 않는다. 그런데 Stack과 Heap은 크기가 변할 수 있다. 그래서 주소 공간의 양 끝단에 배치하여 두 영역 모두 확장하는 것이 가능하도록 한다(나중에 쓰레드 개념이 나오면 또 이렇게 생기진 않았다.). 이 주소 공간은 운영체제가 실행 중인 프로그램에게 제공하는 **개념(abstraction)**이다. 즉, 실제 물리 주소에 존재하는 것은 아니다.
+|<img src="/images/OS/heap_ex.gif" width = "500">|<img src="/images/OS/warz.gif" width = "500">|
+|---|---|
+
 
 # 목표
 

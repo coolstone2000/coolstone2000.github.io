@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_MLFQ.md",
+                "file": "_posts/2024-10-16-Operating_system_address_space.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_MLFQ.md",
+                "file": "_posts/2024-10-16-Operating_system_address_space.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_MLFQ.md",
+                "file": "_posts/2024-10-16-Operating_system_address_space.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_MLFQ.md"
+                "file": "_posts/2024-10-16-Operating_system_address_space.md"
               }
             }
           }
@@ -148,6 +148,9 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "_posts/2024-10-16-Operating_system_MLFQ.md",
+    "images/OS/warz.gif",
+    "images/OS/heap_ex.gif",
     "images/OS/add_mem_space.png",
     "images/OS/add_mem_structure.png",
     "images/OS/add_mem1.png",
@@ -157,11 +160,7 @@
     "images/OS/MLFQ_u.png",
     "images/OS/MLFQ_lottery_curr.png",
     "images/OS/MLFQ_lottery.png",
-    "images/OS/MFLQ_lottery.png",
-    "images/OS/MLFQ_diff_ts.png",
-    "images/OS/MLFQ_rule4.png",
     "_posts/2024-10-15-Operating_system_CPU_scheduling.md",
-    "_posts/2024-10-16-Operating_system_MLFQ.md",
     "_posts/2024-07-30-ML_lect3.md",
     "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
     "_posts/coolstone2000.github.io.code-workspace",
