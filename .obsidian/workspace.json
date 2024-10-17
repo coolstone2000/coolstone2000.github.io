@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_address_space.md",
+                "file": "_posts/2024-07-30-ML_lect3.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_address_space.md",
+                "file": "_posts/2024-07-30-ML_lect3.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_address_space.md",
+                "file": "_posts/2024-07-30-ML_lect3.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "_posts/2024-10-16-Operating_system_address_space.md"
+                "file": "_posts/2024-07-30-ML_lect3.md"
               }
             }
           }
@@ -148,40 +148,47 @@
   },
   "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
-    "_posts/2024-10-16-Operating_system_MLFQ.md",
-    "images/OS/warz.gif",
-    "images/OS/heap_ex.gif",
-    "images/OS/add_mem_space.png",
-    "images/OS/add_mem_structure.png",
-    "images/OS/add_mem1.png",
-    "images/OS/add_past_mem.png",
+    "_site/operating_system/Operating_system_virtualization_processes/index.html",
+    "_site/operating_system/Operating_system_intro/index.html",
+    "_site/operating_system/Operating_system_address_space/index.html",
+    "_site/operating_system/Operating_system_MLFQ/index.html",
+    "_site/operating_system/Operating_system_CPU_scheduling/index.html",
+    "_site/operating_system/Operating_sysetem_direct_execution/index.html",
+    "_site/operating_system/Operating_system_virtualization_processes",
+    "_site/operating_system/Operating_system_intro",
+    "_site/operating_system/Operating_system_address_space",
+    "_site/operating_system/Operating_system_MLFQ",
+    "_site/operating_system/Operating_system_CPU_scheduling",
+    "_site/images/OS/warz.gif",
+    "_site/images/OS/sloth.gif",
+    "_site/images/OS/sch_stcf.png",
+    "_site/images/OS/sch_sjf_rt.png",
+    "_site/images/OS/sch_sjf2.png",
+    "_site/images/OS/sch_sjf1.png",
+    "_site/images/OS/sch_rr.png",
+    "_site/images/OS/sch_io2.png",
+    "_site/images/OS/sch_io1.png",
+    "_site/images/OS/sch_fifo2.png",
+    "test/_posts/2010-09-09-post-gallery.md",
+    "docs/_posts/2012-01-03-layout-table-of-contents-include-post.md",
+    "test/_posts/2012-01-03-layout-table-of-contents-include-post.md",
+    "docs/_posts/2017-01-23-layout-header-video.md",
+    "test/_posts/2017-01-23-layout-header-video.md",
+    "docs/_posts/2010-09-09-post-gallery.md",
     "_posts/2024-10-16-Operating_system_address_space.md",
-    "images/OS/MLFQ_stride.png",
-    "images/OS/MLFQ_u.png",
-    "images/OS/MLFQ_lottery_curr.png",
-    "images/OS/MLFQ_lottery.png",
+    "_posts/2024-10-16-Operating_system_MLFQ.md",
     "_posts/2024-10-15-Operating_system_CPU_scheduling.md",
     "_posts/2024-07-30-ML_lect3.md",
     "_posts/2024-10-09-Operating_sysetem_direct_execution.md",
-    "_posts/coolstone2000.github.io.code-workspace",
     "_posts/2024-07-27-ML_lect2.md",
     "_posts/2024-10-05-Operating_system_virtualization_processes.md",
-    "_posts/2024-10-09-Operating_sysetem_",
     "_posts/2024-07-26-ML_lect1.md",
-    "images/ML",
-    "images/무제 폴더",
     "README.md",
-    "images/OS",
     "_posts/2024-09-11-Operating_system_intro.md",
     "_posts/2024-10-05-Operating_system_virtualization.md",
     "_posts/2024-0726-ML_lect1.md",
-    "_posts/2024-09-11-Operating_system_intro",
     "_posts/2024-02-20-CV.md",
     "_posts/2024-07-27-ML.md",
-    "_posts/2024-07-30-ML_lect3",
-    "_includes/mathjax-support.html",
-    "markdown_lang/md.md",
-    "_posts/2024-07-27-",
-    "markdown_lang"
+    "markdown_lang/md.md"
   ]
 }
