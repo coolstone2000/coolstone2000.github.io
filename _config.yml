@@ -11,9 +11,12 @@
 # https://mmistakes.github.io/minimal-mistakes/docs/quick-start-guide/#installing-the-theme
 
 # theme                  : "minimal-mistakes-jekyll"
-# remote_theme           : "mmistakes/minimal-mistakes"
+remote_theme             : "mmistakes/minimal-mistakes"
 minimal_mistakes_skin    : "air" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
-
+dark_theme_toggle        : true
+after_footer_scripts:
+  - /assets/js/custom/dark-theme.js
+  
 # Site Settings
 locale                   : "en-US"
 title                    : "쿨스톤의 잡다한것"
@@ -115,7 +118,7 @@ author:
       url: "mailto:chanega@naver.com"
     - label: "CV"
       icon: "fas fa-fw fa-link"
-      url: "https://coolstone2000.github.io/cv/CV/"
+      url: "https://coolstone2000.github.io/curriculum_vitae/CV/"
     - label: "GitHub"
       icon: "fab fa-fw fa-github"
       url: "https://github.com/coolstone2000"
@@ -281,4 +284,5 @@ defaults:
       use_math: true
 
 date_format: "%Y-%m-%d"
+
 

@@ -69,7 +69,11 @@ __double underscores__
 <--! --> 혹은 [//]: # 를 치면 주석이 달린다
 
 # local server 열기
-bundle install
-bundle exec jekyll serve --trace
+1. control + `
+2. cd coolstone2000.github.io
+3. bundle install
+4. bundle exec jekyll serve --trace
+
 순서대로 입력
+
 Server address: http://127.0.0.1:4000
