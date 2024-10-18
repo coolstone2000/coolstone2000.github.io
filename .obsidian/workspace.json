@@ -11,10 +11,14 @@
             "id": "fea4a49a98bf1788",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "_pages/category-archive.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "category-archive"
             }
           }
         ]
@@ -158,8 +162,27 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "fea4a49a98bf1788",
+  "active": "0cf32b41cd913593",
   "lastOpenFiles": [
+    "_site/images/profile_image1.jpeg",
+    "images/profile_image1.jpeg",
+    "_site/images/profile_image1.jpg.jpeg",
+    "images/profile_image1.jpg.jpeg",
+    "_site/machine_learning/ML_lect4/index.html",
+    "_site/machine_learning/ML_lect4",
+    "_site/ML_lect4/index.html",
+    "_site/ML_lect4",
+    "_site/page3/index.html",
+    "_site/page3",
+    "_posts/2024-10-18-ML_lect4.md",
+    "_site/machine_learning/ML_lect3/index.html",
+    "_site/machine_learning/ML_lect3",
+    "_posts/2024-07-30-ML_lect3.md",
+    "_posts/2024-10-18-ML_lect4_linear_regression_part2",
+    "_pages/tag-archive.md",
+    "_pages/404.md",
+    "_pages/category-archive.md",
+    "_posts/2024-07-30-ML_lect3_part1.md",
     "_site/images/ML/ML_lr_loglike.png",
     "images/ML/ML_lr_loglike.png",
     "_site/images/ML/ML_lr_in_gaussian.png",
@@ -167,22 +190,7 @@
     "_site/images/ML/ML_lr_norm.png",
     "images/ML/ML_lr_norm.png",
     "_site/images/ML/ML_lr_grd_thre.png",
-    "images/ML/ML_lr_grd_thre.png",
-    "_site/images/ML/ML_lr_grd_dct.png",
-    "images/ML/ML_lr_grd_dct.png",
-    "_site/images/ML/ML_lr_grd0.png",
     "_site/machine_learning/ML_lect3_part1/index.html",
-    "_site/machine_learning/ML_lect3_part1",
-    "_posts/2024-07-30-ML_lect3.md",
-    "_posts/2024-07-30-ML_lect3_part1.md",
-    "_site/assets/js/custom/dark-theme.js",
-    "_site/assets/js/custom",
-    "_site/assets/css/main_dark.css.map",
-    "_site/assets/css/main_dark.css",
-    "assets/js/custom/dark-theme.js",
-    "assets/js/custom",
-    "_site/assets/css/main_dark.scss",
-    "assets/css/main_dark.scss",
     "test/_posts/2010-09-09-post-gallery.md",
     "docs/_posts/2012-01-03-layout-table-of-contents-include-post.md",
     "test/_posts/2012-01-03-layout-table-of-contents-include-post.md",
@@ -201,7 +209,6 @@
     "_posts/2024-10-05-Operating_system_virtualization.md",
     "_posts/2024-0726-ML_lect1.md",
     "_posts/2024-02-20-CV.md",
-    "_posts/2024-07-27-ML.md",
-    "markdown_lang/md.md"
+    "_posts/2024-07-27-ML.md"
   ]
 }
