@@ -3,7 +3,7 @@ layout: single
 title: "제목"
 categories: 카테고리
 tags: 태그
-toc: true
+toc: false
 author_profile: false
 sidebar:
     nav: "docs"
@@ -77,3 +77,10 @@ __double underscores__
 순서대로 입력
 
 Server address: http://127.0.0.1:4000
+
+Command	Shortcut	Functionality
+Jekyll Run	(ctrl+F5)	Builds Project, Starts Jekyll Server & Opens the local hosted site in Browser
+Jekyll Stop	(ctrl+F6)	Stops Jekyll Server
+Jekyll Restart	(ctrl+F7)	Restarts Jekyll Server
+Jekyll Build	(ctrl+F8)	Builds Project
+Jekyll Open in Browser	(ctrl+F9)	Opens the local hosted site in Browser while Jekyll Server is running
