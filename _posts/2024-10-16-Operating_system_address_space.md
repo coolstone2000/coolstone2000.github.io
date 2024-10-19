@@ -9,7 +9,7 @@ author_profile: false
 
 가상 메모리를 이해하기 위해서는 사용자 프로그램이 생성하는 모든 주소는 가상주소라는 것부터 시작해야한다. 프로세스가 자신만의 커다란 전용 메모리를 가진다는 환상을 제공하는 것이다. 운영체제는 각 프로세스에게 코드와 데이터를 저장할 수 있는 대용량의 연속된 **주소 공간(address space)**를 가지고 있다는 시각을 제공한다. 또 가상화를 통해 **고립(isolation)**과 **보호(protection)**을 할 수 있게 된다. 
 
-# Adrress space
+# ◼︎ Adrress space
 
 
 ## 초기 시스템
@@ -28,15 +28,15 @@ author_profile: false
 <center><img src="/images/OS/add_mem1.png" width = "500"></center><br>
 그림을 보면 세 개의 프로세스(A, B, C)는 512KB 물리 메모리에서 각기 작은 부분을 할당받았다. 하나의 CPU가 있을 때 운영체제는 실행할 한개의 프로세스(A)를 선택하고 다른 프로세스(B, C)는 준비 큐에서 대기하게 된다. 이렇게 시분할 시스템이 대중화되면서 운영체제는 여러 프로그램이 메모리에 동시에 존재하기 위해 **보호(protection)**이 중요하게 됐다. 우리는 한 프로세스가 다른 프로세스의 메모리를 읽거나 쓰는 상황을 원치 않는다는 것이다.<br>
 
-# 주소 공간
+# ◼︎ 주소 공간
 
 운영체제는 **사용하기 쉬운(easy to use)** 메모리 개념을 만들어야한다. 이 개념이 바로 **주소 공간(address space)**이다. 운영 체제의 메모리 개념을 이해하는 것은 메모리를 어떻게 가상화 할지 이해하는게 중요하다.<br>
 주소 공간에는 해당 프로세스의 코드가 포함되어야 한다. 그리고 전역 변수를 저장하는 공간(DATA), 지역 변수를 저장하는 공간(stack), 동적 할당받은 데이터를(Heap)을 저장하는 공간이 있다.<br>
 <center><img src="/images/OS/add_mem_structure.png" width = "500"></center><br>
 <center><img src="/images/OS/add_mem_space.png" width = "500"></center><br>
 Text와 Data는 크기가 변하지 않는다. 이것은 아래의 그림에서 프로그램 코드와 같다. 그래서 주소 0부터 시작하여 들어가게 되고 정적이고 추가 메모리를 필요로 하지 않는다. 그런데 Stack과 Heap은 크기가 변할 수 있다. 그래서 주소 공간의 양 끝단에 배치하여 두 영역 모두 확장하는 것이 가능하도록 한다(나중에 쓰레드 개념이 나오면 또 이렇게 생기진 않았다.). 이 주소 공간은 운영체제가 실행 중인 프로그램에게 제공하는 **개념(abstraction)**이다. 즉, 실제 물리 주소에 존재하는 것은 아니다.<br>
-<center><img src="/images/OS/warz.gif" width = "500"><<img src="/images/OS/heap_ex.gif" width = "250"></center><br>
-왼쪽은 stack 오른쪽은 heap이다. 그런데 단순히 올라가고 내려온다로 생각하면 안되고 주소를 봐야한다. 주소가 작은곳에서 큰곳으로 가면 stack이고 그 반대면 heap이라고 하는게 정확하다.
+<center><img src="/images/OS/warz.gif" width = "500"><img src="/images/OS/heap_ex.gif" width = "250"></center><br>
+왼쪽은 heap 오른쪽은 stack이다. 그런데 단순히 올라가고 내려온다로 생각하면 안되고 주소를 봐야한다. 주소가 작은곳에서 큰곳으로 가면 heap이고 그 반대면 stack이라고 하는게 정확하다.
 
 
 
@@ -113,5 +113,19 @@ free(x);
 ```
 이렇게 써주면 해제가 된다.<br>
 
-# ◼︎ 흔한 오류
+# ◼︎ Example
 
+## Allocating and freeing
+
+<center><img src="/images/OS/add_all_free.png"></center><br>
+왼쪽은 allocating 하는 것인데 int형 size 4로 4번 할당하라는 뜻이고 오른쪽 ```free()```는 그것을 다 다시 free로 만들어버리는 것이다.
+
+## len()과 string
+
+<center><img src="/images/OS/add_all_st.png"></center><br>
+맨 처음의 dst처럼 하면 stack에는 차있지만 unallocated하다. 그래서 중간의 것이 옳게된 방법인데 문자형은 항상 맨 뒤에 ₩0가 들어가게 되는데 이것을 len()으로 처리되면 ₩0를 세지 않는다. 그래서 + 1을 해줘야 옳은 방법이 되는 것이다. 그런데 작동은 하긴 한다. 
+
+## ◼︎ Memory leak
+
+<center><img src="/images/OS/add_mem_leak.png"></center><br>
+만약 allocated된것이 사용되지 않고 계속 allocate 되기만 하다가 memmory를 다 채워버리면 어떻게 될까? 이런 상황을 memory leak라 한다. 반드시 free를 통해 없애줘야 한다.
