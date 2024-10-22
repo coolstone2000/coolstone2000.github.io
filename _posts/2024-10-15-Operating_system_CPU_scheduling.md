@@ -16,11 +16,13 @@ author_profile: false
 3. 각 작업은 시작되면 **완료될 때까지 실행**
 4. 모든 작업은 **CPU만 사용** (입출력을 수행하지 않는다.)
 5. 각 작업의 **실행 시간은 사전에 알려져 있다**
-- - -
+
+<br>
+
 # ◼︎ 스케줄링 평가 항목
 
 이렇게 가정된 워크로드로 만든 스케줄링이 있을 것이다. 그런데 이 스케줄링중 어떤게 더 좋은지 평가하는 기준이 필요할 것이다. 그래서 우리는 **스케줄링 평가 항목(scheduling metric)**을 결정해야 한다. 이 평가 기준은 여러개가 존재한다.<br>
-- - -
+
 ## 반환 시간(turnaround time)
 * $T_{turnaround}$ : 반환 시간
 * $T_{completion}$ : 종료 시간(마지막 것이 도착한 시간)
@@ -29,8 +31,9 @@ author_profile: false
 <center><span style="font-size:200%"> $T_{turnaround} = T_{completion} - T_{arrival}$ </span></center><br>
 반환 시간은 이렇게 정의되었지만 위에서 가정했듯이 모든 작업은 동시에 도착한다. 그렇기 때문에 $T_{arrival} = 0$이 되어 **$T_{turnaround} = T_{completion}$**이다.<br>
 반환 시간은 **성능**을 중점으로 둔 평가기준이다. 성능 이외의 평가 기준으로는 **공정성(fairness)**가 있다. 성능과 공정성은 서로 상충된다. 
-- - -
-# FIFO (선입선출)
+<br><br>
+
+# ◼︎ FIFO (선입선출)
 
 가장 기초적인 알고리즘은 **선입선출(First In First Out, FIFO)**와 **선도착선처리(First Come First Served, FCFS)**이다. <br>
 
