@@ -6,7 +6,7 @@ tags: OS
 toc: true
 author_profile: false
 ---
-
+- - -
 # ◼︎ 워크로드에 대한 가정
 
 * 워크로드(work load): 일련의 프로세스들이 실행하는 상황<br><br>

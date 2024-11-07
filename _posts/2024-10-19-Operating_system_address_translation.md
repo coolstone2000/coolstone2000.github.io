@@ -6,7 +6,7 @@ tags: OS
 toc: true
 author_profile: false
 ---
-
+- - -
 CPU를 가상화 할 때 우리는 LDE(Limited Direct Execution)을 사용한다는 것을 알았다. 그런데 메모리 또한 비슷한 방식을 이용한다. 우리가 다룰 기법은 **하드웨어-기반 주소 변환(hardware-based address translation)** 혹은 **주소 변환(address translatino)**이라고 하는 것을 배울것이다. 주소 변환을 통해 하드웨어는 가상 주소를 정보가 실제로 존재하는 물리 주소로 변환할 수 있게 된다. 이런 일을 하기 위해서 운영체제는 메모리의 빈 공간과 사용 중인 공간을 항상 알고 있고 메모리 사용을 제어하고 관리하게된다. 그래서 우리가 하려는 것은 프로그램이 자신의 전용 메모리를 소유하고 그 안에 자신의 코드와 데이터가 존재한다는 **환상(illusion)**을 주는 것이다. <br>
 <center><img src="/images/OS/ned_portal.gif" width = "500"></center><br>
 <br>

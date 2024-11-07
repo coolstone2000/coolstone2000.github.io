@@ -6,6 +6,7 @@ tags: OS
 toc: true
 author_profile: false
 ---
+- - -
 # ◼︎ MLFQ
 
 **멀티 레벨 피드백 큐(Multi-level Feedback Queue, MLFQ)**를 다뤄볼 것이다. 이것이 해결하려는 기본적인 문제는 두 가지이다.
