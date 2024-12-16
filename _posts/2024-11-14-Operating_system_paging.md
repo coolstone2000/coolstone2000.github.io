@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Operating sysetem - Paging
+title: Operating system - Paging
 categories: Operating_system
 tags: OS
 toc: true

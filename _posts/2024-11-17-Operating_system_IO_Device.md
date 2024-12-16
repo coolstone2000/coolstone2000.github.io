@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Operating sysetem - I/O Devices
+title: Operating system - I/O Devices
 categories: Operating_system
 tags: OS
 toc: true

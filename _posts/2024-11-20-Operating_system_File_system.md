@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Operating sysetem - File system
+title: Operating system - File system
 categories: Operating_system
 tags: OS
 toc: true

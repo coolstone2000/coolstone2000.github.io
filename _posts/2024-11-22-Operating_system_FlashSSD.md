@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Operating sysetem - FlashSSD
+title: Operating system - FlashSSD
 categories: Operating_system
 tags: OS
 toc: true

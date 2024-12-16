@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Operating sysetem - Concurrency
+title: Operating system - Concurrency
 categories: Operating_system
 tags: OS
 toc: true

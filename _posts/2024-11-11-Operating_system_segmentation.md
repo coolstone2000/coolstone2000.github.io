@@ -1,6 +1,6 @@
 ---
 layout: single
-title: Operating sysetem - Segmentation
+title: Operating system - Segmentation
 categories: Operating_system
 tags: OS
 toc: true
