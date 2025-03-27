@@ -84,3 +84,4 @@ Jekyll Stop	(ctrl+F6)	Stops Jekyll Server
 Jekyll Restart	(ctrl+F7)	Restarts Jekyll Server
 Jekyll Build	(ctrl+F8)	Builds Project
 Jekyll Open in Browser	(ctrl+F9)	Opens the local hosted site in Browser while Jekyll Server is running
+
