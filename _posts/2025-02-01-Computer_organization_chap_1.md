@@ -46,3 +46,68 @@ VSLI - 초대규모집적회로<br>
 > **Cost per die(다이 하나당 가격)** = Cost per wafer(웨이퍼당 가격) / {Dies per wafer(웨이퍼 하나에 있는 다이의 개수) X Yield(수율)}<br>
 > **Dies per wafer(웨이퍼 하나에 있는 다이의 개수)** = Wafer area(웨이퍼의 면적)/Die area(다이의 면적)<br>
 > **Yield(수율)** = 1/(1+ Defects per area(면적에 있는 결함 개수) X Die area/2$)^2$<br>
+
+# ◼︎ 성능
+
+성능을 판단하는 요소는 굉장히 다양할 수 밖에 없다. 응답시간(Response time)_실행시간(Execution time)이 중요하기도 하고 처리량(Througput)_대역폭(Bandwidth)가 더 중요할 수도 있다. 보통 이 두 가지가 변화면 성능의 변화가 생기게 되는 것이다. 
+
+## Response time(Execution time)
+
+실행시간을 성능으로 본 식은 다음과 같다.
+> **Performance(성능) = 1 / Execution time(실행시간)**
+
+즉, 다음 관계들을 만족하게 된다.
+> $\mathrm{Perform}_x > \mathrm{Perform}_y$ <br>
+> $\frac{1}{\mathrm{Execution\,time}_x} > \frac{1}{\mathrm{Execution\,time}_y}$ <br>
+> $\mathrm{Execution\,time}_x < \mathrm{Execution\,time}_y$ <br>
+
+X is n times faster than Y라고 하면
+>  $\frac{\mathrm{Perform}_x}{\mathrm{Perform}_y} = \frac{\mathrm{Execution\,time}_y}{\mathrm{Execution\,time}_x} = n$
+
+## How to measure time
+
+그럼 이 실행시간을 재기 위해서는 어떻게 해야하는 걸까? 우리는 이걸 위해 **CPU execution time(CPU time)**이란 것을 설정한다. 이것은 user CPU time 과 system CPU time을 합친것이고 CPU의 performance를 뜻하게 된다. User CPU time은 프로그램 자체에 소비된 CPU time이고 system CPU time은 프로그램 실행을 위해 운영체제가 소비한 CPU time인데 이것을 정확히 구분해서 구하는 것은 쉽지 않다. 그래서 경과시간을 기준으로 한다.
+
+### CPU clocking
+CPU는 항상 clock을 가지게 된다. 
+<center><img src="/images/CO/clock.png" width = "700"></center><br>
+그림과 같이 clock의 한번 주기를 **clock period**라고 하고 그것의 역수는 **clock frequency(rate)**라고 한다.
+<br>
+
+이를 이용해 프로그램에 대한 실행시간을 구할 수 있게 된다. 
+>\begin{aligned}
+\mathrm{CPU\,execution\,time\,for\,a\,program(CPU\,time)} & = \mathrm{CPU\,clock\,cycle} \times \mathrm{Clock\,time} \,(N \times t) \newline
+& = \mathrm{CPU\,clock\,cycle}\, / \,\mathrm{Clock\,rate} \,(N \times f)
+\end{aligned}
+
+
+그러면 여기서 사용한 $\mathrm{CPU\,clock\,cycle}$은 어떻게 구하는 것일까? 이 식은 다음과 같다.
+
+> $\mathrm{CPU\,clock\,cycle} = \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction}$
+
+우리는 $\mathrm{Average\,clock\,cycles\,per\,instruction}$을 줄여서 CPI라고 부를 것이다.
+
+최종적으로 CPU time에 대한 공식은 다음과 같다.
+>\begin{aligned}
+\mathrm{CPU\,execution\,time\,for\,a\,program(CPU\,time)} & = \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction} \times \mathrm{Clock\,time} \,(N \times t) \newline
+&= \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction}\, / \,\mathrm{Clock\,rate} \,(N \times f)
+\end{aligned}
+
+만약 cycle에 대한 instruction의 개수가 달라지면 따로따로 생각을 해줘야 한다.
+
+>$\mathrm{Clock \, Cycles} = \sum^{n}_{i=1}(\mathrm{CPI_i} \times \mathrm{Instruction \, Count_i})$
+
+이렇게 되면 CPI의 평균값을 구해야 한다.
+> \begin{aligned}
+\mathrm{CPI} &= \frac{\mathrm{Clock \, Cycles}}{\mathrm{Instruction \, Count}} \newline
+&= \sum^{n}_{i=1}(\mathrm{CPI_i} \times \frac{\mathrm{Instruction \, Count_i}}{\mathrm{Instruction \, Count}})
+\end{aligned}
+
+## The Big Picture(Iron law)
+
+> $\mathrm{CPU \, Time} = \frac{\mathrm{Instruction}}{\mathrm{Program}} \times \frac{\mathrm{Clock \, cycles}}{\mathrm{Instruction}} \times \frac{\mathrm{Seconds}}{\mathrm{Clock \, cycles}}$
+
+
+# 전력 장벽
+
+> Power = Capacitive load $\times$ $\mathrm{Voltage}^2 \times$ Frequency

@@ -13,12 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "_posts/2025-03-26-Momentum_2.md",
+                "file": "_posts/2025-02-01-Computer_organization_chap_1.md",
                 "mode": "source",
-                "source": false
+                "source": false,
+                "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "2025-03-26-Momentum_2"
+              "title": "2025-02-01-Computer_organization_chap_1"
             }
           }
         ]
@@ -163,32 +164,34 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "0cf32b41cd913593",
+  "active": "fea4a49a98bf1788",
   "lastOpenFiles": [
+    "_site/files/2022142255_정석찬_2주차_예비레포트.pdf",
+    "_site/files",
+    "files/2022142255_정석찬_2주차_예비레포트.pdf",
+    "files",
+    "_posts/files",
+    "_site/embeded/system/ES_week2/index.html",
+    "_site/embeded/system/ES_week2",
+    "_site/embeded/system",
+    "_site/embeded",
+    "_site/ES_week2/index.html",
+    "_site/ES_week2",
+    "_posts/2025-03-10-ES_week2.md",
+    "_site/images/CO/chap2_assemble.png",
+    "images/CO/chap2_assemble.png",
+    "_site/images/CO/SCR-20250409-lyak.png",
+    "images/CO/SCR-20250409-lyak.png",
+    "_posts/2025-02-09-Computer_organization_chap_2.md",
+    "_posts/2025-03-26-Momentum_2.md",
+    "_site/images/CO/clock.png",
+    "images/CO/clock.png",
+    "_site/images/CO/SCR-20250402-bkwp.png",
+    "images/CO/SCR-20250402-bkwp.png",
     "_site/images/Memory/IMG_1558.jpg",
     "images/Memory/IMG_1558.jpg",
-    "_site/images/Memory/IMG_1835.jpg",
-    "_site/images/Memory/IMG_2754.jpg",
-    "images/Memory/IMG_1835.jpg",
-    "images/Memory/IMG_2754.jpg",
     "_pages/category-archive.md",
-    "_site/images/Memory/000036400037.jpg",
-    "_site/images/Memory/000036400036.jpg",
-    "_site/images/Memory/000036400034.jpg",
-    "images/Memory/000036400037.jpg",
-    "images/Memory/000036400036.jpg",
-    "_site/moment/Momentum_2/index.html",
-    "_site/moment/Momentum_2",
-    "_site/Momentum_2/index.html",
-    "_site/Momentum_2",
-    "_posts/2025-03-26-Momentum_2.md",
-    "_site/Momentum/index.html",
-    "_site/Momentum",
     "_posts/2025-03-26-Momentum.md",
-    "_site/computer_organization/Computer_organization_chap_1/index.html",
-    "_site/computer_organization/Computer_organization_chap_1",
-    "_site/computer_organization",
-    "_site/images/CO",
     "_posts/2025-02-01-Computer_organization_chap_1.md",
     "_posts/2024-11-29-ML_lect20.md",
     "_posts/2024-11-27-ML_lect19.md",
@@ -208,8 +211,6 @@
     "_posts/2024-11-17-Operating_system_IO_Device.md",
     "_posts/2024-11-17-IO_Device.md",
     "_posts/2024-11-17_IO_Device.md",
-    "_posts/2024-11-17.md",
-    "_posts/2024-11-17-Operating_system_I/O_Devices.md",
-    "_posts/2024-11-16-Operating_system_TLB.md"
+    "_posts/2024-11-17.md"
   ]
 }
