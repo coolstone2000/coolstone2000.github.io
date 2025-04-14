@@ -108,6 +108,6 @@ CPU는 항상 clock을 가지게 된다.
 > $\mathrm{CPU \, Time} = \frac{\mathrm{Instruction}}{\mathrm{Program}} \times \frac{\mathrm{Clock \, cycles}}{\mathrm{Instruction}} \times \frac{\mathrm{Seconds}}{\mathrm{Clock \, cycles}}$
 
 
-# 전력 장벽
+# ◼︎ 전력 장벽
 
 > Power = Capacitive load $\times$ $\mathrm{Voltage}^2 \times$ Frequency
