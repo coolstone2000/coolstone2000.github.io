@@ -1,8 +1,8 @@
 ---
 layout: single
-title: "CO - chapter 3 Arithmetic for Computers"
-categories: Computer_organization
-tags: CO
+title: "CA - chapter 3 Arithmetic for Computers"
+categories: Computer_architecture
+tags: CA
 toc: true
 author_profile: false
 ---

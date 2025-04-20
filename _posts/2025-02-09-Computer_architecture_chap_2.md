@@ -1,8 +1,8 @@
 ---
 layout: single
-title: "CO - chapter 2 Instructions: Language of the Computer"
-categories: Computer_organization
-tags: CO
+title: "CA - chapter 2 Instructions: Language of the Computer"
+categories: Computer_architecture
+tags: CA
 toc: true
 author_profile: false
 ---
@@ -308,7 +308,7 @@ addi x19, x19, 1280 // 1280 = 0000 0101 0000
 Branch instruction들은 모두 SB-format이라고 한다. 이 SB-format은 항상 짝수로만 이동이 가능하다.
 <center><img src="/images/CO/chap2_inst_sb.png" width = "700"></center><br>
 
-imm를 보면 1~12인 것을 볼수 있는데 이것은 imm의 0번째 자리는 항상 0으로 취급하고 앞의 sign bit를 붙여줘서 -4096~4094의 범위를 가진다. 이 이유는 한 명령어가 저장된 최소 공간은 4byte로 설정하려 해서 항상 주소 비트의 끝자리가 00으로 끝나기 때문에 끝의 두자리는 안써도 되기 때문에 0번째 자리가 필요 없는 것이다. 사실 1번째 자리까지 필요 없지만 개발당시 2byte 명령어도 만드려는 계획이 있었기 때문에 한자리만 없앤 것이다. 만약 처음부터 만들 계획이 없었으면 imm[13:2]였을 것이다.
+imm를 보면 1~12인 것을 볼수 있는데 이것은 imm의 0번째 자리는 항상 0으로 취급하고 앞의 sign bit를 붙여줘서 -4096~4094의 범위(짝수만)를 가진다. 이 이유는 한 명령어가 저장된 최소 공간은 4byte로 설정하려 해서 항상 주소 비트의 끝자리가 00으로 끝나기 때문에 끝의 두자리는 안써도 되기 때문에 0번째 자리가 필요 없는 것이다. 사실 1번째 자리까지 필요 없지만 개발당시 2byte 명령어도 만드려는 계획이 있었기 때문에 한자리만 없앤 것이다. 만약 처음부터 만들 계획이 없었으면 imm[13:2]였을 것이다.
 
 UJ-type format도 비슷하다. 
 <center><img src="/images/CO/chap2_inst_uj.png" width = "700"></center><br>

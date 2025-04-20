@@ -1,8 +1,8 @@
 ---
 layout: single
-title: "CO - chapter 1 Computer Abstraction and Technology"
-categories: Computer_organization
-tags: CO
+title: "CA - chapter 1 Computer Abstraction and Technology"
+categories: Computer_architecture
+tags: CA
 toc: true
 author_profile: false
 ---
@@ -83,7 +83,7 @@ CPU는 항상 clock을 가지게 된다.
 
 그러면 여기서 사용한 $\mathrm{CPU\,clock\,cycle}$은 어떻게 구하는 것일까? 이 식은 다음과 같다.
 
-> $\mathrm{CPU\,clock\,cycle} = \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction}$
+> $\mathrm{CPU\,clock\,cycle} = \mathrm{Instruction\,for\,a\,program}(명령어 \, 수) \times \mathrm{Average\,clock\,cycles\,per\,instruction}(CPI)$
 
 우리는 $\mathrm{Average\,clock\,cycles\,per\,instruction}$을 줄여서 CPI라고 부를 것이다.
 
@@ -92,6 +92,8 @@ CPU는 항상 clock을 가지게 된다.
 \mathrm{CPU\,execution\,time\,for\,a\,program(CPU\,time)} & = \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction} \times \mathrm{Clock\,time} \,(N \times t) \newline
 &= \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction}\, / \,\mathrm{Clock\,rate} \,(N \times f)
 \end{aligned}
+
+이것이 CPU의 성능이라고 생각할 수 있다.<br>
 
 만약 cycle에 대한 instruction의 개수가 달라지면 따로따로 생각을 해줘야 한다.
 
