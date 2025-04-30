@@ -1,0 +1,23 @@
+<div class="highlight">
+    <div class="code-header">
+      <span class="dot red"></span>
+      <span class="dot yellow"></span>
+      <span class="dot green"></span>
+      <button class="copy-btn" onclick="copyCode(this)" aria-label="Copy code">
+        <!-- 복사 아이콘 (SVG) -->
+        <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+      </button>
+    </div>
+    <pre><code class="language-{{ include.lang | default: "plaintext" }}">{{ include.code | escape }}</code></pre>
+    <pre><code class="language-js">
+        // 클립보드에 텍스트를 저장함
+        navigator.clipboard.writeText(text);
+    
+        // 클립보드의 텍스트를 가져옴
+        navigator.clipboard.readText();
+      </code></pre>
+  </div>
+  

@@ -1,3 +1,4 @@
+/*
 ---
 # Only the main Sass file needs front matter (the dashes are enough)
 ---
@@ -7,6 +8,7 @@
 
 @import "minimal-mistakes/skins/dark";
 @import "minimal-mistakes"; // main partials
+@import "minimal-mistakes/custom/code-theme";
 
 @import "minimal-mistakes/custom/customOverride.scss";
 
@@ -29,3 +31,6 @@
     font-weight: normal;
     font-style: normal;
 }
+
+*/
+

@@ -72,7 +72,7 @@ RISC-V의 핵심적인 부분은 3가지로 나뉜다.
 
 <center><img src="/images/CO/chap4_fetch.png" width = "700"></center><br>
 
-Fetching instruction은 이 3가지의 요소 instuction memroy, program counter, adder로 구현할 수 있따.
+Fetching instruction은 이 3가지의 요소 instuction memroy, program counter, adder로 구현할 수 있다.
 
 ## R-Format instructions
 

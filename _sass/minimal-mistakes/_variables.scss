@@ -18,7 +18,7 @@ $titleFont: "GumiIndustryTTF";
 $serif: $customFont, $titleFont, Georgia, Times, serif !default;
 $sans-serif: $customFont, $titleFont, -apple-system, BlinkMacSystemFont, "Roboto", "Segoe UI",
   "Helvetica Neue", "Lucida Grande", Arial, sans-serif !default;
-$monospace: $customFont, $titleFont, Monaco, Consolas, "Lucida Console", monospace !default;
+$monospace: $customFont, $titleFont, 'Fira Code', 'JetBrains Mono', 'Menlo', 'Courier New', Monaco, Consolas, "Lucida Console", monospace !default;
 
 /* sans serif typefaces */
 $sans-serif-narrow: $sans-serif !default;

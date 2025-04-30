@@ -7,7 +7,7 @@ search: false
 
 @import "minimal-mistakes/skins/{{ site.minimal_mistakes_skin | default: 'default' }}"; // skin
 @import "minimal-mistakes"; // main partials
-
+@import "minimal-mistakes/custom/code-theme";
 @import "minimal-mistakes/custom/customOverride.scss";
 
 @font-face {
@@ -29,3 +29,158 @@ search: false
     font-weight: normal;
     font-style: normal;
 }
+
+// 🌑 Global Dark Theme Variables
+$background-color: #252a34;
+$text-color: #eaeaea;
+$primary-color: #00adb5;
+$border-color: mix(#fff, $background-color, 20%);
+$code-background-color: mix(#000, $background-color, 15%);
+$code-background-color-dark: mix(#000, $background-color, 20%);
+$form-background-color: mix(#000, $background-color, 15%);
+$footer-background-color: mix(#000, $background-color, 30%);
+$link-color: mix($primary-color, $text-color, 40%);
+$link-color-hover: mix(#fff, $link-color, 25%);
+$link-color-visited: mix(#000, $link-color, 25%);
+$masthead-link-color: $text-color;
+$masthead-link-color-hover: mix(#000, $text-color, 20%);
+$navicon-link-color-hover: mix(#000, $background-color, 30%);
+
+// 🌘 Dark Theme Styles
+html[data-theme='dark'] {
+    background-color: $background-color;
+    color: $text-color;
+  
+    // 사이트 전체에 영향 주는 기본 블록
+    body,
+    .masthead,
+    .page,
+    .page__content,
+    .page__footer,
+    .sidebar,
+    .toc {
+        background-color: $background-color !important;
+        color: $text-color;
+      }
+    
+    .toc__title {
+    background-color: $link-color !important;
+    color: #ffffff !important;
+    }
+
+    .toc__menu,
+    .toc__menu a,
+    .toc__menu-item,
+    .toc__menu .active {
+    color: $text-color !important;
+    opacity: 1 !important;
+    }
+
+    .toc__menu a:hover {
+    color: $link-color-hover !important;
+    }
+
+    .toc .active,
+    .toc .is-active {
+    background-color: mix($link-color, $background-color, 60%);
+    color: #000 !important; // ✅ 글씨 색상을 밝게 고정
+    }
+
+    .toc .active a,
+    .toc .is-active a {
+      color: #000 !important; // ✅ 링크 글자도 검정색
+    }
+
+    nav#site-nav.greedy-nav {
+        background-color: $background-color;
+        color: $text-color;
+      }
+    
+      nav#site-nav.greedy-nav a {
+        color: $masthead-link-color;
+    
+        &:hover {
+          color: $masthead-link-color-hover;
+        }
+      }
+
+    a {
+      color: $link-color;
+  
+      &:hover {
+        color: $link-color-hover;
+      }
+  
+      &:visited {
+        color: $link-color-visited;
+      }
+    }
+
+    .page__meta {
+        color: $text-color;
+      }
+    
+      .page__meta a {
+        color: $link-color;
+    
+        &:hover {
+          color: $link-color-hover;
+        }
+    
+        &:visited {
+          color: $link-color-visited;
+        }
+      }
+
+    .author__urls.social-icons i,
+    .author__urls.social-icons .svg-inline--fa,
+    .page__footer-follow .social-icons i,
+    .page__footer-follow .social-icons .svg-inline--fa {
+      color: inherit;
+    }
+  
+    .ais-search-box .ais-search-box--input {
+      background-color: $form-background-color;
+    }
+
+    .author__urls a,
+    .author__urls a:visited {
+        color: $text-color !important;
+
+        &:hover {
+        color: $link-color;
+        }
+    }
+
+    // ✅ 사이드바 아이콘 색상도 맞춰줌
+    .author__urls .svg-inline--fa {
+        color: $text-color !important;
+    }
+
+    // ✅ Recent posts 텍스트 등 강조 섹션 헤더
+    .page__subtitle,
+    .archive__subtitle,
+    h2.section__title,
+    h2.archive__subtitle,
+    h2.page__subtitle {
+        color: $text-color;
+    }
+
+    // ✅ 사이드바 배경 어두운 경우 대비
+    .sidebar {
+        background-color: $background-color;
+        color: $text-color;
+    }
+
+    code,
+    pre code,
+    .highlighter-rouge code,
+    code.highlighter-rouge {
+        background-color: #171717 !important; // 다크모드에 어울리는 진한 배경
+        color: $text-color !important;                      // 흰색 계열 글자
+        border-radius: 4px;
+        padding: 0.2em 0.4em;
+        font-size: 90%;
+  }
+}
+

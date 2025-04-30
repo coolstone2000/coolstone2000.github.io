@@ -18,9 +18,11 @@
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
 <!-- darkmode css -->
-{% if site.dark_theme_toggle == true %}
-<link rel="stylesheet" href="/assets/css/main_dark.css">
-{% endif %}
+<!-- main.scss → main.css 로 컴파일된 단 하나의 CSS만 불러오기 -->
+<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+<!-- dark-mode toggle -->
+<script src="/assets/js/custom/dark-theme.js" defer></script>
+
 
 {% if site.head_scripts %}
   {% for script in site.head_scripts %}
@@ -36,4 +38,10 @@
 <link rel="shortcut icon" href="/assets/cat.ico/favicon.ico" />
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/cat.ico/apple-touch-icon.png" />
 <link rel="manifest" href="/assets/cat.ico/site.webmanifest" />
+<link href="https://fonts.googleapis.com/css2?family=Fira+Code&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+
 <!-- end custom head snippets -->
+
+<!-- _includes/head-custom.html -->
+<script src="/assets/js/custom/inject-code-header.js"></script>

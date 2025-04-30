@@ -1,4 +1,4 @@
-/* assets/js/custom/dark-theme.js */
+/* assets/js/custom/dark-theme.js 
 const defaultTheme = [...document.styleSheets].find(style => /(main.css)$/.test(style.href));
 const darkTheme = [...document.styleSheets].find(style => /(main_dark.css)$/.test(style.href));
 
@@ -35,4 +35,36 @@ if (darkTheme) {
     }
 
     toggleThemeBtn.addEventListener('click', changeTheme)
-}
+}*/
+
+
+
+// assets/js/custom/dark-theme.js
+document.addEventListener("DOMContentLoaded", () => {
+    const setDarkMode = (isDark) => {
+      document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  
+      if (window['customUtterances']) {
+        const customUtterances = window['customUtterances'];
+        customUtterances.onChange(isDark ? customUtterances.darkTheme : customUtterances.theme);
+      }
+  
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    };
+  
+    const toggleThemeBtn = document.getElementById("toggle_dark_theme");
+    if (!toggleThemeBtn) return;
+  
+    const savedTheme = localStorage.getItem("theme");
+    const isDark = savedTheme
+      ? savedTheme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+  
+    toggleThemeBtn.checked = isDark;
+    setDarkMode(isDark);
+  
+    toggleThemeBtn.addEventListener("change", (e) => {
+      setDarkMode(e.target.checked);
+    });
+  });
+  

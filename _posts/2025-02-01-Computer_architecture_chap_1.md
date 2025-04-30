@@ -75,10 +75,10 @@ CPU는 항상 clock을 가지게 된다.
 <br>
 
 이를 이용해 프로그램에 대한 실행시간을 구할 수 있게 된다. 
->\begin{aligned}
+> $\begin{aligned}
 \mathrm{CPU\,execution\,time\,for\,a\,program(CPU\,time)} & = \mathrm{CPU\,clock\,cycle} \times \mathrm{Clock\,time} \,(N \times t) \newline
 & = \mathrm{CPU\,clock\,cycle}\, / \,\mathrm{Clock\,rate} \,(N \times f)
-\end{aligned}
+\end{aligned}$
 
 
 그러면 여기서 사용한 $\mathrm{CPU\,clock\,cycle}$은 어떻게 구하는 것일까? 이 식은 다음과 같다.
@@ -88,22 +88,26 @@ CPU는 항상 clock을 가지게 된다.
 우리는 $\mathrm{Average\,clock\,cycles\,per\,instruction}$을 줄여서 CPI라고 부를 것이다.
 
 최종적으로 CPU time에 대한 공식은 다음과 같다.
->\begin{aligned}
+> $\begin{aligned}
 \mathrm{CPU\,execution\,time\,for\,a\,program(CPU\,time)} & = \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction} \times \mathrm{Clock\,time} \,(N \times t) \newline
 &= \mathrm{Instruction\,for\,a\,program} \times \mathrm{Average\,clock\,cycles\,per\,instruction}\, / \,\mathrm{Clock\,rate} \,(N \times f)
 \end{aligned}
+$
 
 이것이 CPU의 성능이라고 생각할 수 있다.<br>
 
 만약 cycle에 대한 instruction의 개수가 달라지면 따로따로 생각을 해줘야 한다.
 
->$\mathrm{Clock \, Cycles} = \sum^{n}_{i=1}(\mathrm{CPI_i} \times \mathrm{Instruction \, Count_i})$
+> $\mathrm{Clock \, Cycles} = \sum^{n}_{i=1}(\mathrm{CPI_i} \times \mathrm{Instruction \, Count_i})$
 
+<br>
 이렇게 되면 CPI의 평균값을 구해야 한다.
-> \begin{aligned}
+
+> $\begin{aligned}
 \mathrm{CPI} &= \frac{\mathrm{Clock \, Cycles}}{\mathrm{Instruction \, Count}} \newline
 &= \sum^{n}_{i=1}(\mathrm{CPI_i} \times \frac{\mathrm{Instruction \, Count_i}}{\mathrm{Instruction \, Count}})
 \end{aligned}
+$
 
 ## The Big Picture(Iron law)
 

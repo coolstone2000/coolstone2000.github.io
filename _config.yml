@@ -196,6 +196,8 @@ kramdown:
   toc_levels: 1..6
   smart_quotes: lsquo,rsquo,ldquo,rdquo
   enable_coderay: false
+  coderay_wrap: div
+  
 
 
 # Sass/SCSS
@@ -288,4 +290,15 @@ defaults:
 
 date_format: "%Y-%m-%d"
 
+markdown: kramdown
+kramdown:
+    input: GFM
+    highlighter: rouge
+    syntax_highlighter_opts:
+        block:
+            line_numbers: true
 
+after_footer_scripts:
+  - /assets/js/custom/inject-code-header.js
+
+head_custom: /_includes/head-custom.html

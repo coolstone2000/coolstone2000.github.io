@@ -1,0 +1,133 @@
+/* 최상위 박스 */
+.highlight {
+  overflow: hidden;
+  position: relative;
+  background-color: #171717; 
+  color: #c9d1d9;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Menlo', 'Courier New', monospace !important;
+  font-size: 18px;
+  border-radius: 15px 15px 15px 15px;
+  box-shadow: 0;
+  margin: 1.5em 0;
+  display: block;           /* or flex */
+  width: 100%;              /* 전체 너비로 확장 */
+  box-sizing: border-box;   /* padding 포함한 box size 계산 */
+  letter-spacing: 0; 
+}
+
+/* 상단 버튼줄 */
+.highlight .code-header {
+  background-color: #2e2e2e;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 0; /* highlight에 radius 있으니 이건 제거 */
+}
+
+.highlight .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;          // 완전한 원
+  display: inline-block;
+  pointer-events: none;        // 클릭 불가능하게
+}
+
+.highlight .dot.red    { background-color: #f5655b; }
+.highlight .dot.yellow { background-color: #f6bd3b; }
+.highlight .dot.green  { background-color: #43c645; }
+
+/* 코드 영역 */
+.highlight pre {
+  background-color: #171717;
+  color: #c9d1d9;
+  box-shadow: none !important;
+  margin: 0;
+  padding: 1.2em;
+  border-radius: 15px 15px 15px 15px;
+  overflow-x: auto;
+  width: 100%;
+  line-height: 1.6;
+}
+
+/* 코드 텍스트 상자 초기화 */
+.highlight pre code {
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+  border-radius: 15px 15px 15px 15px;
+  display: block;
+  font-family: 'Fira Code', 'JetBrains Mono', 'Menlo', 'Courier New', monospace !important;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* 라인 넘버 스타일 */
+.highlight table td:first-child {
+  border-right: none !important;
+  padding-right: 0.3ch !important;   // 코드와 번호 사이 최소 간격
+  width: 2ch !important;           /* ← 줄 번호 셀 폭 강제 지정 */
+  text-align: right !important;     /* ← 오른쪽 정렬 (GitHub 스타일) */
+}
+
+.highlight table {
+  border-spacing: 0;
+  margin: 0;
+  padding: 0 !important;   // 좌우 여백 축소
+}
+
+.highlight .lineno {
+  color: #7f8c8d;
+}
+
+.highlight .copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 30px;
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.copy-icon,
+.check-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.highlight .lang-label {
+  position: absolute;
+  bottom: 10px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ccc;
+  font-size: 12px;
+  font-family: 'Fira Code', monospace;
+  padding: 4px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  pointer-events: none;
+  z-index: 2; /* 버튼보다 위에 보이도록 */
+}
+
+/* One Dark Pro 기반 문법 강조 스타일 */
+.highlight .c  { color: #5c6370; font-style: italic; }  /* 주석 */
+.highlight .k  { color: #c678dd; }                      /* 키워드 */
+.highlight .s  { color: #98c379; }                      /* 문자열 */
+.highlight .m  { color: #d19a66; }                      /* 숫자 */
+.highlight .n  { color: #e5c07b; }                      /* 일반 변수 */
+.highlight .nf { color: #61afef; }                      /* 함수 이름 */
+.highlight .o  { color: #56b6c2; }                      /* 연산자 */
+.highlight .p  { color: #abb2bf; }                      /* 괄호/기호 */
+

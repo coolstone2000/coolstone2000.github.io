@@ -6,6 +6,7 @@ tags: CA
 toc: true
 author_profile: false
 ---
+
 하드웨어가 알아들을수 있는 컴퓨터 언어를 **명령어(instruction)**이라고 한다. 이번 장에서는 RISC-V의 명령어에 대하여 알아볼 것이다. 
 
 # ◼︎ 하드웨어 연산
