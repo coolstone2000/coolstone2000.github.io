@@ -285,4 +285,17 @@ sub x2, x19, x3
 
 ### Control hazard(Branch hazard, 제어 해저드)
 
-제어 해저드는 분기 해저드라고도 하는데 make a dicision based on the result of instruction일 때 일어나게 된다. 즉, beq와 같은 instruction이 실행 될 때 발생하는 것이다.
+제어 해저드는 분기 해저드라고도 하는데 make a dicision based on the result of instruction일 때 일어나게 된다. 즉, beq와 같은 instruction이 실행 될 때 발생하는 것이다. <br>
+
+제어 해저드의 경우 **pipeline stall(지연)**을 통해 해결할 수 있다. Branch instruction이 있으면 항상 branch 된다고 가정하고 stall을 하는 방식이다.
+
+<center><img src="/images/CO/chap4_control_haz_stall.png" width = "700"></center><br>
+
+이렇게 항상 branch가 된다고 생각하고 register애서 branch되는 주소값을 **2clock stall**을 통해 알게 된다. 그런데 당연히 이러면 만약 branch가 일어나지 않으면 엄청난 손해를 보게 된다. 그래서 대안으로 나온 것이 **branch prediction**이다.<br>
+이 방식은 분기를 할지 안할지 예측하는 것이라고 생각하면 된다. 그래서 이 prediction에는 여러가지가 있다. 우선 가장 간단하게는 **untaken**이라는 방식이 있다. 이 방식은 항상 branch가 안된다고 생각하는 것이다. 만약 branch가 안되는게 맞았으면 제일 빠른 속도로 실행하는 것이 되는것이고 branch가 돼야 했으면 손해를 보면서 파이프라인을 다시시작(**flush**)해야 한다. 그렇기 때문에 여기서는 이 flush, 즉 잘못된 instruction을 모두 지우고 분기 대상 주소에서 다시시작할 수 있게 만들어야한다. 
+
+<center><img src="/images/CO/chap4_control_haz_pred.png" width = "700"></center><br>
+이렇게 항상 정해져있는 방식을 **static branch prediction**이라고 한다. 이 방식은 굉장히 ridig하고 stereotypical하다. 그렇기 때문에 **dynamic branch prediction**이라는 개념이 나오게 되었다. Dynamic branch prediction은 이전의 결과를 저장하고 있다. 이전의 값이 taken이나 untaken이면 다음 branch도 그 결과를 따라갈 가능성이 굉장히 높다. 이런 방식은 90%정도의 정확도를 가지기 때문에 static 보다 훨신 효율적이다. 그리고 **delayed branch**라는 개념도 있는데 이는 branch 다음 하나의 instruction은 무조건 실행을 하는 것이다. 즉, 분기 결정을 한 cycle뒤에 적용하는 것이다. 이는 MIPS 구조에서 사용되는 방식이다. 
+
+<center><img src="/images/CO/chap4_control_haz_delay.png" width = "700"></center><br>
+이는 delayed branch를 나타낸 그림이다. 이렇게 바로 뒤에 add instruction은 무조건 실행한 다음 register에서 각 branch에 맞는 instruction을 실행하게 되는 것이다. MIPS에서는 자동적으로 이 delayed branch slot에 beq와 무관한 instruction을 넣게 된다.
