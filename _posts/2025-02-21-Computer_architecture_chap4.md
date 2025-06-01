@@ -199,3 +199,90 @@ PCsrc가 맘에 되게 안든다. 그래서 이걸 AND를 이용해 수정해볼
 
 ---
 
+# ◼︎ Overview of pipelining
+
+여태까지 우리는 한 instruction의 실행이 끝나면 그 다음 instruction을 실행시키는 single cycle 방식으로 하였다. 하지만 이렇게 한 작업이 진행이 끝날때까지 기다리기만 하면 굉장히 비효율적이지 않을까?
+
+<center><img src="/images/CO/chap4_pipe_exp.png" width = "700"></center><br>
+
+이 그림을 보면 집안일은 한다고 할때 모든 일이 끝날때 까지 기다리면 굉장히 오핸시간이 걸리게 된다. 하지만 아래의 그림을 보면 건조기가 돌아갈때 세탁기는 다 쓴거니 또 새로 돌릴수 있다. 약간 멀티태스킹한다는 것처럼 생각을 하면 시간이 굉장히 단축이 된다는 것을 볼 수 있다. 
+
+## Steps in executing RISC-V
+
+위에서 본것처럼 RISC-V가 실행되는 방식에도 step을 5가지로 나눌 수 있다.
+
+1. IF(i$): Fetch instruction, increment PC
+2. ID: Instruction, read register
+3. EX: memory-ref → address 연산, Arithmetic/logical Ops → 실행 연산
+4. MEM(D$): load → 메모리에서 data read, store → 메모리에 data write
+5. WB: Write data를 레지스터로
+
+### Example
+
+| Instruction class               | Instruction fetch | Register read | ALU operation | Data access | Register write | Total time |
+|----------------------------------|------------------|--------------|--------------|------------|---------------|-----------|
+| Load word (lw)                   | 200 ps           | 100 ps       | 200 ps       | 200 ps     | 100 ps        | 800 ps    |
+| Store word (sw)                  | 200 ps           | 100 ps       | 200 ps       | 200 ps     | -             | 700 ps    |
+| R-format (add, sub, and, or)    | 200 ps           | 100 ps       | 200 ps       | -          | 100 ps        | 600 ps    |
+| Branch (beq)                     | 200 ps           | 100 ps       | 200 ps       | -          | -             | 500 ps    |
+
+실제로는 이런식으로 각각 다른 실행시간을 가지게 된다.
+
+<center><img src="/images/CO/chap4_pipe_real.png" width = "700"></center><br>
+
+위의 표를 봤을 때 Total time은 명령어에 따라 달라진다는 것을 알 수 있지만 제일 큰 800ps를 기준으로 사용해야한다. 이렇듯 pipeline에서도 100ps처럼 짧게 걸리는 step이 있어도 최대 시간의 step인 200ps을 사용해야한다. 그래서 lw instruction을 3개를 실행한다고 하면 single cycle이면 2400ps가 걸리지만 pipeline을 사용하면 시간이 획기적으로 줄어서 1400ps만 걸린다는 것을 확인할 수 있다.
+
+> $$\text{Time between instructions}_{\text{pipelined}} = \frac{\text{Time between instructions}_{\text{nonpipelined}}}{\text{Number of pipe stages}}$$
+
+위의 수식은 이상적인 공식이라서 nonpipelined가 위의 single cycle이랑 같은게 아니라 모든 단계의 step당 걸리는 시간이 같아야한다. 이런식으로 되면 $\frac{2400}{1400} \neq \frac{800}{200}$이다. 하지만 이것은 instruction의 숫자가 매우 작아서 그런데 많다고 가정해보자. 1,000,003 instructions를 사용한다고 하면 multi cycle을 이용할 때는 $1,000,000 \times 200ps + 1400ps = 200,001,400ps$이고 single cycle일 때는 $1,000,000 \times 800ps + 2,400ps = 800,002,400ps$이다.
+
+\[
+\frac{800,\!002,\!400\ \text{ps}}{200,\!001,\!400\ \text{ps}} \approx \frac{800\ \text{ps}}{200\ \text{ps}} \approx 4.00
+\]
+
+그래서 실제로 실행시간 향상은 거의 이상적인 것과 일치하다. 이로 인해 알 수 있는 것은 pipelining은 instruction 숫자가 늘어날 수록 성능이 향상된다. 
+
+# ◼︎ Designing Instruction Sets for Pipelining
+
+다음은 실제 RISC-V에서 구성되는 pipeline의 step(pipeline stage)이다. 
+<center><img src="/images/CO/chap4_pipe_risc.png" width = "700"></center><br>
+
+그리고 다음은 laod, add, store, sub, or의 instruction이 순서대로 진행될 때 pipeline의 graphic이다.
+<center><img src="/images/CO/chap4_pipe_graph.png" width = "700"></center><br>
+Add와 OR을 보면 Reg가 겹친 것 같지만 오른쪽에 색칠된 것은 read이고 왼쪽에 색칠된 것은 write이기 때문에 같은게 아니다. 
+
+## Pipeline Hazard
+
+어떠한 이유로 pipeline에서 바로 다음 clock에 다음 instruction이 나오지 않으면 hazard가 발생했다는 것이고 이는 stall(bubble)로 해결 할 수 있다. 즉, 그냥 instruction을 진행해도 될 때 까지 기다리는 것이고 그 사이 시간을 buuble이라고 하는 것이다.
+
+### Structural hazard (구조적 해저드)
+
+구조적 해저드는 하드웨어적으로 불가능 할 때 발생한다.
+
+<center><img src="/images/CO/chap4_struct_haz_mem.png" width = "700"></center><br>
+이것은 동그라미 부분에서 memory를 써야하는데 두 상황 동시에 써야하기 때문에 구조적 해저드가 일어난 상황이다.<br>
+이렇게 memory의 구조적 해저드가 일어난 강황에서는 memory를 두개를 사용하면 된다. Instruction memory와 data memory로 분리를 하는 것이다.
+
+<center><img src="/images/CO/chap4_struct_haz_reg.png" width = "700"></center><br>
+이것은 동그라미 부분에서 register를 써야하는데 두 상황 동시에 써야하기 때문에 구조적 해저드가 일어난 상황이다.<br>
+레지스터의 경우에는 memory와는 조금 다르다. Register는 접근이 굉장히 빠르기 때문에 clock의 half time만으로도 접근이 가능하다. 그렇기 때문에 **first half는 write register**를 **second half에서는 read register**를 사용하게 하면 된다. 그 그림은 방금 위에서 설명한 색이 다른 register를 뜻한다.
+
+### Data hazard (데이터 해저드)
+
+데이터 해저드의 경우는 명령어를 실행하는데 필요한 데이터가 아직 준비되지 않아서 실행할 수 없음에서 생기는 해저드이다. 
+
+```
+add x19, x0, x1
+sub x2, x19, x3
+```
+이라는 명령어를 실행한다고 하면 x19 register에 저장되는 계산 값을 sub에서 다시 사용해야 하기 때문에 add가 끝난 후에 instruction을 시작할 수 있지만 이는 pipeline이 아니게 되는 것이다. 이런 경우를 data hazard라고 한다.<br>
+
+이런 data hazard는 **forwarding**과 **bypassing**을 통해 해결할 수 있다. 이 것은 쉽게 생각해 x19에 저장이 됐을 때 값을 가져오는 것이 아닌 ALU 연산이 끝나자 마자 그 값을 바로 가져오는 것이라고 할 수 있다.
+<center><img src="/images/CO/chap4_data_haz_forwarding.png" width = "700"></center><br>
+이렇게 하면 stall(bubble)이 없이 바로 연산을 빠르게 할 수 있다. 하지만 이 방법은 문제가 되는 부분이 있다. 만약 load 명령어라고 생각을 하면 ALU 다음이 아닌 data memory에서 가져온 값을 사용해야하는데 이는 위의 forwarding에서는 해결할 수 없다. 이런 경우를 **load-use data hazard**라고 하는데 이는 **pipeline stall**이란 방식을 통해 해결할 수 있다.
+<center><img src="/images/CO/chap4_data_haz_load.png" width = "700"></center><br>
+이렇게 한 clock stall(bubble)을 넣게 되면 문제없이 memory에서 출력된 값을 EX전에 넣을 수 있게 된다.
+
+### Control hazard(Branch hazard, 제어 해저드)
+
+제어 해저드는 분기 해저드라고도 하는데 make a dicision based on the result of instruction일 때 일어나게 된다. 즉, beq와 같은 instruction이 실행 될 때 발생하는 것이다.
