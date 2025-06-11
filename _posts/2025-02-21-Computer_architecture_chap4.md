@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "CA - chapter 4 The Processror - Datapath and Control"
+title: "CA - chapter 4 The Processor - Datapath and Control"
 categories: Computer_architecture
 tags: CA
 toc: true
@@ -299,3 +299,198 @@ sub x2, x19, x3
 
 <center><img src="/images/CO/chap4_control_haz_delay.png" width = "700"></center><br>
 이는 delayed branch를 나타낸 그림이다. 이렇게 바로 뒤에 add instruction은 무조건 실행한 다음 register에서 각 branch에 맞는 instruction을 실행하게 되는 것이다. MIPS에서는 자동적으로 이 delayed branch slot에 beq와 무관한 instruction을 넣게 된다.
+
+# ◼︎ 파이프라인 데이터패스 및 제어
+
+파이프라인을 만들기 위해서는 각 stage사이에서 현재의 값을 저장하고 있어야 한다. 그래서 추가해준 것이 register이다. 
+
+<center><img src="/images/CO/chap4_pipe_reg.jpeg" width = "700"></center><br>
+
+## ld instruction의 파이프라인
+
+<center><img src="/images/CO/chap4_load_pipe.png" width = "1000"></center><br>
+
+Read일 때는 오른쪽을 write일 때는 왼쪽을 파란색으로 칠해줘서 structural hazard로 부터 벗어날 수 있게한다. 그래서 위의 5가지의 그림을 보면 IF → ID → EX → MEM → WB를 순서대로 pipe라인이 형성돼 load 명령어를 실행하고 있는 것을 확인할 수 있다. 
+
+## store instruction의 파이프라인
+
+Store의 경우 조금 pipeline을 자세하게 봐야한다. 앞 부분은 똑같이 실행되지만 EX부분에서는 차이점이 생기게 된다. store 명령어는 구조가 sd rs2, offset(rs1)꼴이다. 그래서 rd2의 값을 data memory안에 그대로 넣어줘야하고 ALU에는 rs2가 아닌 rs1과 offset이 들어가야 하기 때문에 flow를 자세하게 봐야한다.
+
+<center><img src="/images/CO/chap4_store_ex.png" width = "700"></center><br>
+이렇게 store 명령어는 rs2가 alu로 들어가지 않고 ID/EX register에서 EX/MEM register로 옮겨져서 사용이 되게 된다.
+
+<center><img src="/images/CO/chap4_store_pipe.png" width = "1000"></center><br>
+
+그리고 MEM stage를 보면 load랑 달리 write를 해야하기 때문에 data memory의 왼쪽이 색칠된 것을 확인할 수 있다. 그리고 WB stage의 경우 store 명령어에서 사용하지 않는다는 것을 알 수 있다. 그래서 실제로는 WB stage에서는 아무 일도 일어니지 않는다. 그래서 파란색으로 칠해진 부분이 아무것도 없는 것이다.
+
+## Uncover a bug
+
+그런데 위의 pipeline에는 심각한 오류가 하나 있다. Single cycle일 때랑 굉장히 차이나는 부분중 하나이긴 한데 이는 write 부분의 clock을 맞춰줘야함에서 오는 차이점이다. 원래 우리는 write register가 처음 instruction을 받았을 때 rd를 바로 넣어주었다. 하지만 write register의 경우는 WB stage에서 써줘야 한다. 그래서 다음 pipeline과 같이 변경이 필요하다. 
+
+<center><img src="/images/CO/chap4_pipe_corr.png" width = "700"></center><br>
+
+이렇게 따로 빼줘서 모든 register를 거쳐서 다시 돌아오게 해야하는 것이다. 그래서 load instruction에서 사용하는 부분을 모두 색칠한 수정된 파이프라인은 다음과 같다.
+
+<center><img src="/images/CO/chap4_pipe_load.png" width = "700"></center><br>
+
+## Graphically representing pipelines
+
+파이프라인을 그리는 방법에는 크게 두가지로 나눠진다.
+
+1. Muliple-clock-cycle pipeline diagrams
+2. Single-clock-cycle diagrams
+
+### Multiple-clock-cycle pipeline
+
+<center><img src="/images/CO/chap4_multi_pipe.png" width = "700"></center><br>
+
+clock들 사이에 중간 register를 끼워서 그 사이단계가 존재한다는 것을 보여주면 된다. 이 방법은 instruction이 달라질때 어떤 stage들이 동시에 일어나고 있는지 알기 쉽ㄴ다. 
+
+### Single-clock-cycle diagram
+
+<center><img src="/images/CO/chap4_single_pipe.png" width = "700"></center><br>
+
+그림에서는 clock cycle이 5일때를 보여주고 있다. 즉, 이 방식은 세로로 잘라서 단면을 보여주는 것과 비슷하다. 그래서 이 경우에는 한 cycle 내에서 어떤 instruction이 실행되고 있는지 보여주는데에 특화돼있다. 
+
+## 퍄이프라인 제어(Pipelined control)
+
+Single cycle에서도 그랬듯 우선 기본적인 흐름을 이해한 후에 실제로 이 것들을 제어하기 위한 mux나 control unit들을 추가시켜줘야 한다. 그래서 그것들을 추가해준 간략한 그림이 다음과 같다. 
+
+<center><img src="/images/CO/chap4_pipe_cont.png" width = "700"></center><br>
+
+원래 single cycle에서는 모든 control signal이 동시에 들어갔다. 그런데 지금 위의 pipeline일 때를 보면 서로 다른 stage에서 들어가야 한다는 것을 보여주고 있다. 
+
+<center><img src="/images/CO/chap4_pipe_control_sig.png" width = "1000"></center><br>
+
+위의 표와 pipline을 비교하면서 보면 EX에서 ALUop, ALUscr이 사용되고 MEM에서는 Branch, MemRead, MemWrite 그리고 WB에서는 RegWrite, MemtoReg가 따로따로 stage에서 사용되는 것을 확인할 수 있다. 그리고 앞의 stage에서 사용했으면 뒤의 stage register에는 저장할 필요가 없기 때문에 오른쪽 그림을 보면 점점 register의 크기가 줄어드는 것을 볼 수 있다. 그래서 최종적으로 나오는 control unit을 포함한 pipeline은 다음과 같다.
+
+<center><img src="/images/CO/chap4_control_unit_pipe.png" width = "800"></center><br>
+
+# ◼︎ Data hazard and forwarding
+
+앞에서 data hazard가 무엇인지 배웠다. 그래서 다음의 instruction set은 data hazard가 일어나는 경우라는 것을 알 수 있을 것이다.
+
+```
+sub x2, x1, x3
+and x12, x2, x5
+or  x13, x6, x2
+add x1, x2, x2
+sd  x15, 100(x2)
+```
+
+이 경우 x2가 계속 연산이 끝나기 전에 사용되어서 data hazard가 일어나고 이 부분을 해결해줘야 한다는 것을 알고 있다. 우선 sub계산에서 나온 x2를 아래에서 사용해야하는 것을 알고 있을 것이다. 그래서 data hazard가 일어나고 있는 상황의 그림은 다음과 같다.
+
+<center><img src="/images/CO/chap4_data_haz_pipe.png" width = "700"></center><br>
+
+위에서 data hazard를 해결하기 위한 방법이 뭐였는지 생각해보자. 일단 쉬운 방법은 stall을 사용하는 것이었다. 그냥 sub의 연산이 끝날 때 까지 stall을 하고 and부터 실행하면 된다. 그런데 이 방식은 clock의 사용에서 굉장히 비효율적인 방법이라고 하였다. 그래서 다른 대안으로 forwarding이 있었다. 굳이 WB stage까지 갈 필요 없이 계산값만 미리 알면 가지고 사용할 수 있다는 것이었다. 위의 그림에서 보면 add와 sd는 WB이 되고 난 이후기 때문에 x2를 그대로 사용해도 상관이 없다. 하지만 문제가 되는 부분은 and와 add부분이고 이는 forwarding을 사용하여 EX에서 값을 미리 가져오면 된다.
+
+<center><img src="/images/CO/chap4_data_haz_pipe_corr.png" width = "700"></center><br>
+
+이렇게 and는 EX/MEM register에서 x2의 값을 가져와 사용하고 or은 MEM/WB register에서 가져와서 forwarding을 사용하고 있다. 
+
+## Data hazard detection
+
+Data hazard를 찾기 위한 조건은 다음과 같다. 
+
+> 1a. EX/MEM.RegisterRd == ID/EX.registerRs1
+> 1b. EX/MEM.RegisterRd == ID/EX.registerRs2
+> 2a. MEM/WB.RegisterRd == ID/EX.registerRs1
+> 2b. MEM/WB.RegisterRd == ID/EX.registerRs2
+
+이것을 참고하여 위의 instruction set에서 sub-and에서의 data hazard의 조건은 1a. EX/MEM.RegisterRd == ID/EX.registerRs1이다. 이런식으로 data hazard의 조건을 이용하여 detect하면 되지만 모든 경우에 가능한 것은 아니다. 왜냐하면 register에 write를 하지않는 경우도 있기 때문이다. x0의 경우는 항상 0으로 write가 금지돼 있다. 그래서 1의 조건 앞에 EX/MEM.RegisterRd != 0과 MEM/WB.RegisterR != 0의 조건을 추가해줘야 한다.
+
+## Forwarding
+
+그래서 이 forwarding을 해야하는 위치는 EX가 되는 것이다. ID/EX에서 이전 clock일때의 EX 결과값을 가져와서 forwarding을 하여 ALU가 실행돼야 한다.
+
+<center><img src="/images/CO/chap4_forwarding.png" width = "700"></center><br>
+
+이렇게 두개의 MUX_A와 MUX_B가 사용되기 때문에 이를 제어해줄 control unit이 필요하고 그 control signal은 다음과 같다.
+
+| **Mux control** | **Source** | **Explanation** |
+|-----------------|------------|-----------------|
+| ForwardA = 00   | ID/EX      | The first ALU operand comes from the register file. |
+| ForwardA = 10   | EX/MEM     | The first ALU operand is forwarded from the prior ALU result. |
+| ForwardA = 01   | MEM/WB     | The first ALU operand is forwarded from data memory or an earlier ALU result. |
+| ForwardB = 00   | ID/EX      | The second ALU operand comes from the register file. |
+| ForwardB = 10   | EX/MEM     | The second ALU operand is forwarded from the prior ALU result. |
+| ForwardB = 01   | MEM/WB     | The second ALU operand is forwarded from data memory or an earlier ALU result. |
+
+이 signal을 이용하여 forwarding unit module을 코드로 만들면 다음과 같다.
+
+### EX Hazard(EX/MEM)
+
+``` c
+\\ 1a.
+if (EX/MEM.RegWrite
+and (EX/MEM.RegisterRd ≠ 0)
+and (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 10
+\\ 1b.
+if (EX/MEM.RegWrite
+and (EX/MEM.RegisterRd ≠ 0)
+and (EX/MEM.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 10
+```
+
+### MEM Hazard(MEM/WB)
+
+``` c
+\\ 2a.
+if (MEM/WB.RegWrite
+and (MEM/WB.RegisterRd ≠ 0)
+and (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01
+\\ 2b.
+if (MEM/WB.RegWrite
+and (MEM/WB.RegisterRd ≠ 0)
+and (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01
+```
+
+그런데 이 코드는 문제가 있다. 일단 MEM/WB은 EX/MEM보다 나중의 일이기 때문에 항상 EX/MEM보다는 최신값이어야 한다. 
+
+```
+add x1, x1, x2
+add x1, x1, x3
+add x1, x1, x4
+```
+라고하면 계속 forwarding이 돼야하는데 MEM/WB가 update된 값을 넣어줘야하고 이는 EX/MEM과 값이 다르다. 그래서 수정된 최종 코드는 다음과 같다.
+
+```c
+if (MEM/WB.RegWrite
+and (MEM/WB.RegisterRd ≠ 0)
+and not(EX/MEM.RegWrite and (EX/MEM.RegisterRd ≠ 0) and (EX/MEM.RegisterRd = ID/EX.RegisterRs1))
+and (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01
+if (MEM/WB.RegWrite
+and (MEM/WB.RegisterRd ≠ 0)
+and not(EX/MEM.RegWrite and (EX/MEM.RegisterRd ≠ 0) and (EX/MEM.RegisterRd = ID/EX.RegisterRs2))
+and (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01
+```
+
+그래서 최종적인 pipeline은 다음과 같다. 
+
+<center><img src="/images/CO/chap4_forward_unit_pipe.png" width = "700"></center><br>
+
+## Immediate 연산까지 포함
+
+<center><img src="/images/CO/chap4_forward_imm.png" width = "700"></center><br>
+중간에 ALUsrc로 제어되는 MUX를 추가하여 signed immediate연산을 할 수 있게 된다.
+
+## Data hazards and stalls
+
+앞에서 forward는 모든것을 해결해주지는 못한다고 배웠다. 왜냐하면 일반적으로는 EX의 결과값을 가져와서 다음 cycle에서 사용하면 되지만 load연산의 경우 EX에서 나온 결과값은 주소고 실제 값은 MEM이후에서 알 수 있기 때문에 위에서 했던 방식에 위배된다. 그래서 이 경우는 stall을 통해 지연시켜야한다. 
+
+<center><img src="/images/CO/chap4_load_data_haz.png" width = "700"></center><br>
+
+이렇게 forwarding이 되지 않고 뒤로 가고 있는것을 ld-and사이에서 확인할 수 있다. 이를 해결하기 위해 hazard detection unit에 수정이 더 필요하다. 
+
+```c
+if (ID/EX.MemRead and
+((ID/EX.RegisterRd = IF/ID.RegisterRs1) or
+(ID/EX.RegisterRd = IF/ID.RegisterRs2)))
+stall the pipeline
+```
+이런식으로 MemRead가 1이면 load기 때문에 이럴땐 stall을 한번 하여 nop을 생성해주면 된다. 
+
+<center><img src="/images/CO/chap4_load_stall.png" width = "700"></center><br>
+
+이렇게 모든 것을 포함한 pipeline은 다음과 같다.
+
+<center><img src="/images/CO/chap4_hazard_detect_unit.png" width = "700"></center><br>
