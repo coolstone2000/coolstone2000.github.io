@@ -142,7 +142,11 @@ html[data-theme='dark'] {
     .ais-search-box .ais-search-box--input {
       background-color: $form-background-color;
     }
-
+    .archive__item-title a,
+    .archive__item-title a:hover {
+      text-decoration: none !important; /* 기본 상태와 마우스를 올렸을 때 모두 밑줄 제거 */
+    }
+    
     .author__urls a,
     .author__urls a:visited {
         color: $text-color !important;
@@ -166,6 +170,11 @@ html[data-theme='dark'] {
         color: $text-color;
     }
 
+    .archive__item-title {
+      border-bottom: none !important;     /* 밑줄(테두리)을 강제로 제거 */
+    }
+
+
     // ✅ 사이드바 배경 어두운 경우 대비
     .sidebar {
         background-color: $background-color;
@@ -183,4 +192,3 @@ html[data-theme='dark'] {
         font-size: 90%;
   }
 }
-

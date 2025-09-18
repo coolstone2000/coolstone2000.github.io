@@ -4,22 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "7834c698b7605453",
+        "id": "efcc2301eea045bd",
         "type": "tabs",
         "children": [
           {
-            "id": "fea4a49a98bf1788",
+            "id": "58bf4b619d46efc3",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "release-notes",
               "state": {
-                "file": "_posts/2025-02-21-Computer_architecture_chap4.md",
-                "mode": "preview",
-                "source": false,
-                "backlinks": false
+                "currentVersion": "1.9.12"
               },
-              "icon": "lucide-file",
-              "title": "2025-02-21-Computer_architecture_chap4"
+              "icon": "lucide-book-up",
+              "title": "릴리즈 노트 1.9.12"
             }
           }
         ]
@@ -156,6 +153,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "bases:새 베이스 생성하기": false,
       "switcher:빠른 전환기 열기": false,
       "graph:그래프 뷰 열기": false,
       "canvas:새 캔버스 만들기": false,
@@ -164,8 +162,22 @@
       "command-palette:명령어 팔레트 열기": false
     }
   },
-  "active": "fea4a49a98bf1788",
+  "active": "58bf4b619d46efc3",
   "lastOpenFiles": [
+    "_site/assets/css/main.css.map",
+    "_site/assets/js/vendor/jquery/jquery-3.6.0.js",
+    "_site/assets/js/vendor/jquery",
+    "_site/assets/js/vendor",
+    "_site/assets/js/plugins/smooth-scroll.js",
+    "_site/assets/js/plugins/jquery.magnific-popup.js",
+    "_site/assets/js/plugins/jquery.greedy-navigation.js",
+    "_site/assets/js/plugins/jquery.fitvids.js",
+    "_site/assets/js/plugins/jquery.ba-throttle-debounce.js",
+    "_site/assets/js/plugins/gumshoe.js",
+    "_site/assets/js/plugins",
+    "무제.canvas",
+    "2025-08-24.md",
+    "_posts/2025-02-21-Computer_architecture_chap4.md",
     "images/CO/chap4_pipe_graph.png",
     "images/CO/chap4_pipe_risc.png",
     "_site/images/CO/chap4_pipe_real.png",
@@ -173,27 +185,15 @@
     "_posts/image.png",
     "_site/images/CO/chap4_pipe_exp.png",
     "images/CO/chap4_pipe_exp.png",
-    "_site/assets/css/main.css.map",
-    "_site/assets/css/main_dark.scss",
-    "_site/assets/js/custom/inject-code-header.js",
-    "assets/js/custom/inject-code-header.js",
-    "_includes/mac-code.html",
-    "_sass/minimal-mistakes/custom/_code-theme.scss",
-    "_sass/minimal-mistakes/custom/code-theme.scss",
     "_posts/2025-02-14-Computer_architecture_chap3.md",
     "_posts/2025-02-09-Computer_architecture_chap_2.md",
     "_posts/2025-02-01-Computer_architecture_chap_1.md",
-    "_posts/2025-02-21-Computer_architecture_chap4.md",
     "_posts/2024-11-29-ML_lect20.md",
-    "_posts/2025-02-01-Computer_architecture_chap_1_tmp.html",
-    "_posts/2025-02-01-Computer_architecture_chap_1.pdf",
     "_posts/2025-03-10-ES_week2.md",
     "_posts/2025-03-26-Momentum_2.md",
     "_site/images/CO/chap4_single_cycle.png",
     "images/CO/chap4_single_cycle.png",
     "_site/images/CO/SCR-20250421-cahc.png",
-    "images/CO/SCR-20250421-cahc.png",
-    "_site/assets/js/vendor/jquery/jquery-3.6.0.js",
     "_posts/2025-02-01-Computer_organization_chap_1.md",
     "_posts/2025-02-21-Computer_organization_chap4.md",
     "_posts/2025-02-14-Computer_organization_chap3.md",
@@ -210,7 +210,6 @@
     "_posts/2024-11-28-Operating_system_locks.md",
     "_posts/2024-11-26-Operating_system_thread_api.md",
     "_posts/2024-11-18-ML_lect14.md",
-    "_posts/2024-11-15-ML_lect13.md",
-    "_posts/2024-11-24-Operating_system_concurrency.md"
+    "_posts/2024-11-15-ML_lect13.md"
   ]
 }
