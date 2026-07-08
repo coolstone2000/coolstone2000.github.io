@@ -1,0 +1,16 @@
+{
+  "terminal.integrated.profiles.windows": {
+    "Jekyll Auto Server": {
+      "source": "PowerShell",
+      "args": [
+        "-NoLogo",
+        "-NoExit",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\.vscode\\start-jekyll.ps1"
+      ]
+    }
+  },
+  "terminal.integrated.defaultProfile.windows": "Jekyll Auto Server"
+}

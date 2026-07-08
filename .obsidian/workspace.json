@@ -11,12 +11,14 @@
             "id": "58bf4b619d46efc3",
             "type": "leaf",
             "state": {
-              "type": "release-notes",
+              "type": "markdown",
               "state": {
-                "currentVersion": "1.9.12"
+                "file": "_posts/2024-11-28-Operating_system_locks.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-book-up",
-              "title": "릴리즈 노트 1.9.12"
+              "icon": "lucide-file",
+              "title": "2024-11-28-Operating_system_locks"
             }
           }
         ]
@@ -164,6 +166,13 @@
   },
   "active": "58bf4b619d46efc3",
   "lastOpenFiles": [
+    "_posts/2024-11-18-ML_lect14.md",
+    "_posts/2024-11-19-ML_lect15.md",
+    "_posts/2024-10-20-ML_lect8.md",
+    "_posts/2024-10-21-ML_lec9.md",
+    "_posts/2024-10-22-ML_lec10.md",
+    "_posts/2024-10-19-Operating_system_address_translation.md",
+    "_posts/2024-07-26-ML_lect1.md",
     "_site/assets/css/main.css.map",
     "_site/assets/js/vendor/jquery/jquery-3.6.0.js",
     "_site/assets/js/vendor/jquery",
@@ -174,7 +183,6 @@
     "_site/assets/js/plugins/jquery.fitvids.js",
     "_site/assets/js/plugins/jquery.ba-throttle-debounce.js",
     "_site/assets/js/plugins/gumshoe.js",
-    "_site/assets/js/plugins",
     "무제.canvas",
     "2025-08-24.md",
     "_posts/2025-02-21-Computer_architecture_chap4.md",
@@ -204,12 +212,6 @@
     "_posts/2024-11-25-ML_lect18.md",
     "_posts/2024-11-5-ML_lect18.md",
     "_posts/2024-11-23-ML_lect17.md",
-    "_posts/2024-11-21-ML_lect17.md",
-    "_posts/2024-11-21-ML_lect16.md",
-    "_posts/2024-11-19-ML_lect15.md",
-    "_posts/2024-11-28-Operating_system_locks.md",
-    "_posts/2024-11-26-Operating_system_thread_api.md",
-    "_posts/2024-11-18-ML_lect14.md",
-    "_posts/2024-11-15-ML_lect13.md"
+    "_posts/2024-11-21-ML_lect17.md"
   ]
 }

@@ -9,3 +9,5 @@ gem "jekyll-readme-index"
 gem "jekyll-titles-from-headings"
 gem "jekyll-relative-links"
 gem "jekyll-remote-theme"
+
+gem "wdm", ">= 0.1.1" if Gem.win_platform?
