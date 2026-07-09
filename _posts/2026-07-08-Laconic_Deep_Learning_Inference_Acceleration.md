@@ -34,7 +34,7 @@ Bit Sparsity: 보통은 0값을 skip하려고 했다면 이 연구에서는 어�
 
 Quantize, dense, prune 모델 등 bit level에서도 sparse함. 
 
-$$o(n, y, x) = \sum_{k=0}^{C-1} \sum_{j=0}^{H_F-1} \sum_{i=0}^{W_F-1} w^n(k, j, i) \times a(k, j + y \times S, i + x \times S)$$
+$o(n, y, x) = \sum_{k=0}^{C-1} \sum_{j=0}^{H_F-1} \sum_{i=0}^{W_F-1} w^n(k, j, i) \times a(k, j + y \times S, i + x \times S)$
 
 - $a$: Activation channel로 $C \times H \times W$ (Channel, height, width) 
 - $S$: Stride
@@ -256,9 +256,169 @@ A 비트 위치 (i)     ──>        j=2 (4의자리)     j=1 (2의자리)    
      i=0 (1의 자리)              4               2              1   
 ```
 
-- $i=0$ 행 (1의 자리 비트가 만든 값들): $$2^2 + 2^1 + 2^0 = 4 + 2 + 1 = \mathbf{7}$$
-- $i=1$ 행 (2의 자리 비트가 만든 값들): $$2^3 + 2^2 + 2^1 = 8 + 4 + 2 = \mathbf{14}$$
-- $i=2$ 행 (4의 자리 비트가 만든 값들): $$2^4 + 2^3 + 2^2 = 16 + 8 + 4 = \mathbf{28}$$
-- $i=3$ 행 (8의 자리 비트가 만든 값들): $$2^5 + 2^4 + 2^3 = 32 + 16 + 8 = \mathbf{56}$$
+- $i=0$ 행 (1의 자리 비트가 만든 값들): $2^2 + 2^1 + 2^0 = 4 + 2 + 1 = \mathbf{7}$
+- $i=1$ 행 (2의 자리 비트가 만든 값들): $2^3 + 2^2 + 2^1 = 8 + 4 + 2 = \mathbf{14}$
+- $i=2$ 행 (4의 자리 비트가 만든 값들): $2^4 + 2^3 + 2^2 = 16 + 8 + 4 = \mathbf{28}$
+- $i=3$ 행 (8의 자리 비트가 만든 값들): $2^5 + 2^4 + 2^3 = 32 + 16 + 8 = \mathbf{56}$
 
 이제 하드웨어가 최종 출력 레이어에서 이 행들의 결과를 모두 합하면 $$\text{최종 연산 결과} = 7 + 14 + 28 + 56 = \mathbf{105}$$. 즉 $2^{i+j}$만 있으면 연산을 할 수 있다. 그래도 어쨌든 $8 \times 8 = 64$번의 연산이 필요함. 0부분을 skip한다고 하더라도 이 경우에는 12번 즉, 1이 공통적으로 나오는 부분의 bit 수 만큼은 필요하다는 것임.
+
+## 3. Laconic의 방식
+
+Booth encoding이라는 방식을 통해 $\pm 2^x$형태로 $At_i$와 $Wt_j$가 생성돼서 $A \times W = \sum_{i=0}^{A_{terms}} \sum_{j=0}^{B_{terms}} At_i \times Wt_j$ 형태로 나오게 된다.
+
+# ◼︎ LACONIC
+
+## Booth encoding
+
+십진수를 계산할 때 99,999 × 7을 하려면 9를 다섯 번이나 곱해야 하지만 이를 (100,000 - 1) × 7로 바꾸어 700,000 - 7 = 699,993으로 훨씬 쉽게 계산하는 방식을 2진수에 적용하는 방법임. 2진수에서 1이 연속으로 등장하는 구간(String of 1s)이 있을 때, 이를 시작점($+$)과 끝점($-$)의 단 두 개의 거듭제곱 항으로 변환하면 됨.
+
+$\sum_{k=n}^{m} 2^k = 2^{m+1} - 2^n$
+
+
+60을 일반 2진수로 표현하면 0011 1100이고 $\text{Value} = 2^5 + 2^4 + 2^3 + 2^2 = 32 + 16 + 8 + 4 = 60$임. 
+
+Booth encoding을 사용하면 $2^6 - 2^2$로 변환함.즉, +2^6과 -2^2라는 단 2개의 부호가 있는 항(Terms)으로 $\text{Value} = 64 - 4 = 60$임.
+
+부스 인코딩을 거친 거듭제곱 항($\pm 2^x$) 하나를 처리 장치로 보낼 때, 원본 8비트를 통째로 쓰지 않고 아래와 같은 **4비트 압축 포맷**으로 전선 신호를 인가함.
+
+* **MSB (가장 왼쪽 1비트):** 부호(Sign) 비트 $\rightarrow$ **`0` = 양수(+)**, **`1` = 음수(-)**
+* **LSB (나머지 3비트):** 지수(Exponent) 비트 $\rightarrow$ $0$부터 $7$까지의 자릿수를 2진수 3비트로 표현 (`000` ~ `111`)
+
+### 1) 10진수 15 (`0000 1111`) 부스 인코딩 격자 시각화
+
+원본 8비트 데이터에서 연속된 `1`의 뭉텅이를 찾아내어 **`+2^4`** 와 **`-2^0`** 단 2개의 4비트 패킷 라인으로 직렬 변환하는 과정입니다. (파란색 칸 = 부호 비트 / 흰색 칸 = 지수 비트)
+
+#### ❶ 원본 8비트 데이터 (Raw Binary)
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 10px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e3f2fd; font-weight: bold; color: #0d47a1 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e3f2fd; font-weight: bold; color: #0d47a1 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e3f2fd; font-weight: bold; color: #0d47a1 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e3f2fd; font-weight: bold; color: #0d47a1 !important;">1</td>
+  </tr>
+</table>
+
+#### ❷ 변환된 4비트 하드웨어 직렬 패킷 (Term 1 & Term 2)
+* **Cycle 0 : `+2^4` 항 (부호: + [0] / 지수: 4 [100])**
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 5px 0 15px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #bbdefb; font-weight: bold; color: #0d47a1 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+  </tr>
+</table>
+
+* **Cycle 1 : `-2^0` 항 (부호: - [1] / 지수: 0 [000])**
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 5px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #bbdefb; font-weight: bold; color: #0d47a1 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+  </tr>
+</table>
+
+---
+
+### 2) 10진수 54 (`0011 0110`) 부스 인코딩 격자 시각화
+
+내부 비트열에 `1` 뭉텅이가 두 군데로 쪼개져 있어, 부스 인코딩 시 **`+2^6`**, **`-2^4`**, **`+2^3`**, **`-2^1`** 총 4개의 패킷이 생성되어 4사이클 주기로 하드웨어 버스에 순차 인가됩니다.
+
+#### ❶ 원본 8비트 데이터 (Raw Binary)
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 10px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffecb3; font-weight: bold; color: #b75700 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffecb3; font-weight: bold; color: #b75700 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e8f5e9; font-weight: bold; color: #1b5e20 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e8f5e9; font-weight: bold; color: #1b5e20 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #e0e0e0; color: #555555 !important; font-weight: bold;">0</td>
+  </tr>
+</table>
+
+#### ❷ 변환된 4비트 하드웨어 직렬 패킷 (Term 1 ~ 4)
+* **Cycle 0 : `+2^6` 항 (부호: + [0] / 지수: 6 [110])**
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 5px 0 12px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #bbdefb; font-weight: bold; color: #0d47a1 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+  </tr>
+</table>
+
+* **Cycle 1 : `-2^4` 항 (부호: - [1] / 지수: 4 [100])**
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 5px 0 12px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #bbdefb; font-weight: bold; color: #0d47a1 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+  </tr>
+</table>
+
+* **Cycle 2 : `+2^3` 항 (부호: + [0] / 지수: 3 [011])**
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 5px 0 12px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #bbdefb; font-weight: bold; color: #0d47a1 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+  </tr>
+</table>
+
+* **Cycle 3 : `-2^1` 항 (부호: - [1] / 지수: 1 [010])**
+<table style="border-collapse: collapse; text-align: center; font-family: ui-monospace, monospace; font-size: 0.85rem; margin: 5px 0;">
+  <tr>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #bbdefb; font-weight: bold; color: #0d47a1 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">1</td>
+    <td style="border: 1px solid #333333; width: 32px; height: 32px; background-color: #ffffff; font-weight: bold; color: #222222 !important;">0</td>
+  </tr>
+</table>
+
+## 실제 계산
+
+위에서 예시 그대로 가져와서 해보면 
+
+$A = 15$ (0000 1111) $\rightarrow$ $16 - 1 = \mathbf{(+2^4, -2^0)}$ [유효 항 2개] 
+
+ $W = 7$ (0000 0111) $\rightarrow$ $8 - 1 = \mathbf{(+2^3, -2^0)}$ [유효 항 2개]   
+
+```text
+ W의 유효 항    ──>    +2^3       -2^0
+   A의 유효 항
+       │
+       ▼
+     +2^4           [주기 1]    [주기 2]
+                    +2^7       -2^4
+
+     -2^0           [주기 3]    [주기 4]
+                    -2^3       +2^0
+```
+
+- 1주기: $+2^4 \times +2^3 \rightarrow \text{지수 합: } 4+3=7 \rightarrow +2^7 = \mathbf{128}$   
+
+- 2주기: $+2^4 \times -2^0 \rightarrow \text{지수 합: } 4+0=4 \rightarrow -2^4 = \mathbf{-16}$  
+
+-  3주기: $-2^0 \times +2^3 \rightarrow \text{지수 합: } 0+3=3 \rightarrow -2^3 = \mathbf{-8}$   
+  
+- 4주기: $-2^0 \times -2^0 \rightarrow \text{지수 합: } 0+0=0 \rightarrow +2^0 = \mathbf{1}$  
+ 
+최종적으로 $128 - 16 - 8 + 1 = 105$
+
+<center><img src="/images/PR/Laconic/figure2.JPG" width = "700"><br></center>
+
+(a)는 그냥 기본적인 bit 형태의 곱임. 그래서 8bit로 들어오고 있음. 그래서 4cycle이 필요함. (b)는 LPE(Laconic PE) 한개가 어떻게 연산이 되고 있는지 보여줌. 이 경우는 cycle수가 2가 됐음. (c)는 이 LPE를 결국 격자형태로 많이 깔면 cycle 자체는 많이 늘어나보여도 그냥 bit parallel PE에 계속 넣는거보다 병렬성이 좋아서 가속됨.
+
+최악의 경우(Worst-case), 8비트 값은 부스 인코딩되었을 때 최대 5개의 항(Term)으로 쪼개짐(10101010 or 01010101). 이는 모든 입력 조건에서 라코닉이 기존 방식보다 항상 최소한 같거나 빠르려면 비트 병렬 PE 1개당 25개의 LPE가 필요함을 의미함.
+
+근데 이래도 더 빠를수 밖에 없는 이유는 worst case가 아닐 확률이 훨신 높음(Bit sparsity 높다는 얘기). 그리고 결국 곱셈기보다 훨신 작기 때문에 여러개 붙여도 곱셈기 여러개 생기는 것보다 훨씬 빠른 속도임. 
