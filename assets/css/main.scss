@@ -192,3 +192,87 @@ html[data-theme='dark'] {
         font-size: 90%;
   }
 }
+
+/* 1. 오른쪽 목차(TOC) 글자 크기 및 여백 수정 */
+nav.toc {
+  /* 적용해두신 깔끔한 Pretendard 폰트를 목차에도 강제 적용 */
+  font-family: 'Pretendard', sans-serif !important; 
+}
+
+nav.toc .toc__menu {
+  /* 전체 글자 크기를 확 줄임 (조금 더 작게 원하시면 0.7rem으로 변경) */
+  font-size: 0.75rem; 
+}
+
+nav.toc .toc__menu li {
+  margin-bottom: 0 !important;
+  /* 💡 답답함을 유발하는 가장 큰 원인인 가로 밑줄을 완전히 제거! */
+  border-bottom: none !important; 
+}
+
+nav.toc .toc__menu a {
+  /* 줄 간격을 넓혀서 글씨들이 다닥다닥 붙어있지 않게 함 */
+  line-height: 1.6 !important; 
+  padding: 0.35rem 0.5rem !important; /* 여백 확보 */
+  display: block !important;
+  /* 글씨 굵기를 얇고 가볍게 설정 (투박한 느낌 제거) */
+  font-weight: 400 !important; 
+}
+
+/* 💡 하위 목차(들여쓰기 된 부분) 디테일 설정 */
+nav.toc .toc__menu ul {
+  /* 하위 목차는 안쪽으로 조금 더 밀어 넣어서 계층 구조를 명확히 함 */
+  margin-left: 0.8rem; 
+}
+nav.toc .toc__menu ul a {
+  /* 하위 항목은 글자 크기를 한 단계 더 작게 */
+  font-size: 0.7rem; 
+  /* 색상을 살짝 투명하게 빼서(80%) 본문과 차이를 줌 */
+  opacity: 0.8; 
+}
+
+/* 2. 인용구 및 긴 수식 가로 스크롤 허용 */
+.page__content blockquote {
+  overflow-x: auto;
+}
+.MathJax_Display, .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+/* ==========================================
+   📌 하단 관련 글(You may also enjoy) 및 요약문 긴 URL 줄바꿈 처리
+   ========================================== */
+.archive__item-excerpt {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ==========================================
+   📌 다크모드 하단 공유(Share) 버튼 글씨 흰색 변경
+   ========================================== */
+html[data-theme='dark'] .page__share .btn {
+  color: #ffffff !important; /* 버튼 안의 텍스트를 흰색으로 강제 고정 */
+}
+
+html[data-theme='dark'] .page__share .btn i,
+html[data-theme='dark'] .page__share .btn .svg-inline--fa {
+  color: #ffffff !important; /* 트위터, 페이스북 등 로고 아이콘도 흰색으로 고정 */
+}
+
+/* ==========================================
+   📌 Mermaid 그래프(다이어그램) 가운데 정렬
+   ========================================== */
+.language-mermaid {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100%;
+  padding: 1.5rem 0; /* 위아래 여백을 줘서 덜 답답하게 만듦 */
+}
+
+/* 혹시 모를 SVG 내부 쏠림 방지 */
+.language-mermaid svg {
+  margin: 0 auto !important;
+}

@@ -1,3 +1,96 @@
 @import "./toggle.scss";
 @import "./summary.scss";
-/* ... */
+
+/* Code blocks: preserve alignment and spacing in rendered posts */
+.page__content .highlight,
+.page__content .highlight pre,
+.page__content .highlight code,
+.page__content .highlight span,
+.page__content .highlight td {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+    font-size: 0.75rem !important; /* 💡 0.85rem보다 더 축소하여 컴팩트하게 맞췄습니다. */
+    line-height: 1.60 !important; /* 글자 크기에 맞춰 줄간격도 1.60으로 최적화했습니다. */
+    letter-spacing: 0 !important;
+    font-variant-ligatures: none !important;
+    font-variant-numeric: tabular-nums lining-nums !important;
+    font-feature-settings: "tnum" 1, "lnum" 1, "liga" 0 !important;
+}
+
+.page__content pre,
+.page__content pre code,
+.page__content .highlight pre,
+.page__content .highlight pre code {
+    white-space: pre !important;
+    tab-size: 4;
+    -moz-tab-size: 4;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.page__content pre code {
+    display: block;
+    min-width: 100%;
+}
+
+/* Markdown tables in post content */
+.page__content > table {
+	width: auto;
+	max-width: 100%;
+	border-collapse: collapse;
+	border-spacing: 0;
+	margin: 1.25rem 0;
+	font-size: 0.95rem;
+}
+
+.page__content > table th,
+.page__content > table td {
+	padding: 0.55rem 0.8rem;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.page__content > table th {
+	font-weight: 700;
+	text-align: center;
+}
+
+.page__content > table td {
+	text-align: center;
+}
+
+/* Dark mode table contrast */
+html[data-theme='dark'] .page__content > table {
+	background: #1e232b;
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+html[data-theme='dark'] .page__content > table thead th {
+	background: linear-gradient(180deg, #353c49 0%, #2a303a 100%);
+	color: #f4f7fb;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+html[data-theme='dark'] .page__content > table tbody th,
+html[data-theme='dark'] .page__content > table tbody td {
+	background: rgba(255, 255, 255, 0.015);
+	color: #eef2f7;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+html[data-theme='dark'] .page__content > table tbody tr:nth-child(even) th,
+html[data-theme='dark'] .page__content > table tbody tr:nth-child(even) td {
+	background: rgba(255, 255, 255, 0.04);
+}
+
+html[data-theme='dark'] .page__content > table th,
+html[data-theme='dark'] .page__content > table td {
+	border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme='dark'] .page__content > table th:last-child,
+html[data-theme='dark'] .page__content > table td:last-child {
+	border-right: 0;
+}
