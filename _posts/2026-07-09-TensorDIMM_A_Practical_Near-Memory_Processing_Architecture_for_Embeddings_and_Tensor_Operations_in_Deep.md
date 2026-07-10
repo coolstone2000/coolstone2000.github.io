@@ -1,16 +1,17 @@
 ---
 layout: single
-title: "Laconic Deep Learning Inference Acceleration, ISCA 2019"
+title: "TensorDIMM_A Practical Near-Memory Processing Architecture for Embeddings and Tensor Operations in Deep, MICRO 2019"
 categories: Paper_review
 tags: PR
 toc: true
 author_profile: false
+comments: true
 ---
 
 
 # ◼︎ Abstract
 
-곱 연산을 bit 수준에서 분해하는 하드웨어 가속기 Laconic을 통해 곱셈에 필요한 연산량을 40배 가까이 줄이는 결과를 얻음.
+Tensor 연산의 memory 용량과 bandwidth 문제를 해결 하기 위해 Near Memory Processing(NMP)코어를 가진 DIMM모듈을 이용함.
 
 # ◼︎ Introduction
 
@@ -422,3 +423,62 @@ $A = 15$ (0000 1111) $\rightarrow$ $16 - 1 = \mathbf{(+2^4, -2^0)}$ [유효 항 
 최악의 경우(Worst-case), 8비트 값은 부스 인코딩되었을 때 최대 5개의 항(Term)으로 쪼개짐(10101010 or 01010101). 이는 모든 입력 조건에서 라코닉이 기존 방식보다 항상 최소한 같거나 빠르려면 비트 병렬 PE 1개당 25개의 LPE가 필요함을 의미함.
 
 근데 이래도 더 빠를수 밖에 없는 이유는 worst case가 아닐 확률이 훨신 높음(Bit sparsity 높다는 얘기). 그리고 결국 곱셈기보다 훨신 작기 때문에 여러개 붙여도 곱셈기 여러개 생기는 것보다 훨씬 빠른 속도임. 
+
+## Activation and Weight Representation
+
+일단 memory에서 booth encoding 된 숫자 형태는 비효율적이기 때문에 memory에서 값을 저장할때는 보통의 2진수 상태로 둠. 그리고 weight와 activation을 16channel로 한번에 가져오는게 balance 있다고 하는데 아마 이건 8bit에 16channel이라서 $8 \times 16 = 128$이라서 SRAM 크기에도 좋고 CNN 구조에서 filter를 $4 \times 4$로 많이 했다 보니 이때 filter의 channel은 정확히 16개이긴 함.
+
+$$
+\begin{aligned}
+W \times A &= \sum_{\forall(s,t) \in W_{terms}} (-1)^s 2^t \times \sum_{\forall(s',t') \in A_{terms}} (-1)^{s'} 2^{t'} \\
+&= ((-1)^{(s_0+s'_0)}2^{(t_0+t'_0)} + \dots + (-1)^{(s_0+s'_m)}2^{(t_0+t'_m)}) \\
+&\quad + \dots + ((-1)^{(s_n+s'_0)}2^{(t_n+t'_0)} + \dots + (-1)^{(s_n+s'_m)}2^{(t_n+t'_m)})
+\end{aligned}
+$$
+
+$s$는 weight 값의 sign bit $t$는 weight 값의 지수값 $s'$은 activation 값의 sign bit $t'$은 activation 값의 지수값임. 이걸 하드웨어적으로 만들면 figure 3와 같음.
+
+### A Histogram-Based PE
+
+<center><img src="/images/PR/Laconic/figure3.JPG" width = "800"><br></center>
+
+여기서는 16 channel일때 흐름을 봄. 크게 6단계로 나눠짐. 
+
+> **Step 1 : 지수 덧셈 및 부호 판별**
+>
+> 16개의 3비트 weight 지수 항($$(t_0 \dots t_{15})$$)과 sign bit($$(s_0 \dots s_{15})$$), 그리고 16개의 3비트 activation 지수 항($$(t'_0 \dots t'_{15})$$)과 sign bit($$(s'_0 \dots s'_{15})$$)를 입력받아 곱을 계산함. 지수들을 서로 더하여 4비트 크기(7+7 = 14)의 지수 결과물($$(t_0+t'_0) \dots (t_{15}+t'_{15})$$)을 생성하고, sign bit 끼리는 XOR 게이트로 $$E_{0\text{sign}} \dots E_{15\text{sign}}$$.
+>
+> ---
+>
+> **Step 2 : 디코더를 통한 원핫(One-hot) 변환**
+>
+> $i$번째 액티베이션 및 가중치 쌍($$i \in \{0 \dots 15\}$$)에 대하여, LPE는 **4b-to-16b 디코더**를 통해 $$2^{t_i+t'_i}$$를 계산함. 4비트 지수 합을 하나의 '1' 비트와 15개의 '0' 비트로 이루어진 16비트 one-hot format으로 변환(해당 자리수에 1이 active되는 형태)하며, 이 '1'의 위치는 부호 결과($$E_i.\text{sign}$$)에 따라 $+2^j$ 또는 $-2^j$ 값을 의미하게 됨.
+>
+> ---
+>
+> **Step 3 : 히스토그램 버킷 누적**
+>
+> Step 2에서 나온 16개의 16비트 숫자들을 **16개의 버킷($N^0 \dots N^{15}$)**에 누적하여 디코더 출력값들의 히스토그램을 생성함. 16개의 버킷은 $2^0 \dots 2^{15}$ 자릿수에 대응합니다. 버킷은 최대 16개의 부호가 있는 입력을 받으므로 최종 카운트 범위는 $[-16 \dots 16]$이 되며, **2의 보수 형태의 6비트**로 표현됨.
+>
+> ---
+>
+> **Step 4 : 비트 결합을 통한 가산기 제거**
+>
+> 원래는 16개의 6비트 카운트 값들을  shift를 거쳐 16입력 가산기 트리를 써야 하지만 Laconic은 비트 자리가 절대 겹치지 않는 버킷 구조를 활용하여 전선을 그대로 이어 붙이는 **Concatenation** 을 사용함.
+>
+> ---
+>
+> **Step 5 : 압축된 가산기 트리 연산**
+>
+> Step 4에서 전선 결합으로 1차 압축된 값들은 최종 **6입력 가산기 트리**를 통해 더해져 최종 **22비트 크기의 partial sum**을 도출함.
+>
+> ---
+>
+> **Step 6 : 최종 psum 누적**
+>
+> 이전 단계에서 도출된 부분합이 **psum accumulator**에 최종 누적됨. 
+
+
+
+
+

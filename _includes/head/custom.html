@@ -38,4 +38,204 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 
+<script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.1.0/dist/medium-zoom.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 포스팅 본문(.page__content) 안의 모든 이미지를 자동으로 선택
+    const images = Array.from(document.querySelectorAll('.page__content img'));
+    
+    // 확대 기능 활성화 및 디자인 커스텀
+    mediumZoom(images, {
+      margin: 40,               /* 확대 시 모니터 가장자리와의 여백 */
+      background: 'rgba(26, 29, 36, 0.95)', /* 확대 시 뒷배경 색상 및 투명도 (다크모드 맞춤) */
+      scrollOffset: 40          /* 마우스 휠을 살짝 굴리면 부드럽게 닫힘 */
+    });
+  });
+</script>
+
+<style>
+  /* 화면 맨 위에 고정되는 얇은 선 */
+  .progress-container { width: 100%; height: 4px; background: transparent; position: fixed; top: 0; left: 0; z-index: 9999; }
+  .progress-bar { height: 4px; background: #00adb5; width: 0%; border-radius: 0 2px 2px 0; }
+</style>
+
+<div class="progress-container"><div class="progress-bar" id="myBar"></div></div>
+
+<script>
+  window.onscroll = function() {
+    let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+    let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    let scrolled = (winScroll / height) * 100;
+    document.getElementById("myBar").style.width = scrolled + "%";
+  };
+</script>
+
+<style>
+  /* 반응형 PDF 뷰어 컨테이너 */
+  .pdf-container { position: relative; width: 100%; height: 0; padding-bottom: 120%; /* 세로 비율 조절 */ margin: 30px 0; border: 1px solid #444; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+  .pdf-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/anchor-js/anchor.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    anchors.options = { 
+      placement: 'left', /* 제목 왼쪽에 아이콘 표시 */
+      icon: '🔗',
+      visible: 'hover'   /* 마우스를 올렸을 때만 표시 */
+    };
+    /* 본문 안의 h2, h3, h4 태그에만 적용 */
+    anchors.add('.page__content h2, .page__content h3, .page__content h4');
+  });
+</script>
+
+<style>
+  #btn-back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999; /* 다른 요소에 가려지지 않게 최상단 배치 */
+    border: none;
+    outline: none;
+    background-color: #252a34; 
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  #btn-back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  #btn-back-to-top:hover {
+    background-color: #00adb5; 
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 173, 181, 0.5);
+  }
+
+  #btn-back-to-top:hover svg path {
+    stroke: #ffffff;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. 웹페이지 로딩이 끝나면 안전한 위치에 버튼을 직접 생성합니다
+    const bttButton = document.createElement("button");
+    bttButton.id = "btn-back-to-top";
+    bttButton.title = "맨 위로 가기";
+    bttButton.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00adb5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 15l-6-6-6 6"/></svg>`;
+    
+    document.body.appendChild(bttButton); // <body> 태그 제일 끝에 찰싹 붙임
+
+    // 2. 스크롤을 감지해서 버튼을 보여주거나 숨깁니다
+    window.addEventListener("scroll", () => {
+      // 스크롤이 300px 이상 내려갔을 때
+      if (window.scrollY > 300) {
+        bttButton.classList.add("show");
+      } else {
+        bttButton.classList.remove("show");
+      }
+    });
+
+    // 3. 클릭하면 맨 위로 이동합니다
+    bttButton.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+</script>
+
+<script>
+  document.addEventListener('copy', function(e) {
+    const selection = window.getSelection();
+    const copiedText = selection.toString();
+    
+    // 💡 매너 설정: 짧은 단어나 '코드 블록(<pre>)' 안의 내용을 복사할 때는 출처를 붙이지 않음 (코드는 바로 붙여넣고 실행해야 하니까요!)
+    if (copiedText.length < 50 || selection.anchorNode.parentNode.closest('pre')) {
+      return; 
+    }
+
+    const pageTitle = document.title;
+    const pageLink = document.location.href;
+    const sourceText = `\n\n---\n출처: ${pageTitle}\n링크: ${pageLink}`;
+    
+    e.clipboardData.setData('text/plain', copiedText + sourceText);
+    e.preventDefault();
+  });
+</script>
+
+<style>
+  /* 기본 스크롤바 크기 (폭 12px로 늘림) */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  /* 1. 라이트 모드 (기본값) */
+  ::-webkit-scrollbar-track {
+    background: #f4f4f4; /* 밝은 회색 배경 */
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #cccccc; /* 조금 더 진한 회색 */
+    border-radius: 6px;
+    border: 3px solid #f4f4f4; /* 폭이 넉넉해진 만큼 여백 조절 */
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #00adb5; /* 포인트 컬러 */
+  }
+
+  /* 2. 다크 모드일 때만 색상 자동 변경 */
+  [data-theme='dark'] ::-webkit-scrollbar-track {
+    background: #1a1d24; /* 기존 다크모드 배경 */
+  }
+  [data-theme='dark'] ::-webkit-scrollbar-thumb {
+    background-color: #444; /* 다크모드용 짙은 막대 */
+  }
+  [data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
+    background-color: #00adb5;
+  }
+</style>
+
+<style>
+  /* 외부 링크 옆에 붙을 앙증맞은 화살표 아이콘 디자인 */
+  .external-link::after {
+    content: " ↗";
+    font-size: 0.85em;
+    color: #888;
+    display: inline-block;
+    transition: transform 0.2s, color 0.2s;
+  }
+  .external-link:hover::after {
+    transform: translate(2px, -2px);
+    color: #00adb5;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const links = document.querySelectorAll('.page__content a');
+    const currentDomain = window.location.hostname;
+
+    links.forEach(link => {
+      // 1. 링크가 존재하고, 2. 내 블로그 주소가 아니며, 3. 페이지 내 앵커(#)가 아닐 때
+      if (link.hostname && link.hostname !== currentDomain && !link.href.startsWith('javascript:')) {
+        link.target = '_blank';              /* 새 창에서 열기 속성 추가 */
+        link.rel = 'noopener noreferrer';    /* 보안 속성 추가 */
+        link.classList.add('external-link'); /* 화살표 CSS 클래스 추가 */
+      }
+    });
+  });
+</script>
+
 <!-- end custom head snippets -->

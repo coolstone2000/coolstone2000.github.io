@@ -6,17 +6,36 @@
           }
         },
         tex2jax: {
-        inlineMath: [ ['$', '$'] ],
-        displayMath: [ ['$$', '$$'] ],
-        processEscapes: true,
-      }
+          inlineMath: [ ['$', '$'] ],
+          displayMath: [ ['$$', '$$'] ],
+          processEscapes: true,
+        }
     });
-    MathJax.Hub.Register.MessageHook("Math Processing Error",function (message) {
-          alert("Math Processing Error: "+message[1]);
-        });
-    MathJax.Hub.Register.MessageHook("TeX Jax - parse error",function (message) {
-          alert("Math Processing Error: "+message[1]);
-        });
-    </script>
-<script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+    
+    // 💡 에러 발생 시 독자에게 팝업을 띄우지 않고, 개발자 도구(F12) 콘솔에만 조용히 로그를 남깁니다.
+    MathJax.Hub.Register.MessageHook("Math Processing Error", function (message) {
+      console.error("MathJax Error: " + message[1]);
+    });
+    MathJax.Hub.Register.MessageHook("TeX Jax - parse error", function (message) {
+      console.error("MathJax Parse Error: " + message[1]);
+    });
+</script>
+
+<script type="text/javascript" async 
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+
+<script>
+  // 지킬 테마가 페이지를 비동기로 새로 불러올 때마다 MathJax를 강제 리로딩
+  document.addEventListener("pjax:success", function() {
+    if (typeof MathJax !== "undefined") {
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    }
+  });
+  // 혹시 터보링크(Turbolinks)를 쓰는 테마일 경우
+  document.addEventListener("turbolinks:load", function() {
+    if (typeof MathJax !== "undefined") {
+      MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+    }
+  });
 </script>
