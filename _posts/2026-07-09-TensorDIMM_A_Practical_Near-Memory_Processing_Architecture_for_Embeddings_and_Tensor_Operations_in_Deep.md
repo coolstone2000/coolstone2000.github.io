@@ -15,21 +15,11 @@ Tensor 연산의 memory 용량과 bandwidth 문제를 해결 하기 위해 Near 
 
 # ◼︎ Introduction
 
-하드웨어 가속이 필요로 하는데 이 부분은 보통 MAC 연산과 이와 관련된 data 전송에서 bottleneck이 있음. 그래서 보통 4가지로 이를 해결함.
+CNN과 달리 DNN에서는 GPU나 NPU로 가속을 해결하는 부분 보다 memory wall문제가 매우 큼. Convolution 연산보다 embedding layer의 높은 memory capacity와 bandwidth를 GPU의 memory가 커버를 하지 못하고 이 부분의 workload가 매우 높음. 그래서 DNN inference에 CPU만 사용하거나 embedding만 CPU에서 하고 나머지는 GPU에서 하는 hybrid CPU-GPU를 사용함. 근데 이는 모든 embedding이 GPU memory에 저장될 수 있다고 가정하면 엄청 속도차이가 남. CPU만 사용하면 data 가져오면서 overhead가 있고 CPU-GPU를 해도 PCle channel을 통해 embedding을 복사하는 과정 때문에 latency가 생김. 
 
-- **1. Data reuse:** 데이터 흐름을 효율적으로 scheduling하는 방식
-- **2. Data type and width:** Quantization(16, 8 등등 비트수 낮추기)
-- **3. Zero values(Sparsity):** 0 값을 처리하는 방식(pruning)
-- **4. Approximate computation:** 정확하지 않고 근사치로
+그래서 DIMM에 기반하되 Near Memory Processing(NMP) unit을 추가하여 개선한 TensorDIMM을 제시함. 상용 DRAM 장치를 그대로 활용하면서 GPU와 호환되게하는 TensorDIMM이 embedding을 훨씬 빠르게 하여 속도 향상을 시킴.
 
-## Our Focus
-
-Bit Sparsity: 보통은 0값을 skip하려고 했다면 이 연구에서는 어떠한 값 내부의 비트에 0이 있는 경우의 연산을 skip하는 것을 목표로 함. 그래도 수학적으로는 같기 때문임.
-
-### Contrtibution
-
-1. 기존에 16bit 모델에서 0bit의 비율이 90% 이상이라는 것을 넘어 8bit, pruning 된 모델 등등 quantized 모델도 그러함을 증명
-2. Laconic 설계. 입력 데이터를 리스트로 encoding 하고 직렬로 곱하고 accumulate함. 병렬성 때문에 전체적인 latency 감소. 이를 LPE(Laconic Processing element)유닛으로 하여 면적이 크고 전력을 많이 먹는 곱셈기 대신 작은 adder를 많이 사용하여 조합한 방식으로 효율적인 설계. 
+# ◼︎ Background
 
 # ◼︎ Bit Sparsity Is Abundant
 
