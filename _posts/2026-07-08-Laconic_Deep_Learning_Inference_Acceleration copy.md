@@ -438,7 +438,7 @@ $s$는 weight 값의 sign bit $t$는 weight 값의 지수값 $s'$은 activation 
 
 ### A Histogram-Based PE
 
-<center><img src="/images/PR/Laconic/figure3.JPG" width = "800"><br></center>
+<center><img src="/images/PR/Laconic/figure3.jpg" width = "800"><br></center>
 
 여기서는 16 channel일때 흐름을 봄. 크게 6단계로 나눠짐. 
 
@@ -1008,7 +1008,7 @@ Figure 3에서 (2)one-hot과 (3)histogram 사이에 $$D_0^0, D_0^1, D_0^2, \dots
 ## Tile Organization
 
 
-<center><img src="/images/PR/Laconic/figure4.JPG" width = "800"><br></center>
+<center><img src="/images/PR/Laconic/figure4.jpg" width = "800"><br></center>
 
 지금까지 하나의 LPE에 대해서 했지만 tile처럼 여러개의 LPE를 깔면 병렬적으로 한번에 처리 가능하고 어짜피 연산에는 수십 cycle이 걸리기 때문에 data의 병목도 생기지 않음.
 
