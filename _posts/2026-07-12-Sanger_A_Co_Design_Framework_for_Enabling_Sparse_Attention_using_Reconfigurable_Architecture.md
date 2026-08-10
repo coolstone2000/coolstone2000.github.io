@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "Sanger_A Co-Design Framework for Enabling Sparse Attention using Reconfigurable Architecture, MICRO 2021"
+title: "Sanger: A Co-Design Framework for Enabling Sparse Attention using Reconfigurable Architecture, MICRO 2021"
 categories: Paper_review
 tags: PR
 toc: true
@@ -12,7 +12,7 @@ comments: true
 # ◼︎ Abstract
 
 최근 attention 기반 모델이 많아졌지만 attention mechenism에는 본질적으로 많은 수의 불필요한 연산이 있음. 그래서 이를 해결하기 위해 sparse attention이 주목받고 있고 이는 sampled dense-dense matrix multiplication(SDDMM)즉 sparse-dense matrix multiplication(SpMM)에 나오는 0값을 하드웨어적으로 제거할 수 있어야 함. 하지만 sparse pattern이 불규칙하면 하드웨어 효율이 낮고, 규칙적인 pattern에 대해 하면 연산 절감 효과가 제한적임. 
-
+ 
 그래서 Sanger를 제안하는 것이고 소프트웨어 부분은 attention matrix를 동적인 구조적 패턴으로 pruning하며, 하드웨어 부분은 이러한 패턴을 활용할 수 있는 재구성 가능한 아키텍처를 제공함. 
 
 # ◼︎ Introduction

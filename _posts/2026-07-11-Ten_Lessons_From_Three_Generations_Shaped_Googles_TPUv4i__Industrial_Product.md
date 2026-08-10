@@ -1,6 +1,6 @@
 ---
 layout: single
-title: "Ten_Lessons_From_Three_Generations_Shaped_Googles_TPUv4i__Industrial_Product, ISCA 2021"
+title: "Ten Lessons From Three Generations Shaped Googles TPUv4i Industrial Product, ISCA 2021"
 categories: Paper_review
 tags: PR
 toc: true

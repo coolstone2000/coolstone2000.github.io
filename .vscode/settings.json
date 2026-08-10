@@ -13,11 +13,11 @@
     }
   },
   "terminal.integrated.profiles.osx": {
-    "Jekyll Auto Server": {
-      "path": "/bin/zsh",
-      "args": [
-        "-lc",
-        "export PATH=\"$HOME/.rbenv/bin:$PATH\"; eval \"$(rbenv init - zsh)\"; cd '/Users/coolstone/Documents/GitHub/coolstone2000.github.io' && if lsof -nP -iTCP:4000 -sTCP:LISTEN >/dev/null 2>&1; then echo 'Jekyll server already running at http://127.0.0.1:4000'; else mkdir -p /tmp && RBENV_VERSION=3.3.4 nohup bundle exec jekyll serve --livereload --host 127.0.0.1 --port 4000 > /tmp/coolstone-jekyll-server.log 2>&1 & fi; exec zsh -l"
+  "Jekyll Auto Server": {
+    "path": "/bin/zsh",
+    "args": [
+      "-lc",
+      "export PATH=\"$HOME/.rbenv/bin:$PATH\"; eval \"$(rbenv init - zsh)\"; cd '/Users/coolstone/Documents/GitHub/coolstone2000.github.io' && if lsof -nP -iTCP:4000 -sTCP\\:LISTEN >/dev/null 2>&1; then echo 'Jekyll server already running at http://127.0.0.1:4000'; else mkdir -p /tmp && RBENV_VERSION=3.3.4 nohup bundle exec jekyll serve --livereload --force_polling --host 127.0.0.1 --port 4000 > /tmp/coolstone-jekyll-server.log 2>&1 & fi; exec zsh -l"
       ]
     }
   },

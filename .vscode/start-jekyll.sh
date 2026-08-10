@@ -3,7 +3,7 @@
 set -u
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-log_file="$repo_root/.vscode/jekyll-server.log"
+log_file="${TMPDIR:-/tmp}/coolstone-jekyll-server.log"
 
 bundle_bin=""
 jekyll_bin=""
@@ -42,7 +42,7 @@ mkdir -p "$(dirname "$log_file")"
 
 if [ -z "$bundle_bin" ]; then
   if [ -n "$jekyll_bin" ]; then
-    nohup "$jekyll_bin" serve --livereload --force_polling --host 127.0.0.1 --port 4000 >"$log_file" 2>&1 &
+    nohup "$jekyll_bin" serve --livereload --incremental --force_polling --host 127.0.0.1 --port 4000 >"$log_file" 2>&1 &
     echo "Jekyll server starting at http://127.0.0.1:4000"
     echo "Log: $log_file"
     exit 0
@@ -52,8 +52,12 @@ if [ -z "$bundle_bin" ]; then
   printf '%s\n' "Open a normal terminal and run: which jekyll && jekyll --version" >>"$log_file"
   exit 0
 fi
-
-nohup "$bundle_bin" exec jekyll serve --livereload --force_polling --host 127.0.0.1 --port 4000 >"$log_file" 2>&1 &
+nohup "$bundle_bin" exec jekyll serve \
+  --livereload \
+  --force_polling \
+  --host 127.0.0.1 \
+  --port 4000 \
+  >"$log_file" 2>&1 &
 
 echo "Jekyll server starting at http://127.0.0.1:4000"
 echo "Log: $log_file"
