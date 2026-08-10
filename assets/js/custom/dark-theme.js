@@ -1,12 +1,12 @@
 // assets/js/custom/dark-theme.js
 
 console.log(
-  "===== NEW DARK THEME JS LOADED : DEBUG VERSION 2026-08-10 ====="
+  "===== DARK THEME JS LOADED : FINAL TABLE WRAPPER VERSION ====="
 );
 
 (() => {
   /* =========================================================
-     일반 Markdown 표 가로 스크롤
+     일반 Markdown 표 처리
      ========================================================= */
 
   const applyTableScroll = () => {
@@ -20,83 +20,144 @@ console.log(
       )
     );
 
+
     /*
      * 일반 Markdown 표만 선택
      *
-     * Rouge 코드블럭 내부 table은 전부 제외함.
+     * Rouge 코드블럭 내부 table은 제외
      */
-    const tables = allTables.filter(
-      (table) => {
-        /*
-         * Rouge line-number table 제외
-         */
-        if (
-          table.classList.contains(
-            "rouge-table"
-          )
-        ) {
-          return false;
-        }
-
-
-        /*
-         * 코드블럭 내부에 있는 table 제외
-         */
-        if (
-          table.closest(".highlight") ||
-          table.closest(
-            ".highlighter-rouge"
-          ) ||
-          table.closest("pre") ||
-          table.closest("code")
-        ) {
-          return false;
-        }
-
-
-        return true;
+    const tables = allTables.filter((table) => {
+      /*
+       * Rouge line-number table 제외
+       */
+      if (
+        table.classList.contains(
+          "rouge-table"
+        )
+      ) {
+        return false;
       }
-    );
+
+
+      /*
+       * 코드블럭 내부 table 제외
+       */
+      if (
+        table.closest(".highlight") ||
+        table.closest(
+          ".highlighter-rouge"
+        ) ||
+        table.closest("pre") ||
+        table.closest("code")
+      ) {
+        return false;
+      }
+
+
+      return true;
+    });
 
 
     /*
-     * 일반 Markdown 표에만
-     * 가로 스크롤 적용
+     * 일반 Markdown 표 처리
      */
     tables.forEach((table) => {
-      table.style.setProperty(
-        "display",
-        "block",
-        "important"
+      /*
+       * 일반 Markdown 표 전용 클래스
+       */
+      table.classList.add(
+        "markdown-table"
       );
 
-      table.style.setProperty(
-        "width",
-        "100%",
-        "important"
+
+      /*
+       * 예전 dark-theme.js에서
+       * table에 직접 넣었던 inline style 제거
+       */
+      table.style.removeProperty(
+        "display"
       );
 
-      table.style.setProperty(
-        "max-width",
-        "100%",
-        "important"
+      table.style.removeProperty(
+        "width"
       );
 
-      table.style.setProperty(
-        "overflow-x",
-        "auto",
-        "important"
+      table.style.removeProperty(
+        "min-width"
       );
 
-      table.style.setProperty(
-        "overflow-y",
-        "hidden",
-        "important"
+      table.style.removeProperty(
+        "max-width"
       );
 
-      table.style.setProperty(
-        "-webkit-overflow-scrolling",
-        "touch"
+      table.style.removeProperty(
+        "overflow"
+      );
+
+      table.style.removeProperty(
+        "overflow-x"
+      );
+
+      table.style.removeProperty(
+        "overflow-y"
+      );
+
+      table.style.removeProperty(
+        "margin"
+      );
+
+      table.style.removeProperty(
+        "margin-left"
+      );
+
+      table.style.removeProperty(
+        "margin-right"
+      );
+
+      table.style.removeProperty(
+        "-webkit-overflow-scrolling"
+      );
+
+
+      /*
+       * 이미 wrapper가 존재하면
+       * 중복으로 감싸지 않음
+       */
+      if (
+        table.parentElement?.classList.contains(
+          "markdown-table-wrapper"
+        )
+      ) {
+        return;
+      }
+
+
+      /*
+       * 가로 스크롤용 wrapper 생성
+       */
+      const wrapper =
+        document.createElement(
+          "div"
+        );
+
+      wrapper.className =
+        "markdown-table-wrapper";
+
+
+      /*
+       * 기존 table 위치에 wrapper 삽입
+       */
+      table.parentNode.insertBefore(
+        wrapper,
+        table
+      );
+
+
+      /*
+       * table을 wrapper 내부로 이동
+       */
+      wrapper.appendChild(
+        table
       );
     });
 
@@ -115,6 +176,13 @@ console.log(
       "[dark-theme] 제외된 table:",
       allTables.length - tables.length
     );
+
+    console.log(
+      "[dark-theme] wrapper:",
+      document.querySelectorAll(
+        ".markdown-table-wrapper"
+      ).length
+    );
   };
 
 
@@ -127,130 +195,143 @@ console.log(
       "===== FIX ROUGE CALLED ====="
     );
 
+
     const rougeTables =
       document.querySelectorAll(
         "table.rouge-table"
       );
 
 
-    console.log(
-      "[rouge] 발견된 rouge-table:",
-      rougeTables.length
-    );
+    rougeTables.forEach((table) => {
+      /*
+       * 혹시 일반 Markdown 표 클래스가
+       * 잘못 붙어 있으면 제거
+       */
+      table.classList.remove(
+        "markdown-table"
+      );
 
 
-    rougeTables.forEach(
-      (table, index) => {
-        /*
-         * 기존에 잘못 들어갔을 가능성이 있는
-         * inline style 제거
-         */
-        table.style.removeProperty(
-          "display"
-        );
+      /*
+       * 일반 Markdown table 처리 과정에서
+       * 들어갔을 가능성이 있는 inline style 제거
+       */
+      table.style.removeProperty(
+        "display"
+      );
 
-        table.style.removeProperty(
-          "width"
-        );
+      table.style.removeProperty(
+        "width"
+      );
 
-        table.style.removeProperty(
-          "max-width"
-        );
+      table.style.removeProperty(
+        "min-width"
+      );
 
-        table.style.removeProperty(
-          "overflow"
-        );
+      table.style.removeProperty(
+        "max-width"
+      );
 
-        table.style.removeProperty(
-          "overflow-x"
-        );
+      table.style.removeProperty(
+        "overflow"
+      );
 
-        table.style.removeProperty(
-          "overflow-y"
-        );
+      table.style.removeProperty(
+        "overflow-x"
+      );
 
-        table.style.removeProperty(
-          "-webkit-overflow-scrolling"
-        );
+      table.style.removeProperty(
+        "overflow-y"
+      );
 
+      table.style.removeProperty(
+        "margin"
+      );
 
-        /*
-         * Rouge table 정상 레이아웃
-         */
-        table.style.setProperty(
-          "display",
-          "table",
-          "important"
-        );
+      table.style.removeProperty(
+        "margin-left"
+      );
 
-        table.style.setProperty(
-          "width",
-          "100%",
-          "important"
-        );
+      table.style.removeProperty(
+        "margin-right"
+      );
 
-        table.style.setProperty(
-          "max-width",
-          "none",
-          "important"
-        );
-
-        table.style.setProperty(
-          "margin",
-          "0",
-          "important"
-        );
+      table.style.removeProperty(
+        "-webkit-overflow-scrolling"
+      );
 
 
-        /*
-         * 코드블럭 배경
-         */
-        table.style.setProperty(
-          "background",
-          "#171717",
-          "important"
-        );
+      /*
+       * Rouge table 정상 레이아웃
+       */
+      table.style.setProperty(
+        "display",
+        "table",
+        "important"
+      );
 
-        table.style.setProperty(
-          "background-color",
-          "#171717",
-          "important"
-        );
+      table.style.setProperty(
+        "width",
+        "100%",
+        "important"
+      );
 
+      table.style.setProperty(
+        "max-width",
+        "none",
+        "important"
+      );
 
-        /*
-         * 일반 Markdown table 스타일 제거
-         */
-        table.style.setProperty(
-          "border",
-          "0",
-          "important"
-        );
-
-        table.style.setProperty(
-          "border-radius",
-          "0",
-          "important"
-        );
-
-        table.style.setProperty(
-          "box-shadow",
-          "none",
-          "important"
-        );
-
-        table.style.setProperty(
-          "overflow",
-          "visible",
-          "important"
-        );
+      table.style.setProperty(
+        "margin",
+        "0",
+        "important"
+      );
 
 
-        console.log(
-          `[rouge] table ${index} 복구 완료`
-        );
-      }
-    );
+      /*
+       * 코드블럭 배경
+       */
+      table.style.setProperty(
+        "background",
+        "#171717",
+        "important"
+      );
+
+      table.style.setProperty(
+        "background-color",
+        "#171717",
+        "important"
+      );
+
+
+      /*
+       * 일반 Markdown table 디자인 제거
+       */
+      table.style.setProperty(
+        "border",
+        "0",
+        "important"
+      );
+
+      table.style.setProperty(
+        "border-radius",
+        "0",
+        "important"
+      );
+
+      table.style.setProperty(
+        "box-shadow",
+        "none",
+        "important"
+      );
+
+      table.style.setProperty(
+        "overflow",
+        "visible",
+        "important"
+      );
+    });
 
 
     /* =======================================================
@@ -300,8 +381,8 @@ console.log(
 
 
     console.log(
-      "[rouge] gutter/code cell 복구:",
-      rougeCells.length
+      "[rouge] 복구 완료:",
+      rougeTables.length
     );
   };
 
@@ -318,11 +399,9 @@ console.log(
     );
 
 
-    /*
-     * Rouge table이 없으면
-     * 수정할 것도 없음.
-     */
-    if (tables.length === 0) {
+    if (
+      tables.length === 0
+    ) {
       return false;
     }
 
@@ -330,11 +409,14 @@ console.log(
     const brokenTable =
       tables.find((table) => {
         const style =
-          getComputedStyle(table);
+          getComputedStyle(
+            table
+          );
 
 
-        const broken =
-          style.display !== "table" ||
+        return (
+          style.display !==
+            "table" ||
 
           style.backgroundColor !==
             "rgb(23, 23, 23)" ||
@@ -346,40 +428,8 @@ console.log(
             "0px" ||
 
           style.boxShadow !==
-            "none";
-
-
-        if (broken) {
-          console.warn(
-            "[rouge] 잘못된 Rouge table 발견",
-            {
-              element: table,
-
-              display:
-                style.display,
-
-              background:
-                style.backgroundColor,
-
-              border:
-                style.border,
-
-              radius:
-                style.borderRadius,
-
-              shadow:
-                style.boxShadow,
-
-              inlineStyle:
-                table.getAttribute(
-                  "style"
-                )
-            }
-          );
-        }
-
-
-        return broken;
+            "none"
+        );
       });
 
 
@@ -388,7 +438,7 @@ console.log(
 
 
   /* =========================================================
-     중복 requestAnimationFrame 방지
+     requestAnimationFrame 중복 방지
      ========================================================= */
 
   let rougeFixScheduled =
@@ -396,7 +446,9 @@ console.log(
 
 
   const scheduleRougeFix = () => {
-    if (rougeFixScheduled) {
+    if (
+      rougeFixScheduled
+    ) {
       return;
     }
 
@@ -411,15 +463,9 @@ console.log(
           false;
 
 
-        /*
-         * 상태가 잘못됐을 때만
-         * 실제 fix 실행
-         */
-        if (needsRougeFix()) {
-          console.log(
-            "===== ROUGE FIX SCHEDULED ====="
-          );
-
+        if (
+          needsRougeFix()
+        ) {
           fixRouge();
         }
       }
@@ -428,132 +474,57 @@ console.log(
 
 
   /* =========================================================
-     Rouge MutationObserver
+     본문 변경 감시
      ========================================================= */
 
-  const startRougeProtection = () => {
-    console.log(
-      "===== ROUGE PROTECTION START ====="
-    );
-
-
+  const startContentProtection = () => {
     /*
-     * 최초 한 번 강제 복구
+     * 최초 Rouge 복구
      */
     fixRouge();
 
 
-    /*
-     * 페이지 내용 감시
-     */
     const content =
       document.querySelector(
         ".page__content"
       );
 
 
-    if (!content) {
+    if (
+      !content
+    ) {
       console.warn(
-        "[rouge] .page__content를 찾지 못함"
+        "[dark-theme] .page__content를 찾지 못함"
       );
+
+      return;
     }
 
 
-    if (content) {
-      const observer =
-        new MutationObserver(
-          (mutations) => {
-            /*
-             * 어떤 변경이 발생했는지
-             * 디버깅용 로그
-             */
-            const relevantMutations =
-              mutations.filter(
-                (mutation) => {
-                  const target =
-                    mutation.target;
+    /*
+     * 본문에 동적으로 표가 추가되는 경우 대응
+     */
+    const observer =
+      new MutationObserver(
+        () => {
+          applyTableScroll();
 
-
-                  if (
-                    !(target instanceof Element)
-                  ) {
-                    return false;
-                  }
-
-
-                  return !!(
-                    target.matches?.(
-                      "table.rouge-table"
-                    ) ||
-
-                    target.matches?.(
-                      "td.rouge-gutter"
-                    ) ||
-
-                    target.matches?.(
-                      "td.rouge-code"
-                    ) ||
-
-                    target.closest?.(
-                      "table.rouge-table"
-                    )
-                  );
-                }
-              );
-
-
-            if (
-              relevantMutations.length > 0
-            ) {
-              console.log(
-                "===== ROUGE MUTATION DETECTED =====",
-                relevantMutations.length
-              );
-            }
-
-
-            scheduleRougeFix();
-          }
-        );
-
-
-      observer.observe(
-        content,
-        {
-          /*
-           * 동적으로 코드블럭 생성되는 경우
-           */
-          childList: true,
-
-          /*
-           * 하위 요소까지 전부 감시
-           */
-          subtree: true,
-
-          /*
-           * style 변경 감시
-           */
-          attributes: true,
-
-          attributeFilter: [
-            "style"
-          ]
+          scheduleRougeFix();
         }
       );
 
 
-      /*
-       * 콘솔에서 Observer 존재 여부
-       * 확인할 수 있게 전역으로 보관
-       */
-      window.__rougeObserver =
-        observer;
+    observer.observe(
+      content,
+      {
+        childList: true,
+        subtree: true
+      }
+    );
 
 
-      console.log(
-        "[rouge] content MutationObserver 등록 완료"
-      );
-    }
+    window.__contentObserver =
+      observer;
 
 
     /* =======================================================
@@ -562,18 +533,14 @@ console.log(
 
     const themeObserver =
       new MutationObserver(
-        (mutations) => {
-          console.log(
-            "===== THEME MUTATION DETECTED =====",
-            mutations.length
+        () => {
+          window.requestAnimationFrame(
+            () => {
+              applyTableScroll();
+
+              scheduleRougeFix();
+            }
           );
-
-
-          /*
-           * Theme CSS가 적용된 뒤
-           * 한 프레임 뒤에 검사
-           */
-          scheduleRougeFix();
         }
       );
 
@@ -595,11 +562,7 @@ console.log(
 
 
     console.log(
-      "[rouge] theme MutationObserver 등록 완료"
-    );
-
-    console.log(
-      "[dark-theme] Rouge protection enabled"
+      "[dark-theme] content protection enabled"
     );
   };
 
@@ -608,7 +571,9 @@ console.log(
      Theme 변경
      ========================================================= */
 
-  const setDarkMode = (isDark) => {
+  const setDarkMode = (
+    isDark
+  ) => {
     console.log(
       "[dark-theme] setDarkMode:",
       isDark
@@ -691,9 +656,9 @@ console.log(
 
 
     /*
-     * Rouge 보호 시작
+     * Rouge + 동적 콘텐츠 보호
      */
-    startRougeProtection();
+    startContentProtection();
 
 
     /* =======================================================
@@ -706,7 +671,9 @@ console.log(
       );
 
 
-    if (!toggleThemeBtn) {
+    if (
+      !toggleThemeBtn
+    ) {
       console.warn(
         "[dark-theme] toggle_dark_theme 없음"
       );
@@ -726,12 +693,14 @@ console.log(
 
 
     /* =======================================================
-       Theme 결정
+       초기 Theme 결정
        ======================================================= */
 
     const isDark =
       savedTheme
-        ? savedTheme === "dark"
+
+        ? savedTheme ===
+          "dark"
 
         : window
             .matchMedia(
@@ -753,35 +722,27 @@ console.log(
     );
 
 
-    /* =======================================================
-       Toggle 상태
-       ======================================================= */
-
+    /*
+     * Toggle 상태
+     */
     toggleThemeBtn.checked =
       isDark;
 
 
-    /* =======================================================
-       Theme 적용
-       ======================================================= */
-
+    /*
+     * Theme 적용
+     */
     setDarkMode(
       isDark
     );
 
 
-    /* =======================================================
-       Theme 변경 이벤트
-       ======================================================= */
-
+    /*
+     * Toggle 이벤트
+     */
     toggleThemeBtn.addEventListener(
       "change",
       (event) => {
-        console.log(
-          "===== THEME TOGGLE CHANGE ====="
-        );
-
-
         setDarkMode(
           event.target.checked
         );
@@ -790,7 +751,7 @@ console.log(
 
 
     console.log(
-      "[dark-theme] toggle event 등록 완료"
+      "[dark-theme] initialize 완료"
     );
   };
 
@@ -803,11 +764,6 @@ console.log(
     document.readyState ===
     "loading"
   ) {
-    console.log(
-      "[dark-theme] DOMContentLoaded 대기"
-    );
-
-
     document.addEventListener(
       "DOMContentLoaded",
       initialize,
@@ -815,13 +771,7 @@ console.log(
         once: true
       }
     );
-
   } else {
-    console.log(
-      "[dark-theme] DOM 이미 로딩 완료"
-    );
-
-
     initialize();
   }
 
@@ -829,8 +779,8 @@ console.log(
   /* =========================================================
      window.load
 
-     모든 이미지/스크립트/리소스 로딩 후
-     마지막으로 한 번 더 검사함.
+     이미지 / 스크립트 등
+     모든 리소스 로딩 후 최종 검사
      ========================================================= */
 
   window.addEventListener(
@@ -843,21 +793,8 @@ console.log(
 
       applyTableScroll();
 
-
-      /*
-       * 여기서는 검사만 하지 않고
-       * 한 번 강제로 복구함.
-       *
-       * 콘솔에서 직접 실행할 때
-       * 정상화됐던 상황과 최대한 동일하게 함.
-       */
       fixRouge();
 
-
-      /*
-       * 혹시 그 이후 또 변경되는 경우는
-       * MutationObserver가 처리함.
-       */
       scheduleRougeFix();
     },
     {
@@ -867,23 +804,20 @@ console.log(
 
 
   /* =========================================================
-     전역 디버그 함수
+     디버깅용 전역 함수
 
-     콘솔에서 아래 명령 사용 가능:
+     Console:
 
      window.__fixRouge()
      window.__checkRouge()
      window.__applyTableScroll()
-
      ========================================================= */
 
   window.__fixRouge =
     fixRouge;
 
-
   window.__checkRouge =
     needsRougeFix;
-
 
   window.__applyTableScroll =
     applyTableScroll;
@@ -892,5 +826,4 @@ console.log(
   console.log(
     "[dark-theme] DEBUG helpers registered"
   );
-
 })();

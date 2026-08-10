@@ -1,96 +1,407 @@
 @import "./toggle.scss";
 @import "./summary.scss";
 
-/* Code blocks: preserve alignment and spacing in rendered posts */
+
+/* ==========================================================
+   Code blocks
+   ========================================================== */
+
 .page__content .highlight,
 .page__content .highlight pre,
 .page__content .highlight code,
 .page__content .highlight span,
 .page__content .highlight td {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
-    font-size: 0.75rem !important; /* 💡 0.85rem보다 더 축소하여 컴팩트하게 맞췄습니다. */
-    line-height: 1.60 !important; /* 글자 크기에 맞춰 줄간격도 1.60으로 최적화했습니다. */
-    letter-spacing: 0 !important;
-    font-variant-ligatures: none !important;
-    font-variant-numeric: tabular-nums lining-nums !important;
-    font-feature-settings: "tnum" 1, "lnum" 1, "liga" 0 !important;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    "Courier New",
+    monospace !important;
+
+  font-size: 0.75rem !important;
+  line-height: 1.60 !important;
+
+  letter-spacing: 0 !important;
+
+  font-variant-ligatures:
+    none !important;
+
+  font-variant-numeric:
+    tabular-nums
+    lining-nums !important;
+
+  font-feature-settings:
+    "tnum" 1,
+    "lnum" 1,
+    "liga" 0 !important;
 }
+
 
 .page__content pre,
 .page__content pre code,
 .page__content .highlight pre,
 .page__content .highlight pre code {
-    white-space: pre !important;
-    tab-size: 4;
-    -moz-tab-size: 4;
-    overflow-wrap: normal;
-    word-break: normal;
+  white-space: pre !important;
+
+  tab-size: 4;
+  -moz-tab-size: 4;
+
+  overflow-wrap: normal;
+  word-break: normal;
 }
+
 
 .page__content pre code {
-    display: block;
-    min-width: 100%;
+  display: block;
+
+  min-width: 100%;
 }
 
-/* Markdown tables in post content */
-.page__content > table {
-	width: auto;
-	max-width: 100%;
-	border-collapse: collapse;
-	border-spacing: 0;
-	margin: 1.25rem 0;
-	font-size: 0.95rem;
+
+
+/* ==========================================================
+   Markdown Table Wrapper
+
+   역할:
+   - 작은 표는 가운데 정렬
+   - 큰 표는 가로 스크롤
+   - Wrapper 자체에는 디자인 없음
+   ========================================================== */
+
+.page__content
+.markdown-table-wrapper {
+  display: block !important;
+
+  width: 100% !important;
+  max-width: 100% !important;
+
+  margin: 1.25rem 0 !important;
+  padding: 0 !important;
+
+  overflow-x: auto !important;
+  overflow-y: hidden !important;
+
+  -webkit-overflow-scrolling:
+    touch;
+
+  background:
+    transparent !important;
+
+  background-color:
+    transparent !important;
+
+  border:
+    0 !important;
+
+  border-radius:
+    0 !important;
+
+  box-shadow:
+    none !important;
 }
 
-.page__content > table th,
-.page__content > table td {
-	padding: 0.55rem 0.8rem;
-	vertical-align: middle;
-	white-space: nowrap;
+
+
+/* ==========================================================
+   Markdown Table 기본 Layout
+   ========================================================== */
+
+.page__content
+.markdown-table-wrapper
+> table.markdown-table {
+  /*
+   * 중요
+   *
+   * 표 내용 크기만큼만 너비를 차지함.
+   */
+  display:
+    table !important;
+
+  width:
+    max-content !important;
+
+  min-width:
+    0 !important;
+
+  max-width:
+    none !important;
+
+
+  /*
+   * 중요
+   *
+   * 작은 표 가운데 정렬
+   */
+  margin:
+    0 auto !important;
+
+
+  /*
+   * 기존 표 디자인 유지
+   */
+  border-collapse:
+    collapse !important;
+
+  border-spacing:
+    0 !important;
+
+  font-size:
+    0.95rem !important;
 }
 
-.page__content > table th {
-	font-weight: 700;
-	text-align: center;
+
+
+/* ==========================================================
+   Markdown Table Header / Cell
+   ========================================================== */
+
+.page__content
+.markdown-table-wrapper
+> table.markdown-table th,
+
+.page__content
+.markdown-table-wrapper
+> table.markdown-table td {
+  padding:
+    0.55rem 0.8rem !important;
+
+  vertical-align:
+    middle !important;
+
+  /*
+   * 열이 불필요하게 좁아져
+   * 줄바꿈되는 것을 방지
+   */
+  white-space:
+    nowrap !important;
+
+  text-align:
+    center !important;
 }
 
-.page__content > table td {
-	text-align: center;
+
+.page__content
+.markdown-table-wrapper
+> table.markdown-table th {
+  font-weight:
+    700 !important;
 }
 
-/* Dark mode table contrast */
-html[data-theme='dark'] .page__content > table {
-	background: #1e232b;
-	border: 1px solid rgba(255, 255, 255, 0.12);
-	box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
-	border-radius: 12px;
-	overflow: hidden;
+
+
+/* ==========================================================
+   Dark Mode - Table
+   기존 디자인 유지
+   ========================================================== */
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table {
+  background:
+    #1e232b !important;
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.12
+    ) !important;
+
+  box-shadow:
+    0 10px 28px
+    rgba(
+      0,
+      0,
+      0,
+      0.24
+    ) !important;
+
+  border-radius:
+    12px !important;
+
+  overflow:
+    hidden !important;
 }
 
-html[data-theme='dark'] .page__content > table thead th {
-	background: linear-gradient(180deg, #353c49 0%, #2a303a 100%);
-	color: #f4f7fb;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+
+
+/* ==========================================================
+   Dark Mode - Table Header
+   기존 그라데이션 유지
+   ========================================================== */
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+thead th {
+  background:
+    linear-gradient(
+      180deg,
+      #353c49 0%,
+      #2a303a 100%
+    ) !important;
+
+  color:
+    #f4f7fb !important;
+
+  border-bottom:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.16
+    ) !important;
 }
 
-html[data-theme='dark'] .page__content > table tbody th,
-html[data-theme='dark'] .page__content > table tbody td {
-	background: rgba(255, 255, 255, 0.015);
-	color: #eef2f7;
-	border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+
+
+/* ==========================================================
+   Dark Mode - Table Body
+   ========================================================== */
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+tbody th,
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+tbody td {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.015
+    ) !important;
+
+  color:
+    #eef2f7 !important;
+
+  border-bottom:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.10
+    ) !important;
 }
 
-html[data-theme='dark'] .page__content > table tbody tr:nth-child(even) th,
-html[data-theme='dark'] .page__content > table tbody tr:nth-child(even) td {
-	background: rgba(255, 255, 255, 0.04);
+
+
+/* ==========================================================
+   Dark Mode - Zebra Stripe
+   ========================================================== */
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+tbody
+tr:nth-child(even)
+th,
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+tbody
+tr:nth-child(even)
+td {
+  background:
+    rgba(
+      255,
+      255,
+      255,
+      0.04
+    ) !important;
 }
 
-html[data-theme='dark'] .page__content > table th,
-html[data-theme='dark'] .page__content > table td {
-	border-right: 1px solid rgba(255, 255, 255, 0.08);
+
+
+/* ==========================================================
+   Dark Mode - 세로 Border
+   ========================================================== */
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+th,
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+td {
+  border-right:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      0.08
+    ) !important;
 }
 
-html[data-theme='dark'] .page__content > table th:last-child,
-html[data-theme='dark'] .page__content > table td:last-child {
-	border-right: 0;
+
+
+/* ==========================================================
+   마지막 열 오른쪽 Border 제거
+   ========================================================== */
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+th:last-child,
+
+html[data-theme='dark']
+.page__content
+.markdown-table-wrapper
+> table.markdown-table
+td:last-child {
+  border-right:
+    0 !important;
+}
+
+
+
+/* ==========================================================
+   Mobile
+   ========================================================== */
+
+@media screen and
+(max-width: 768px) {
+
+  .page__content
+  .markdown-table-wrapper {
+    width:
+      100% !important;
+
+    max-width:
+      100% !important;
+
+    overflow-x:
+      auto !important;
+
+    overflow-y:
+      hidden !important;
+
+    -webkit-overflow-scrolling:
+      touch;
+  }
+
 }

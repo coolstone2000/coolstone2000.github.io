@@ -3241,7 +3241,6 @@ LLM의 Weight가 차지하는 Memory Footprint가 매우 크기 때문에 4-bit�
 
 따라서 **3-bit와 같은 매우 낮은 Precision에서도 Accuracy를 유지할 수 있는 새로운 Data Type과 Hardware가 필요함.**
 
-
 #### 기존 방식 비교
 
 | Framework | Per-Group | 다양한 Precision | 3-bit Accuracy | Hardware Efficiency |
@@ -3255,121 +3254,2195 @@ LLM의 Weight가 차지하는 Memory Footprint가 매우 크기 때문에 4-bit�
 
 기존 방식들은 Accuracy 또는 Hardware Efficiency 중 한쪽에서는 장점이 있지만, 두 가지를 동시에 만족시키는 데 한계가 있음.
 
-# ◼︎ TPUv4i Performance Analysis
+# ◼︎ BitMoD Quatization Framework
 
-이 절에서는 Google의 실제 추론 애플리케이션과 MLPerf Inference 벤치마크를 이용해 TPUv4i의 성능과 전력 효율을 분석함. 주요 비교 대상은 이전 세대인 TPUv3와 NVIDIA의 추론용 GPU인 T4임.
+## A. Asymmetric FP3 and FP4 Data Types
 
-**핵심 결과**
+BitMoD는 **기본 Floating-Point에서 중복되는 Zero를 새로운 Special Value로 바꾸어**, 제한된 Bit 수를 더 효율적으로 활용하는 새로운 FP3/FP4 Data Type을 제안함.
 
-- 실제 Google 워크로드에서 TPUv4i와 TPUv3의 성능은 모두 TPUv2의 약 1.9배임
-- TPUv4i의 성능/TDP는 TPUv3보다 약 2.3배 높음
-- MLPerf에서 TPUv4i는 NVIDIA T4보다 약 1.3~1.6배 빠름
-- 단순한 최고 성능보다 전력, 메모리, 냉각을 포함한 성능/TCO를 개선한 것이 핵심임
+기본 Floating-Point는 Sign-Magnitude 표현을 사용하기 때문에 `+0`과 `-0`이 서로 다른 Bit Pattern을 가지지만 실제 값은 모두 0임.
 
-## TPU 세대별 실제 워크로드 성능
+특히 3-bit에서는 총 8개의 Bit Pattern밖에 없기 때문에 하나의 중복된 Zero가 차지하는 비중이 큼.
 
-Figure 8은 Google의 실제 프로덕션 추론 애플리케이션에서 TPU 세대별 성능을 TPUv2 기준으로 비교한 결과임.
+$$
+2^3 = 8
+$$
 
-<table class="tpu-table">
-  <thead>
-    <tr>
-      <th>TPU</th>
-      <th>TPUv2 대비 성능</th>
-      <th>특징</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>TPUv1</td>
-      <td>약 0.7배</td>
-      <td>초기 추론 전용 구조임</td>
-    </tr>
-    <tr>
-      <td>TPUv3</td>
-      <td>약 1.9배</td>
-      <td>2코어 기반의 학습·추론용 칩임</td>
-    </tr>
-    <tr>
-      <td>TPUv4i</td>
-      <td>약 1.9배</td>
-      <td>1코어 기반의 추론 전용 칩임</td>
-    </tr>
-  </tbody>
-</table>
+기본 FP3의 실제 고유한 값은 다음 7개임.
 
-TPUv4i는 TPUv3와 비슷한 성능을 제공하지만 칩 TDP는 TPUv3의 450W에서 175W로 크게 감소함. 따라서 추론 성능 자체보다 전력과 냉각 비용을 고려한 효율에서 큰 이점을 가짐.
+$$
+\{0,\pm1,\pm2,\pm4\}
+$$
 
-## TPUv3 대비 전력 효율
+```text
+3-bit → 총 8개의 Bit Pattern
 
-TPUv4i의 실제 프로덕션 워크로드 성능/TDP는 TPUv3보다 약 2.3배 높게 측정됨.
+하지만
 
-이러한 결과는 다음 변화가 함께 작용한 결과임.
++0 = 0
+-0 = 0
 
-- 최대 연산 성능이 123TFLOPS에서 138TFLOPS로 증가함
-- 온칩 SRAM이 32MB에서 144MB로 약 4.5배 증가함
-- 칩 TDP가 450W에서 175W로 감소함
-- 코어당 MXU 수가 2개에서 4개로 증가함
-- 7nm 공정과 CMEM을 통해 메모리 및 연산 효율이 개선됨
+→ 실제 고유한 값은 7개
+→ 하나의 Quantization Level이 낭비됨
+```
 
-**성능/TDP 개선 요인**
+BitMoD는 이 **Redundant Zero를 다른 Special Value로 교체**하여 8개의 Quantization Level을 모두 활용함.
 
-CMEM이 약 1.5배, 7nm 공정이 약 1.3배의 개선에 기여했으며, 나머지 구조 개선이 약 1.2배의 추가 효과를 제공한 것으로 분석됨.
+### FP3 Extension
+
+기본 FP3는 다음 값을 표현함.
+
+$$
+\{0,\pm1,\pm2,\pm4\}
+$$
+
+BitMoD는 여기에 Weight Group의 분포에 따라 하나의 Special Value를 추가함.
+
+즉, **Weight Group마다 Quantization Error를 줄일 수 있는 Special Value를 선택하여 기존 FP3를 확장하는 방식**임.
+
+### Special Value를 Low-Precision Integer로 제한
+
+이론적으로 Special Value는 FP16과 같은 임의의 값을 사용할 수도 있음.
+
+하지만 복잡한 High-Precision 값을 사용하면 이를 처리하기 위한 Hardware가 추가로 필요하여 저정밀 Quantization의 장점이 줄어듦.
+
+따라서 BitMoD는 Special Value를 **Hardware-Friendly한 Low-Precision Integer로 제한함.**
+
+또한 Special Value 후보가 너무 많으면 어떤 값을 사용했는지 저장하기 위한 Metadata와 Hardware MUX가 증가함.
+
+Special Value 후보의 개수를 $N$이라고 하면 필요한 Encoding Bit는
+
+$$
+\lceil \log_2 N \rceil
+$$
+
+임.
+
+BitMoD는
+
+$$
+N=4
+$$
+
+로 설정하여 **Weight Group당 2-bit의 Metadata만 사용함.**
+
+BitMoD는 Weight Group의 서로 다른 분포에 대응하기 위해 Special Value를 두 가지 목적으로 설계함.
+
+#### 1. Extended Resolution (ER)
+
+첫 번째 방법은 **기존 FP 범위 안에 새로운 값을 추가하는 것**임.
+
+FP3의 기존 범위는
+
+$$
+[-4,+4]
+$$
+
+이므로 `±3`을 추가함.
+
+```text
+Basic FP3
+
+-4    -2    -1     0    +1    +2          +4
 
 
-즉, TPUv4i는 트랜지스터 수만 증가시킨 칩이 아니라 CMEM, MXU 활용률, 전력 설계와 같은 여러 구조적 개선을 통해 높은 전력 효율을 달성한 칩임.
+FP3-ER (+3)
 
-## NVIDIA T4와의 비교
+-4    -2    -1     0    +1    +2    +3    +4
+                                      ↑
+                               Special Value
+```
 
-Figure 9는 MLPerf Inference 벤치마크에서 TPUv4i와 NVIDIA T4의 성능을 비교함.
+최대 표현 범위는 그대로 유지하면서 기존에 없던 Quantization Level을 추가하므로 **값을 더 세밀하게 표현할 수 있음.**
 
-T4는 ResNet50과 SSD에서 `int8`을 사용하고 NMT에서는 `fp16`을 사용함. 반면 TPUv4i는 이전 TPU와의 ML 호환성을 유지하기 위해 모든 모델에서 `bfloat16`을 사용함.
+이를 **FP3-ER (Extended Resolution)**이라고 함.
 
-<table class="tpu-table">
-  <thead>
-    <tr>
-      <th>비교 항목</th>
-      <th>TPUv4i 결과</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>T4 대비 추론 성능</td>
-      <td>약 1.3~1.6배</td>
-    </tr>
-    <tr>
-      <td>T4 대비 성능/TDP</td>
-      <td>약 0.9~1.0배</td>
-    </tr>
-    <tr>
-      <td>NMT 성능/TDP</td>
-      <td>약 1.3배</td>
-    </tr>
-  </tbody>
-</table>
+$$
+\boxed{\text{FP3-ER Special Value} = \pm3}
+$$
 
-TPUv4i는 전체 성능에서는 T4보다 빠르지만 시스템 TDP까지 고려한 효율은 평균적으로 비슷한 수준임.
+ER은 특히 **대칭적이고 Gaussian-like한 Weight Group**을 표현하는 데 유리함.
 
-다만 NMT처럼 두 장치가 모두 부동소수점 연산을 사용하는 경우 TPUv4i의 성능/TDP가 T4보다 높게 나타남.
+#### 2. Extended Asymmetry (EA)
 
-## SSD 성능이 낮은 이유
+두 번째 방법은 **기존 FP 범위 밖에 새로운 값을 추가하는 것**임.
 
-SSD 벤치마크에서는 TPUv4i의 상대적인 효율이 낮게 나타남.
+예를 들어 `+6`을 추가하면
 
-SSD에는 Non-Max Suppression과 여러 gather 연산이 포함되어 있으며, 이러한 연산은 계산량보다 불규칙한 메모리 접근의 영향을 크게 받음.
+```text
+Basic FP3
 
-논문에서는 GPU의 coalescing memory 구조가 TPU의 HBM보다 이러한 접근 패턴을 더 효율적으로 처리했을 가능성이 있다고 설명함.
+-4    -2    -1    0    +1    +2    +4
 
-## 핵심 정리
 
-TPUv4i는 TPUv3보다 절대 성능이 크게 높아진 것은 아니지만 훨씬 낮은 전력으로 유사한 성능을 제공함.
+FP3-EA (+6)
 
-핵심적인 의미는 다음과 같음.
+-4    -2    -1    0    +1    +2    +4         +6
+                                               ↑
+                                        Special Value
+```
 
-1. TPUv3와 비슷한 실제 추론 성능을 유지함
-2. TPUv3 대비 성능/TDP를 약 2.3배 개선함
-3. NVIDIA T4보다 추론 처리 속도가 약 1.3~1.6배 빠름
-4. CMEM과 대용량 온칩 SRAM이 메모리 병목을 줄임
-5. 175W TDP를 통해 공랭식 데이터센터 배포가 가능함
-6. `bfloat16`을 유지하여 기존 TPU 학습 모델을 빠르게 배포할 수 있음
+Negative 방향은 `-4`까지지만 Positive 방향은 `+6`까지 표현할 수 있으므로 Data Type 자체가 비대칭적으로 변함.
 
-결국 TPUv4i의 목표는 벤치마크 최고 성능이 아니라, 실제 Google 추론 워크로드에서 전력과 냉각을 포함한 전체 성능/TCO를 높이는 것임.
+```text
+Negative Range → -4
+Positive Range → +6
+```
+
+따라서 한쪽 방향에 Outlier가 존재하는 **Asymmetric Weight Group을 표현하는 데 유리함.**
+
+Figure 3의 실험에서 여러 후보를 비교한 결과, `±6`이 대부분의 LLM에서 가장 낮은 Quantization Error를 보여 최종 Special Value로 선택됨.
+
+이를 **FP3-EA (Extended Asymmetry)**라고 함.
+
+$$
+\boxed{\text{FP3-EA Special Value} = \pm6}
+$$
+
+### ER과 EA의 차이
+
+두 방식의 목적은 서로 다름.
+
+| Type | Special Value | Range 변화 | 목적 |
+|---|---:|---|---|
+| **FP3-ER** | ±3 | 기존 Range 유지 | Quantization Resolution 증가 |
+| **FP3-EA** | ±6 | 한쪽 Range 확장 | Asymmetric Outlier 표현 |
+
+즉, **ER은 표현 범위를 더 촘촘하게 만들고, EA는 한쪽 표현 범위를 더 넓히는 방식**임.
+
+### FP4 Extension
+
+BitMoD는 FP3에 사용한 동일한 아이디어를 FP4에도 적용함.
+
+기본 FP4 값은 다음과 같음.
+
+$$
+\{0,\pm0.5,\pm1,\pm1.5,\pm2,\pm3,\pm4,\pm6\}
+$$
+
+실험을 통해 가장 적합한 Special Value를 찾은 결과,
+
+- **FP4-ER → ±5**
+- **FP4-EA → ±8**
+
+을 사용함.
+
+| Basic Dtype | Extended Dtype | Special Value | 역할 |
+|---|---|---:|---|
+| FP3 | **FP3-ER** | -3 or +3 | Resolution 확장 |
+| FP3 | **FP3-EA** | -6 or +6 | Asymmetry 확장 |
+| FP4 | **FP4-ER** | -5 or +5 | Resolution 확장 |
+| FP4 | **FP4-EA** | -8 or +8 | Asymmetry 확장 |
+
+최종적으로 BitMoD는 Weight Group마다 다음과 같은 후보 중 적절한 Special Value를 선택할 수 있음.
+
+## B. Fine-grained Data Type Adaptation
+
+앞의 `Asymmetric FP3 and FP4 Data Types`에서는 FP3와 FP4에 사용할 **4개의 Special Value 후보**를 정의했음.
+
+| Precision | Basic Values | Special Values |
+|---|---|---|
+| FP3 | $\{0,\pm1,\pm2,\pm4\}$ | $\{-3,+3,-6,+6\}$ |
+| FP4 | $\{0,\pm0.5,\pm1,\pm1.5,\pm2,\pm3,\pm4,\pm6\}$ | $\{-5,+5,-8,+8\}$ |
+
+하지만 하나의 Weight Group에서는 **4개의 Special Value를 모두 사용하는 것이 아니라 하나만 선택하여 사용함.**
+
+BitMoD는 모든 Weight Group에 동일한 Data Type을 적용하지 않고, **각 Weight Group마다 Quantization Error가 가장 작은 Special Value를 선택함.**
+
+이를 **Fine-grained Data Type Adaptation**이라고 함.
+
+
+즉, Scaling Factor만 Group마다 달라지는 것이 아니라 **Quantization에 사용하는 Data Type 자체도 Group의 Weight Distribution에 맞게 달라지는 방식**임.
+
+<style>
+/* =========================================================
+   BitMoD Algorithm 1
+   LaTeX / IEEE Paper 스타일
+   이 Algorithm에만 적용됨
+   ========================================================= */
+
+.bitmod-algo1 {
+  --algo-line: rgba(180, 185, 195, 0.75);
+  --algo-line-soft: rgba(180, 185, 195, 0.28);
+  --algo-muted: rgba(180, 185, 195, 0.72);
+
+  width: 100%;
+  max-width: 900px;
+
+  margin: 30px auto 34px;
+
+  font-family:
+    "Times New Roman",
+    Times,
+    serif;
+
+  color: inherit;
+
+  box-sizing: border-box;
+}
+
+.bitmod-algo1 *,
+.bitmod-algo1 *::before,
+.bitmod-algo1 *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   Algorithm 전체 Frame
+   ========================================================= */
+
+.bitmod-algo1 .algo-frame {
+  width: 100%;
+
+  border-top: 3px solid var(--algo-line);
+  border-bottom: 3px solid var(--algo-line);
+
+  padding: 0;
+}
+
+
+/* =========================================================
+   Algorithm Caption
+   ========================================================= */
+
+.bitmod-algo1 .algo-caption {
+  padding: 9px 8px 8px;
+
+  border-bottom: 1px solid var(--algo-line);
+
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.bitmod-algo1 .algo-caption strong {
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   Input / Output
+   ========================================================= */
+
+.bitmod-algo1 .algo-io {
+  padding: 10px 8px 11px;
+
+  border-bottom: 1px solid var(--algo-line);
+
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.bitmod-algo1 .algo-io-row {
+  display: grid;
+
+  grid-template-columns: 72px 1fr;
+
+  gap: 5px;
+}
+
+.bitmod-algo1 .algo-io-label {
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   Algorithm Body
+   ========================================================= */
+
+.bitmod-algo1 .algo-body {
+  padding: 10px 0 11px;
+}
+
+
+/* 한 줄 */
+.bitmod-algo1 .algo-row {
+  display: grid;
+
+  grid-template-columns: 42px 1fr;
+
+  min-height: 30px;
+
+  align-items: baseline;
+
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+
+/* Line Number */
+.bitmod-algo1 .algo-ln {
+  padding-right: 12px;
+
+  text-align: right;
+
+  color: var(--algo-muted);
+
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+
+  user-select: none;
+}
+
+
+/* 실제 Algorithm 내용 */
+.bitmod-algo1 .algo-code {
+  padding-left: 8px;
+
+  white-space: nowrap;
+}
+
+
+/* Keyword */
+.bitmod-algo1 .algo-kw {
+  font-weight: 700;
+}
+
+
+/* Function */
+.bitmod-algo1 .algo-func {
+  font-variant: small-caps;
+}
+
+
+/* Comment */
+.bitmod-algo1 .algo-comment {
+  color: var(--algo-muted);
+
+  font-style: italic;
+}
+
+
+/* =========================================================
+   들여쓰기
+   ========================================================= */
+
+.bitmod-algo1 .indent-1 {
+  padding-left: 28px;
+}
+
+.bitmod-algo1 .indent-2 {
+  padding-left: 56px;
+}
+
+.bitmod-algo1 .indent-3 {
+  padding-left: 84px;
+}
+
+
+/* =========================================================
+   Section Comment
+   ========================================================= */
+
+.bitmod-algo1 .algo-section {
+  margin: 5px 0 3px;
+}
+
+.bitmod-algo1 .algo-section .algo-code {
+  color: var(--algo-muted);
+
+  font-style: italic;
+}
+
+
+/* =========================================================
+   수학 기호
+   ========================================================= */
+
+.bitmod-algo1 .algo-math {
+  font-family:
+    "Times New Roman",
+    Times,
+    serif;
+
+  font-style: italic;
+}
+
+
+/* =========================================================
+   모바일
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  .bitmod-algo1 {
+    overflow-x: auto;
+  }
+
+  .bitmod-algo1 .algo-frame {
+    min-width: 690px;
+  }
+
+  .bitmod-algo1 .algo-caption {
+    font-size: 16px;
+  }
+
+  .bitmod-algo1 .algo-io,
+  .bitmod-algo1 .algo-row {
+    font-size: 15px;
+  }
+
+}
+</style>
+
+
+<div class="bitmod-algo1">
+
+  <div class="algo-frame">
+
+
+    <!-- Algorithm Caption -->
+    <div class="algo-caption">
+      <strong>Algorithm 1:</strong>
+      Fine-grained data type adaptation
+    </div>
+
+
+    <!-- Input / Output -->
+    <div class="algo-io">
+
+      <div class="algo-io-row">
+
+        <div class="algo-io-label">
+          Input:
+        </div>
+
+        <div>
+          Weight group:
+          <span class="algo-math">W</span>;
+          Quantization precision:
+          <span class="algo-math">p</span>
+        </div>
+
+      </div>
+
+
+      <div class="algo-io-row">
+
+        <div class="algo-io-label">
+          Output:
+        </div>
+
+        <div>
+          Quantized weight group:
+          <span class="algo-math">W<sub>qout</sub></span>;
+          Selected special value:
+          <span class="algo-math">v<sub>out</sub></span>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- Algorithm Body -->
+    <div class="algo-body">
+
+
+      <!-- Line 1 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">1</div>
+
+        <div class="algo-code">
+
+          <span class="algo-kw">Func</span>
+          <span class="algo-func">
+            AdaptiveQuant
+          </span>(
+          <span class="algo-math">W</span>,
+          <span class="algo-math">p</span>
+          ):
+
+        </div>
+
+      </div>
+
+
+      <!-- Comment -->
+      <div class="algo-row algo-section">
+
+        <div class="algo-ln"></div>
+
+        <div class="algo-code indent-1 algo-comment">
+          // Get basic and special quantization values according to Table IV
+        </div>
+
+      </div>
+
+
+      <!-- Line 2 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">2</div>
+
+        <div class="algo-code indent-1">
+
+          basicValues =
+          GetBasicValues(
+          <span class="algo-math">p</span>
+          )
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 3 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">3</div>
+
+        <div class="algo-code indent-1">
+
+          specialValues =
+          GetSpecialValues(
+          <span class="algo-math">p</span>
+          )
+
+        </div>
+
+      </div>
+
+
+      <!-- Comment -->
+      <div class="algo-row algo-section">
+
+        <div class="algo-ln"></div>
+
+        <div class="algo-code indent-1 algo-comment">
+          // Search for the best special value
+        </div>
+
+      </div>
+
+
+      <!-- Line 4 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">4</div>
+
+        <div class="algo-code indent-1">
+
+          minError = +∞
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 5 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">5</div>
+
+        <div class="algo-code indent-1">
+
+          <span class="algo-kw">for</span>
+          <span class="algo-math">v</span>
+          <span class="algo-kw">in</span>
+          specialValues
+          <span class="algo-kw">do</span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 6 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">6</div>
+
+        <div class="algo-code indent-2">
+
+          quantValues =
+          basicValues ∪
+          <span class="algo-math">v</span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 7 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">7</div>
+
+        <div class="algo-code indent-2">
+
+          <span class="algo-math">W<sub>q</sub></span>
+          =
+          NonLinearQuantize(
+          <span class="algo-math">W</span>,
+          quantValues
+          )
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 8 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">8</div>
+
+        <div class="algo-code indent-2">
+
+          newError =
+          MeanSquareError(
+          <span class="algo-math">W</span>,
+          <span class="algo-math">W<sub>q</sub></span>
+          )
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 9 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">9</div>
+
+        <div class="algo-code indent-2">
+
+          <span class="algo-kw">if</span>
+          newError &lt; minError
+          <span class="algo-kw">then</span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 10 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">10</div>
+
+        <div class="algo-code indent-3">
+
+          minError = newError
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 11 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">11</div>
+
+        <div class="algo-code indent-3">
+
+          <span class="algo-math">
+            W<sub>qout</sub>
+          </span>
+          =
+          <span class="algo-math">
+            W<sub>q</sub>
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 12 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">12</div>
+
+        <div class="algo-code indent-3">
+
+          <span class="algo-math">
+            v<sub>out</sub>
+          </span>
+          =
+          <span class="algo-math">
+            v
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- Line 13 -->
+      <div class="algo-row">
+
+        <div class="algo-ln">13</div>
+
+        <div class="algo-code indent-1">
+
+          <span class="algo-kw">
+            return
+          </span>
+
+          <span class="algo-math">
+            W<sub>qout</sub>
+          </span>,
+
+          <span class="algo-math">
+            v<sub>out</sub>
+          </span>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+/* =========================================================
+   BitMoD Algorithm 1 Explanation
+   Minimal / Paper Review Style
+   이 영역에만 적용됨
+   ========================================================= */
+.bitmod-algo-explain {
+  --bae-accent: #8fa6c9;
+  --bae-border: rgba(170, 175, 185, 0.18);
+  --bae-code-bg: rgba(127, 127, 127, 0.035);
+
+  width: 100%;
+  max-width: 900px;
+  margin: 34px auto 42px;
+
+  /* font-family / font-size / line-height 지정하지 않음 */
+  /* → 블로그 기본 설정 그대로 상속 */
+
+  box-sizing: border-box;
+}
+
+.bitmod-algo-explain *,
+.bitmod-algo-explain *::before,
+.bitmod-algo-explain *::after {
+  box-sizing: border-box;
+}
+
+
+/* Intro */
+.bitmod-algo-explain .bae-intro {
+  margin: 0 0 30px;
+  padding-left: 15px;
+
+  border-left: 2px solid rgba(143, 166, 201, 0.55);
+
+  /* 글꼴 / 크기 지정 없음 */
+}
+
+
+/* Step */
+.bitmod-algo-explain .bae-step {
+  padding-bottom: 26px;
+  margin-bottom: 26px;
+
+  border-bottom: 1px solid var(--bae-border);
+}
+
+.bitmod-algo-explain .bae-step:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+
+/* 제목 */
+.bitmod-algo-explain .bae-step-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+
+  margin-bottom: 13px;
+}
+
+.bitmod-algo-explain .bae-step-index {
+  font-weight: 700;
+}
+
+.bitmod-algo-explain .bae-step-title {
+  font-weight: 700;
+}
+
+
+/* Line 2–3 같은 표시만 별도 디자인 */
+.bitmod-algo-explain .bae-line {
+  margin-left: auto;
+
+  padding: 2px 7px;
+
+  border: 1px solid rgba(143, 166, 201, 0.28);
+  border-radius: 4px;
+
+  color: var(--bae-accent);
+
+  font-family: "Times New Roman", Times, serif;
+  font-size: 0.75em;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+/* 설명 문장 */
+.bitmod-algo-explain .bae-desc {
+  margin: 0;
+
+  /* 아무 Typography 지정 없음 */
+  /* → 블로그 p 스타일 그대로 사용 */
+}
+
+
+/* Algorithm Expression */
+.bitmod-algo-explain .bae-expression {
+  margin-top: 14px;
+  padding: 10px 14px;
+
+  border-left: 2px solid rgba(143, 166, 201, 0.32);
+
+  background: var(--bae-code-bg);
+
+  /*
+   * Algorithm 식만 논문 느낌을 위해
+   * Times 계열 사용
+   */
+  font-family: "Times New Roman", Times, serif;
+
+  line-height: 1.6;
+}
+
+.bitmod-algo-explain .bae-expression-line + .bae-expression-line {
+  margin-top: 2px;
+}
+
+.bitmod-algo-explain .bae-key {
+  font-weight: 700;
+}
+
+
+/* BasicValues / SpecialValues */
+.bitmod-algo-explain .bae-values {
+  margin-top: 15px;
+
+  border-top: 1px solid var(--bae-border);
+  border-bottom: 1px solid var(--bae-border);
+}
+
+.bitmod-algo-explain .bae-value-row {
+  display: grid;
+
+  grid-template-columns: 145px minmax(0, 1fr);
+
+  gap: 15px;
+
+  padding: 9px 4px;
+}
+
+.bitmod-algo-explain .bae-value-row + .bae-value-row {
+  border-top: 1px solid var(--bae-border);
+}
+
+.bitmod-algo-explain .bae-value-label {
+  font-weight: 700;
+}
+
+.bitmod-algo-explain .bae-value-content {
+  font-family: "Times New Roman", Times, serif;
+}
+
+
+/* Candidate */
+.bitmod-algo-explain .bae-candidates {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  margin-top: 14px;
+
+  border-top: 1px solid var(--bae-border);
+  border-bottom: 1px solid var(--bae-border);
+}
+
+.bitmod-algo-explain .bae-candidate {
+  padding: 9px 10px;
+
+  text-align: center;
+
+  font-family: "Times New Roman", Times, serif;
+}
+
+.bitmod-algo-explain .bae-candidate + .bae-candidate {
+  border-left: 1px solid var(--bae-border);
+}
+
+
+/* Quantization Level */
+.bitmod-algo-explain .bae-level {
+  margin-top: 15px;
+  padding: 10px 4px;
+
+  border-top: 1px solid var(--bae-border);
+  border-bottom: 1px solid var(--bae-border);
+
+  text-align: center;
+
+  font-family: "Times New Roman", Times, serif;
+}
+
+.bitmod-algo-explain .bae-level-label {
+  margin-bottom: 5px;
+
+  /*
+   * 여기는 설명 label이므로
+   * 블로그 글꼴을 그대로 사용
+   */
+  font-family: inherit;
+
+  font-size: 0.8em;
+  font-weight: 700;
+
+  opacity: 0.65;
+}
+
+
+/* MSE 수식 */
+.bitmod-algo-explain .bae-formula {
+  margin-top: 17px;
+  padding: 14px 5px;
+
+  border-top: 1px solid var(--bae-border);
+  border-bottom: 1px solid var(--bae-border);
+
+  overflow-x: auto;
+
+  text-align: center;
+
+  /* MathJax 자체 글꼴 사용 */
+}
+
+
+/* 변수 설명 */
+.bitmod-algo-explain .bae-output-list {
+  margin-top: 15px;
+
+  border-top: 1px solid var(--bae-border);
+}
+
+.bitmod-algo-explain .bae-output-row {
+  display: grid;
+
+  grid-template-columns: 110px minmax(0, 1fr);
+
+  gap: 15px;
+
+  padding: 9px 4px;
+
+  border-bottom: 1px solid var(--bae-border);
+}
+
+.bitmod-algo-explain .bae-output-name {
+  color: var(--bae-accent);
+
+  font-family: "Times New Roman", Times, serif;
+  font-weight: 700;
+}
+
+.bitmod-algo-explain .bae-output-desc {
+  /*
+   * 설명 부분
+   * 블로그 Typography 그대로 상속
+   */
+}
+
+
+/* 마지막 */
+.bitmod-algo-explain .bae-step-final .bae-step-title {
+  color: var(--bae-accent);
+}
+
+
+/* Mobile */
+@media (max-width: 650px) {
+
+  .bitmod-algo-explain .bae-step-head {
+    flex-wrap: wrap;
+  }
+
+  .bitmod-algo-explain .bae-line {
+    margin-left: 0;
+  }
+
+  .bitmod-algo-explain .bae-value-row,
+  .bitmod-algo-explain .bae-output-row {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .bitmod-algo-explain .bae-candidates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bitmod-algo-explain .bae-candidate:nth-child(3) {
+    border-left: none;
+    border-top: 1px solid var(--bae-border);
+  }
+
+  .bitmod-algo-explain .bae-candidate:nth-child(4) {
+    border-top: 1px solid var(--bae-border);
+  }
+
+}
+
+}
+</style>
+
+
+<div class="bitmod-algo-explain">
+
+
+  <!-- =====================================================
+       Intro
+       ===================================================== -->
+
+  <div class="bae-intro">
+
+    Algorithm 1의 목적은 하나의 Weight Group에
+    <strong>모든 Special Value 후보를 하나씩 적용</strong>한 뒤,
+    원본 Weight와의 MSE가 가장 작은 Special Value를
+    최종적으로 선택하는 것임.
+
+  </div>
+
+
+  <!-- =====================================================
+       STEP 1
+       ===================================================== -->
+
+  <div class="bae-step">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        1.
+      </span>
+
+      <span class="bae-step-title">
+        Basic Value와 Special Value 가져오기
+      </span>
+
+      <span class="bae-line">
+        Line 2–3
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      Quantization Precision <i>p</i>에 따라 Table IV에서
+      Basic Quantization Value와 Special Value 후보를 가져옴.
+
+      3-bit Quantization을 사용하는 경우,
+      기본 FP3 값과 네 개의 Special Value 후보가 사용됨.
+
+    </p>
+
+
+    <div class="bae-expression">
+
+      <div class="bae-expression-line">
+        basicValues =
+        GetBasicValues(<i>p</i>)
+      </div>
+
+      <div class="bae-expression-line">
+        specialValues =
+        GetSpecialValues(<i>p</i>)
+      </div>
+
+    </div>
+
+
+    <div class="bae-values">
+
+      <div class="bae-value-row">
+
+        <div class="bae-value-label">
+          Basic FP3
+        </div>
+
+        <div class="bae-value-content">
+          {0, ±1, ±2, ±4}
+        </div>
+
+      </div>
+
+
+      <div class="bae-value-row">
+
+        <div class="bae-value-label">
+          Special Values
+        </div>
+
+        <div class="bae-value-content">
+          {-3, +3, -6, +6}
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="bae-candidates">
+
+      <div class="bae-candidate">
+        FP3 + (-3)
+      </div>
+
+      <div class="bae-candidate">
+        FP3 + (+3)
+      </div>
+
+      <div class="bae-candidate">
+        FP3 + (-6)
+      </div>
+
+      <div class="bae-candidate">
+        FP3 + (+6)
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STEP 2
+       ===================================================== -->
+
+  <div class="bae-step">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        2.
+      </span>
+
+      <span class="bae-step-title">
+        최소 Quantization Error 초기화
+      </span>
+
+      <span class="bae-line">
+        Line 4
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      아직 어떤 Special Value가 가장 적합한지 알 수 없으므로
+      최소 Quantization Error를 무한대로 초기화함.
+
+      이후 각 후보의 Error를 계산하면서 더 작은 값이 발견될 때마다
+      <i>minError</i>를 갱신함.
+
+    </p>
+
+
+    <div class="bae-expression">
+      minError = +∞
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STEP 3
+       ===================================================== -->
+
+  <div class="bae-step">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        3.
+      </span>
+
+      <span class="bae-step-title">
+        모든 Special Value를 하나씩 비교
+      </span>
+
+      <span class="bae-line">
+        Line 5–6
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      Special Value 후보를 하나씩 순회하면서 현재 선택된 값
+      <i>v</i>를 Basic Value에 추가함.
+
+      따라서 하나의 Weight Group에 대해 네 가지 서로 다른
+      Quantization Data Type을 차례대로 시험하게 됨.
+
+    </p>
+
+
+    <div class="bae-expression">
+
+      <div class="bae-expression-line">
+        <span class="bae-key">for</span>
+        <i>v</i> in specialValues
+      </div>
+
+      <div class="bae-expression-line">
+        quantValues =
+        basicValues ∪ <i>v</i>
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STEP 4
+       ===================================================== -->
+
+  <div class="bae-step">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        4.
+      </span>
+
+      <span class="bae-step-title">
+        Non-linear Quantization 수행
+      </span>
+
+      <span class="bae-line">
+        Line 7
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      현재 선택된 Quantization Value 집합을 이용하여
+      Weight Group <i>W</i>를 양자화함.
+
+      BitMoD의 FP3/FP4는 Integer처럼 Quantization Level 사이의
+      간격이 일정하지 않으므로 Non-linear Quantization을 사용함.
+
+    </p>
+
+
+    <div class="bae-expression">
+
+      <i>W</i><sub>q</sub>
+      =
+      NonLinearQuantize(
+      <i>W</i>, quantValues )
+
+    </div>
+
+
+    <div class="bae-level">
+
+      <div class="bae-level-label">
+        FP3-EA (+6) Quantization Level
+      </div>
+
+      −4 &nbsp;&nbsp;
+      −2 &nbsp;&nbsp;
+      −1 &nbsp;&nbsp;
+      0 &nbsp;&nbsp;
+      +1 &nbsp;&nbsp;
+      +2 &nbsp;&nbsp;
+      +4 &nbsp;&nbsp;
+      +6
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STEP 5
+       ===================================================== -->
+
+  <div class="bae-step">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        5.
+      </span>
+
+      <span class="bae-step-title">
+        Quantization Error 계산
+      </span>
+
+      <span class="bae-line">
+        Line 8
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      원본 Weight <i>W</i>와 Quantized Weight
+      <i>W</i><sub>q</sub> 사이의
+      Mean Square Error(MSE)를 계산함.
+
+      MSE가 작을수록 양자화된 Weight가 원본 Weight를
+      더 정확하게 표현하고 있다는 의미임.
+
+    </p>
+
+
+    <div class="bae-expression">
+
+      newError =
+      MeanSquareError(
+      <i>W</i>,
+      <i>W</i><sub>q</sub> )
+
+    </div>
+
+
+    <div class="bae-formula">
+
+      \[
+      \mathrm{MSE}(W,W_q)
+      =
+      \frac{1}{N}
+      \sum_{i=1}^{N}
+      (W_i-W_{q,i})^2
+      \]
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STEP 6
+       ===================================================== -->
+
+  <div class="bae-step">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        6.
+      </span>
+
+      <span class="bae-step-title">
+        가장 좋은 결과 저장
+      </span>
+
+      <span class="bae-line">
+        Line 9–12
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      현재 Special Value에서 계산된 MSE가 지금까지 발견한
+      최소 Error보다 작다면 해당 결과를 새로운 최적 결과로 저장함.
+
+    </p>
+
+
+    <div class="bae-expression">
+
+      <div class="bae-expression-line">
+        <span class="bae-key">if</span>
+        newError &lt; minError
+      </div>
+
+      <div class="bae-expression-line">
+        &nbsp;&nbsp;&nbsp;&nbsp;minError = newError
+      </div>
+
+      <div class="bae-expression-line">
+        &nbsp;&nbsp;&nbsp;&nbsp;<i>W</i><sub>qout</sub>
+        = <i>W</i><sub>q</sub>
+      </div>
+
+      <div class="bae-expression-line">
+        &nbsp;&nbsp;&nbsp;&nbsp;<i>v</i><sub>out</sub>
+        = <i>v</i>
+      </div>
+
+    </div>
+
+
+    <div class="bae-output-list">
+
+      <div class="bae-output-row">
+
+        <div class="bae-output-name">
+          minError
+        </div>
+
+        <div class="bae-output-desc">
+          현재까지 발견한 가장 작은 Quantization Error
+        </div>
+
+      </div>
+
+
+      <div class="bae-output-row">
+
+        <div class="bae-output-name">
+          W<sub>qout</sub>
+        </div>
+
+        <div class="bae-output-desc">
+          현재까지 가장 낮은 Error를 보인 Quantized Weight Group
+        </div>
+
+      </div>
+
+
+      <div class="bae-output-row">
+
+        <div class="bae-output-name">
+          v<sub>out</sub>
+        </div>
+
+        <div class="bae-output-desc">
+          해당 Quantized Weight를 생성한 Special Value
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =====================================================
+       STEP 7
+       ===================================================== -->
+
+  <div class="bae-step bae-step-final">
+
+    <div class="bae-step-head">
+
+      <span class="bae-step-index">
+        7.
+      </span>
+
+      <span class="bae-step-title">
+        최종 결과 반환
+      </span>
+
+      <span class="bae-line">
+        Line 13
+      </span>
+
+    </div>
+
+
+    <p class="bae-desc">
+
+      모든 Special Value 후보를 비교한 뒤,
+      가장 낮은 MSE를 얻은 Quantized Weight Group
+      <i>W</i><sub>qout</sub>과 해당 Special Value
+      <i>v</i><sub>out</sub>을 최종 결과로 반환함.
+
+    </p>
+
+
+    <div class="bae-expression">
+
+      <span class="bae-key">
+        return
+      </span>
+
+      &nbsp;
+
+      <i>W</i><sub>qout</sub>,
+      <i>v</i><sub>out</sub>
+
+    </div>
+
+  </div>
+
+
+</div>
+
+
+예를 들어 다음과 같은 FP3 Weight Group이 있다고 가정함.
+
+```text
+W = [-0.8, 0.3, 1.1, 2.2, 3.8, 5.7]
+```
+
+Positive 방향에 큰 값 `5.7`이 존재하므로 각 Special Value를 적용했을 때 다음과 같은 결과가 나왔다고 가정할 수 있음.
+
+| Special Value | Data Type 특성 | MSE 예시 |
+|---|---|---:|
+| -3 | Negative Resolution 증가 | 0.42 |
+| +3 | Positive Resolution 증가 | 0.31 |
+| -6 | Negative Range 확장 | 0.57 |
+| **+6** | **Positive Range 확장** | **0.08** |
+
+가장 작은 Error를 가지는 값이 `+6`이므로
+
+$$
+v_{out}=+6
+$$
+
+이 선택됨.
+
+따라서 이 Weight Group은 최종적으로
+
+$$
+\{0,\pm1,\pm2,\pm4,+6\}
+$$
+
+을 사용하는 **FP3-EA(+6)**로 양자화됨.
+
+반대로 Negative Outlier가 많은 다른 Group에서는 `-6`이 선택될 수 있고, 대칭적인 분포를 가진 Group에서는 `±3`을 사용하는 FP3-ER이 선택될 수 있음.
+
+### Quantization 속도
+
+Algorithm 1은 하나의 Weight Group을 기준으로 설명하고 있지만, 실제 구현에서는 GPU Vectorization을 통해 **Weight Tensor의 여러 Group에 대해 최적 Special Value를 동시에 탐색할 수 있음.**
+
+논문의 구현에서는 하나의 NVIDIA A6000 GPU를 사용했을 때 **Llama-2-7B 전체 모델을 양자화하는 데 약 10초**가 소요됨.
+
+따라서 Group마다 여러 Special Value를 비교하는 과정이 추가되더라도 실제 Quantization 과정의 Overhead는 크지 않음.
+
+## C. Efficient Per-group Dequantization
+
+Per-Group Quantization은 Weight를 작은 Group으로 나누어 Quantization Error를 줄일 수 있지만, **각 Group마다 서로 다른 Scaling Factor를 사용하기 때문에 Dequantization 비용이 증가하는 문제**가 있음.
+
+BitMoD는 이를 해결하기 위해 Weight뿐만 아니라 **Per-Group Scaling Factor도 INT8로 한 번 더 Quantization**함.
+
+이를 통해 Accuracy를 유지하면서 Per-Group Dequantization을 Hardware에서 효율적으로 처리할 수 있도록 함.
+
+### 1. Quantization 이후에는 Dequantization이 필요함
+
+Quantized Weight $W_q$는 실제 Weight 값 자체가 아니며, Scaling Factor $\Delta$를 함께 사용해야 원래 값에 가까운 Floating-Point Weight를 얻을 수 있음.
+
+$$
+W_{qf}=W_q\Delta
+$$
+
+예를 들어,
+
+$$
+W_q=3,\qquad \Delta=0.2
+$$
+
+라면 실제 연산에서 표현되는 Weight는
+
+$$
+W_{qf}=3\times0.2=0.6
+$$
+
+### 2. Per-Channel에서는 Dequantization이 비교적 간단함
+
+Per-Channel Quantization에서는 하나의 Channel 전체가 동일한 Scaling Factor를 공유함.
+
+예를 들어 하나의 Channel에 다음 Weight들이 있다고 가정함.
+
+$$
+W_q=[2,-1,3,1]
+$$
+
+그리고 Channel Scaling Factor가
+
+$$
+\Delta=0.2
+$$
+
+Activation이
+
+$$
+A=[1.0,2.0,0.5,1.5]
+$$
+
+라면 Quantized Weight와 Activation의 Dot-Product를 먼저 계산할 수 있음.
+
+$$
+P
+=
+2(1.0)+(-1)(2.0)+3(0.5)+1(1.5)
+$$
+
+$$
+P=3
+$$
+
+모든 Weight가 같은 $\Delta$를 사용하므로 Scaling Factor는 마지막에 한 번만 적용하면 됨.
+
+$$
+Y=P\Delta
+$$
+
+$$
+Y=3\times0.2=0.6
+$$
+
+따라서 Per-Channel에서는 **Dot-Product를 모두 끝낸 뒤 한 번만 Re-scaling**하면 됨.
+
+### 3. Per-Group에서는 왜 문제가 생기는 이유
+
+Per-Group Quantization에서는 하나의 Channel이 여러 Group으로 나뉘며 **각 Group이 서로 다른 Scaling Factor를 가짐.**
+
+예를 들어 하나의 Channel이 두 Group으로 나누어져 있다고 가정함.
+
+```text
+Group 1
+Wq = [2, -1]
+Δ₁ = 0.1
+
+Group 2
+Wq = [3, 1]
+Δ₂ = 0.4
+```
+
+Activation은 다음과 같다고 가정함.
+
+$$
+A=[1.0,2.0,0.5,1.5]
+$$
+
+#### Group 1
+
+Group 1의 Dot-Product는
+
+$$
+P_1
+=
+2(1.0)+(-1)(2.0)
+$$
+
+$$
+P_1=0
+$$
+
+Scaling Factor $\Delta_1=0.1$을 적용하면
+
+$$
+P_1\Delta_1
+=
+0\times0.1
+=
+0
+$$
+
+#### Group 2
+
+Group 2에서는
+
+$$
+P_2
+=
+3(0.5)+1(1.5)
+$$
+
+$$
+P_2=3
+$$
+
+이지만 Group 2의 Scaling Factor는
+
+$$
+\Delta_2=0.4
+$$
+
+이므로
+
+$$
+P_2\Delta_2
+=
+3\times0.4
+=
+1.2
+$$
+
+최종 Output은
+
+$$
+Y=P_1\Delta_1+P_2\Delta_2
+$$
+
+$$
+Y=0+1.2=1.2
+$$
+
+**Group마다 Scaling Factor가 다르기 때문에 모든 Dot-Product를 먼저 더한 뒤 마지막에 Scaling Factor 하나만 적용할 수 없음.**
+
+BitMoD는 Weight는 FP3, FP4, INT6 등의 Low-Precision으로 Quantization하지만 **Activation은 FP16으로 유지함.**
+
+따라서 Group Dot-Product의 Partial Sum 역시 Floating-Point 형태가 됨.
+
+기존 방식에서 Scaling Factor도 FP16이라면 Dequantization은 개념적으로
+
+$$
+\text{FP Partial Sum}
+\times
+\text{FP16 Scaling Factor}
+$$
+
+이를 Group마다 반복하기 위해서는 Floating-Point Multiplication을 지원하는 Hardware가 필요함.
+
+즉, Low-Precision Weight를 통해 얻었던 Hardware Efficiency가 **Per-Group Dequantization 때문에 감소할 수 있음.**
+
+### 4. BitMoD의 해결 방법: Scaling Factor도 Quantization
+
+BitMoD는 **Scaling Factor에 Second-Level Quantization을 적용함.**
+
+> **Weight를 Quantization한 뒤 생성된 Quantization Parameter를 한 번 더 Quantization하는 구조임.**
+
+### 5. Scaling Factor Quantization 예시
+
+하나의 Channel이 4개의 Group으로 나뉘어 있고 각각의 Scaling Factor가 다음과 같다고 가정함.
+
+$$
+[\Delta_1,\Delta_2,\Delta_3,\Delta_4]
+=
+[0.10,0.21,0.32,0.40]
+$$
+
+이 Scaling Factor들을 INT8 Symmetric Quantization한다고 하겠음.
+
+INT8 Symmetric Quantization의 Positive Maximum은
+
+$$
+127
+$$
+
+이므로 Scaling Factor들을 Quantization하기 위한 **2차 Scaling Factor**를 다음과 같이 만들 수 있음.
+
+$$
+\Delta_{SF}
+=
+\frac{0.40}{127}
+\approx0.00315
+$$
+
+이제 각 Per-Group Scaling Factor를 INT8로 변환함.
+
+#### Group 1
+
+$$
+SF_{q,1}
+=
+Round
+\left(
+\frac{0.10}{0.00315}
+\right)
+$$
+
+$$
+SF_{q,1}\approx32
+$$
+
+#### Group 2
+
+$$
+SF_{q,2}
+=
+Round
+\left(
+\frac{0.21}{0.00315}
+\right)
+\approx67
+$$
+
+#### Group 3
+
+$$
+SF_{q,3}
+\approx102
+$$
+
+#### Group 4
+
+$$
+SF_{q,4}
+=127
+$$
+
+따라서 기존 Floating-Point Scaling Factor는
+
+```text
+FP Scaling Factors
+
+[0.10, 0.21, 0.32, 0.40]
+```
+
+에서
+
+```text
+INT8 Scaling Factors
+
+[32, 67, 102, 127]
+
+공통 2차 Scaling Factor
+
+ΔSF ≈ 0.00315
+```
+
+형태로 바뀜.
+
+원래 Scaling Factor는 근사적으로
+
+$$
+\Delta_g
+\approx
+SF_{q,g}\Delta_{SF}
+$$
+
+로 복원할 수 있음.
+
+예를 들어 Group 1은
+
+$$
+32\times0.00315
+\approx0.1008
+$$
+
+이므로 원래
+
+$$
+0.10
+$$
+
+과 매우 비슷함.
+
+### 6. Second-Level Quantization을 적용한 결과
+
+원래 Output은
+
+$$
+Y
+=
+P_1\Delta_1
++
+P_2\Delta_2
++
+P_3\Delta_3
++
+P_4\Delta_4
+$$
+
+임.
+
+Scaling Factor를 INT8로 Quantization하면
+
+$$
+\Delta_g
+\approx
+SF_{q,g}\Delta_{SF}
+$$
+
+이므로
+
+$$
+Y
+\approx
+P_1SF_{q,1}\Delta_{SF}
++
+P_2SF_{q,2}\Delta_{SF}
++
+P_3SF_{q,3}\Delta_{SF}
++
+P_4SF_{q,4}\Delta_{SF}
+$$
+
+가 됨.
+
+$$
+Y
+\approx
+\Delta_{SF}
+\left(
+P_1SF_{q,1}
++
+P_2SF_{q,2}
++
+P_3SF_{q,3}
++
+P_4SF_{q,4}
+\right)
+$$
+
+가 됨.
+
+여기가 핵심임.
+
+기존에는 Group마다
+
+```text
+P₁ × FP Δ₁
+P₂ × FP Δ₂
+P₃ × FP Δ₃
+P₄ × FP Δ₄
+```
+
+가 필요했다면,
+
+Scaling Factor Quantization 이후에는
+
+```text
+P₁ × INT8 SF₁
+P₂ × INT8 SF₂
+P₃ × INT8 SF₃
+P₄ × INT8 SF₄
+        ↓
+       합산
+        ↓
+공통 Scaling 적용
+```
+
+형태로 바꿀 수 있음.
+
+이러한 Integer Scaling Factor는 BitMoD Hardware에서 **Bit-Serial 방식으로 처리하기 쉬움.**
+
+### 7. Scaling Factor를 몇 bit로 Quantization?
+
+Scaling Factor까지 너무 낮은 Precision으로 Quantization하면 Accuracy가 감소할 수 있음.
+
+따라서 논문에서는 Weight에 INT4-Asym Per-Group Quantization을 적용하고, Scaling Factor의 Precision을 변화시키면서 실험함.
+
+Group Size는 128임.
+
+$$
+\begin{array}{c|cccc}
+\hline
+\text{SF Precision}
+& \text{OPT-1.3B}
+& \text{Phi-2B}
+& \text{Llama-2-7B}
+& \text{Llama-2-13B}
+\\
+\hline
+
+\text{FP16}
+& 15.41
+& 10.68
+& 5.77
+& 5.01
+\\
+
+\mathbf{INT8}
+& \mathbf{15.41}
+& \mathbf{10.68}
+& \mathbf{5.77}
+& \mathbf{5.01}
+\\
+
+\text{INT6}
+& 15.43
+& 10.74
+& 5.77
+& 5.01
+\\
+
+\text{INT4}
+& 15.52
+& 10.76
+& 5.77
+& 5.03
+\\
+
+\text{INT2}
+& 18.46
+& 15.68
+& 8.41
+& 6.19
+\\
+
+\hline
+\end{array}
+$$
+
+가장 중요한 결과는 **FP16과 INT8 Scaling Factor의 결과가 완전히 동일하다는 것**임.
+
+즉 Scaling Factor를 FP16에서 INT8로 줄여도 Accuracy Loss가 발생하지 않음.
+
+반면 INT2까지 낮추면 Scaling Factor 자체의 Quantization Error가 커지면서 모델 Perplexity가 크게 증가함.
+
+따라서 BitMoD는 **INT8 Per-Group Scaling Factor를 최종적으로 선택함.**
+
+### 8. Channel Size와 Group Size의 관계
+
+Weight Channel의 크기를 $D$, Group Size를 $G$라고 하면 하나의 Channel에는
+
+$$
+\frac{D}{G}
+$$
+
+개의 Group이 존재함.
+
+예를 들어 LLM의 Channel Size가
+
+$$
+D=4096
+$$
+
+이고 Group Size가
+
+$$
+G=128
+$$
+
+이라면
+
+$$
+\frac{4096}{128}=32
+$$
+
+이므로 하나의 Channel에는 32개의 Group이 존재함.
+
+따라서 원래는
+
+```text
+Channel
+
+Group 1   → Δ₁
+Group 2   → Δ₂
+Group 3   → Δ₃
+...
+Group 32  → Δ₃₂
+```
+
+처럼 32개의 Floating-Point Scaling Factor가 필요함.
+
+BitMoD에서는 이 32개의 Scaling Factor를 다시 Symmetric Quantization하여
+
+```text
+Group 1   → INT8 SF₁
+Group 2   → INT8 SF₂
+Group 3   → INT8 SF₃
+...
+Group 32  → INT8 SF₃₂
+```
+
+형태로 저장함.
+
+### 9. Memory Overhead
+
+BitMoD에서는 Weight Group 하나당 추가로 저장해야 하는 정보가 두 가지임.
+
+1. **INT8 Scaling Factor**
+
+$$
+8\text{ bits}
+$$
+
+2. Fine-grained Data Type Adaptation에서 어떤 Special Value를 선택했는지를 나타내는 Metadata
+
+$$
+2\text{ bits}
+$$
+
+따라서 Group 하나당 총 Metadata는
+
+$$
+8+2=10\text{ bits}
+$$
+
+### 10. 실제 Weight와 Metadata크기 비교
+
+BitMoD에서 일반적으로 사용하는 Group Size가 128이라고 하겠음.
+
+#### FP3 Weight
+
+128개의 Weight를 FP3로 저장하면
+
+$$
+128\times3
+=
+384\text{ bits}
+$$
+
+가 필요함.
+
+추가 Metadata는 10-bit이므로
+
+$$
+\frac{10}{384}
+\times100
+\approx2.6\%
+$$
+
+#### FP4 Weight
+
+FP4라면
+
+$$
+128\times4
+=
+512\text{ bits}
+$$
+
+이고,
+
+$$
+\frac{10}{512}
+\times100
+\approx1.95\%
+$$
+
+즉 Group Size가 128 정도로 크면 **Scaling Factor와 Special Value 정보를 추가하더라도 Memory Overhead는 매우 작음.**
+
+### 11. 기존 Asymmetric Integer Quantization과 비교
+
+기존 Software PTQ의 Per-Group Asymmetric Integer Quantization에서는 Group마다 일반적으로 다음 정보가 필요함.
+
+```text
+Scaling Factor → FP16 = 16 bit
+Zero-point     → INT8  =  8 bit
+
+Total          → 24 bit / Group
+```
+
+반면 BitMoD는
+
+```text
+Scaling Factor     → INT8 = 8 bit
+Special Value ID   →       2 bit
+
+Total              →      10 bit / Group
+```
+
+| 방식 | Scaling Factor | 추가 Parameter | 총 Metadata |
+|---|---:|---:|---:|
+| 기존 Asymmetric PTQ | 16 bit | Zero-point 8 bit | **24 bit** |
+| **BitMoD** | **8 bit** | **Special Value ID 2 bit** | **10 bit** |
+
+따라서 BitMoD는 Per-Group Quantization을 사용하면서도 기존 Asymmetric PTQ보다 Metadata Overhead가 더 작음.
+
+# ◼︎ BitMoD Hardware Accelerator
+
+## A. Unified Bit-serial Representation
