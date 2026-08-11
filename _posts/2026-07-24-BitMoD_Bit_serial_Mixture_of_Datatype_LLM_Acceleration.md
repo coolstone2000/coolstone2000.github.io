@@ -5446,3 +5446,4663 @@ Total              →      10 bit / Group
 # ◼︎ BitMoD Hardware Accelerator
 
 ## A. Unified Bit-serial Representation
+
+BitMoD Hardware는 하나의 Accelerator에서 다양한 Weight Precision과 Data Type을 지원하는 것을 목표로 함.
+
+지원 대상은 다음과 같음.
+
+- **INT8**
+- **INT6**
+- **FP4**
+- **FP3**
+
+INT8과 INT6는 높은 Accuracy가 필요한 경우 사용하고, FP4와 FP3는 더 높은 Weight Compression과 Hardware Efficiency가 필요한 경우 사용할 수 있음.
+
+문제는 **Integer와 Floating Point의 표현 방식이 서로 다르다는 것**임.
+
+```text
+INT8 / INT6
+→ Integer Representation
+
+FP4 / FP3
+→ Floating-Point Representation
+```
+
+각 Data Type마다 별도의 연산기를 만들면 Hardware Complexity와 Area Overhead가 증가함.
+
+반대로 모든 Data Type을 INT8로 변환하면 구현은 단순해지지만, FP3나 FP4를 사용하더라도 실제 계산은 8-bit 수준으로 수행하게 되어 **Low-Precision Weight의 연산 효율 이점을 제대로 활용할 수 없음.**
+
+따라서 BitMoD는 서로 다른 Data Type을 동일한 Hardware에서 처리하기 위해 **Unified Bit-serial Representation**을 제안함.
+
+### Unified Bit-serial Term
+
+BitMoD는 하나의 Weight를 한 번에 계산하지 않고 여러 개의 **Bit-serial Term**으로 분해함.
+
+각 Bit-serial Term은 다음 네 가지 정보로 구성됨.
+
+| Field | 의미 |
+|---|---|
+| **Sign** | 값의 부호 |
+| **Exp** | Exponent |
+| **Man** | Mantissa |
+| **Bsig** | Bit-significance |
+
+하나의 Bit-serial Term이 나타내는 값은 다음과 같음.
+
+$$
+v_{\text{term}}
+=
+(-1)^{sign}
+\cdot
+2^{exp}
+\cdot
+man
+\cdot
+2^{bsig}
+$$
+
+즉 하나의 Weight를
+
+$$
+W=T_1+T_2+\cdots+T_n
+$$
+
+처럼 여러 Term으로 분해하여 처리하는 방식임.
+
+```text
+INT8 ─┐
+INT6 ─┤
+FP4  ─┼─→ Unified Bit-serial Terms → BitMoD PE
+FP3  ─┘
+
+                  ↓
+
+         Sign / Exp / Man / Bsig
+```
+
+이를 통해 Data Type이 달라도 동일한 PE를 사용할 수 있으며, **Precision이 낮아질수록 처리해야 하는 Bit-serial Term의 수도 감소함.**
+
+즉 Weight Bit-width 감소가 단순히 Memory Footprint 감소에 그치지 않고 실제 Hardware Computation 감소로 이어짐.
+
+
+### Figure 4. Unified Bit-serial Representation
+
+<center><img src="/images/PR/BitMoD/figure4.png" width = "700"><br></center>
+
+Figure 4는 BitMoD가 서로 다른 Data Type을 어떻게 공통 Bit-serial Term으로 변환하는지를 보여줌.
+
+- **Figure 4(a)**: INT8 / INT6
+- **Figure 4(b)**: FP4
+- **FP3**: FP4와 동일한 Decoder Hardware 사용
+
+결국 어떤 Data Type이 입력되더라도 최종적으로는
+
+$$
+\text{Sign}+\text{Exp}+\text{Man}+\text{Bsig}
+$$
+
+형태의 Bit-serial Term으로 변환되는 것이 핵심임.
+
+### Figure 4(a) — INT8 / INT6
+
+Figure 4(a)의 왼쪽을 보면 INT8과 INT6 Binary Weight가 여러 개의 **3-bit Booth String**으로 나누어져 있음.
+
+BitMoD는 Integer Weight에 **Booth Encoding**을 적용하여 Bit-serial Term을 생성함.
+
+#### INT8
+
+INT8 Weight는
+
+$$
+I_7I_6I_5I_4I_3I_2I_1I_0
+$$
+
+의 8-bit로 구성되며, Figure 4(a)에서는 이를 4개의 Booth Term으로 분해함.
+
+각 Term의 Bit-significance는 다음과 같음.
+
+```text
+INT8
+
+Bsig = 6
+Bsig = 4
+Bsig = 2
+Bsig = 0
+
+→ 4개의 Bit-serial Term
+```
+
+Figure에서 괄호로 묶인 3-bit 영역 하나가 하나의 Booth String을 의미함.
+
+인접한 Booth Term의 `Bsig`는 2씩 차이남.
+
+#### INT6
+
+INT6도 같은 Booth Encoding을 사용하지만 Precision이 낮기 때문에 필요한 Term 수가 더 적음.
+
+```text
+INT6
+
+Bsig = 4
+Bsig = 2
+Bsig = 0
+
+→ 3개의 Bit-serial Term
+```
+
+따라서
+
+```text
+INT8 → 4 Terms
+INT6 → 3 Terms
+```
+
+으로 처리량이 줄어듦.
+
+### Booth Encoding의 역할
+
+Figure 4(a)의 오른쪽 `Truth Table of INT Booth Term`은 각 3-bit Booth String이 어떤 연산으로 Decode되는지를 보여줌.
+
+| 3-bit String | Operation | Sign | Exp | Man |
+|---|---:|---:|---:|---:|
+| `000 / 111` | $0$ | 0 | 0 | 0 |
+| `001 / 010` | $+x$ | 0 | 0 | 1 |
+| `110 / 101` | $-x$ | 1 | 0 | 1 |
+| `011` | $+2x$ | 0 | 1 | 1 |
+| `100` | $-2x$ | 1 | 1 | 1 |
+
+즉 각 Booth String은
+
+```text
+0
++x
+-x
++2x
+-2x
+```
+
+중 하나의 간단한 연산으로 변환됨.
+
+예를 들어 Figure 4의 `011` Booth String은
+
+$$
++2x
+$$
+
+이에 대응하는 Field는
+
+```text
+Sign = 0
+Exp  = 1
+Man  = 1
+```
+
+이며,
+
+$$
+(-1)^0
+\cdot
+2^1
+\cdot
+1
+=
+2
+$$
+
+이므로 $+2x$가 됨.
+
+반대로 `100`이면
+
+```text
+Sign = 1
+Exp  = 1
+Man  = 1
+```
+
+이므로
+
+$$
+(-1)^1
+\cdot
+2^1
+\cdot
+1
+=
+-2
+$$
+
+가 되어 $-2x$를 나타냄.
+
+즉 Figure 4(a)의 Truth Table은 **Integer의 Booth String을 Sign / Exp / Man 정보로 Decode하는 과정**을 보여줌.
+
+### Bsig(Bit-significance)
+
+`Bsig`는 현재 Bit-serial Term이 원래 Weight의 어느 위치에 해당하는지를 나타냄.
+
+예를 들어 동일한 $+x$ Term이라고 하더라도
+
+```text
+Bsig = 0
+→ x × 2⁰
+
+Bsig = 2
+→ x × 2²
+
+Bsig = 4
+→ x × 2⁴
+
+Bsig = 6
+→ x × 2⁶
+```
+
+처럼 실제 기여하는 값의 크기가 달라짐.
+
+따라서 하나의 Bit-serial Term은 최종적으로
+
+$$
+(-1)^{Sign}
+\times
+2^{Exp}
+\times
+Man
+\times
+2^{Bsig}
+$$
+
+으로 표현됨.
+
+즉,
+
+- `Sign / Exp / Man` → Booth String 자체가 어떤 값을 의미하는지 표현함.
+- `Bsig` → 그 값이 원래 Integer Weight의 어느 Bit 위치에 있는지를 표현함.
+
+### Figure 4(b) — FP4
+
+INT8과 INT6는 Booth Encoding을 통해 Bit-serial Term으로 분해할 수 있지만, FP4는 Floating-Point Format이므로 같은 방식으로 바로 처리할 수 없음.
+
+BitMoD는 Figure 4(b)처럼 FP4를 먼저 **Fixed-Point 형태로 변환한 뒤 Bit-serial Term을 생성함.**
+
+Figure 4(b)의 전체 흐름은 다음과 같음.
+
+```text
+FP4
+ ↓
+FP → Fixed
+ ↓
+Redundant -0 확인
+ ↓
+ ┌───────────────┐
+ │               │
+일반 값          -0
+ │               │
+그대로 사용      Group의 Special Value로 교체
+ │               │
+ └───────┬───────┘
+         ↓
+   Fixed-Point Value
+         ↓
+        LOD
+         ↓
+최대 2개의 Bit-serial Term
+```
+
+### FP4 → Fixed-Point 변환
+
+Figure 4(b)의 가장 왼쪽을 보면 FP4는
+
+```text
+S | E₁ E₀ | M
+```
+
+형태로 들어옴.
+
+BitMoD는 이를 다음과 같은 Fixed-Point 형태로 변환함.
+
+```text
+S | I₃ I₂ I₁ I₀ | F₀
+```
+
+각 Bit는 다음 값을 담당함.
+
+```text
+I₃ → 8
+I₂ → 4
+I₁ → 2
+I₀ → 1
+F₀ → 0.5
+```
+
+#### 왜 Integer Bit가 4개 필요한가?
+
+BitMoD의 FP4-EA는 Special Value로 최대
+
+$$
+\pm8
+$$
+
+까지 사용함.
+
+따라서 `8`을 표현하기 위해 $I_3$까지 필요함.
+
+#### 왜 Fraction Bit가 필요한가?
+
+기본 FP4에는
+
+$$
+\pm0.5,\qquad \pm1.5
+$$
+
+같은 값이 존재함.
+
+예를 들어
+
+$$
+1.5=1+0.5
+$$
+
+이므로 Fixed-Point에서는
+
+```text
+I₀ = 1
+F₀ = 1
+```
+
+로 표현할 수 있음.
+
+### Figure 4(b)의 `eq` — Redundant -0 검사
+
+Figure 4(b)의 중앙 아래에는 `eq` Comparator가 존재함.
+
+이 회로의 역할은 현재 입력이 **Redundant Negative Zero(-0)**인지 확인하는 것임.
+
+기본 Floating Point에서는
+
+```text
++0
+-0
+```
+
+이 서로 다른 Bit Pattern을 가지지만 실제 값은 모두 0임.
+
+BitMoD에서는 이 중 `-0` Bit Pattern을 앞의 Quantization Framework에서 **Special Value를 나타내는 Encoding으로 재사용함.**
+
+따라서 Hardware에서는
+
+```text
+FP4
+ ↓
+Fixed 변환
+ ↓
+-0인가?
+```
+
+를 확인함.
+
+- `-0`가 아니라면 → 변환된 Fixed-Point 값을 그대로 사용
+- `-0`라면 → 현재 Weight Group에 지정된 Special Value를 사용
+
+함.
+
+Figure 4의 `eq` 출력이 MUX의 Select Signal로 연결되어 있는 이유가 이것임.
+
+### Figure 4(b)의 `SV_reg`
+
+Figure 위쪽의 `SV_reg`에는 BitMoD가 사용할 수 있는 네 개의 Special Value가 저장됨.
+
+FP4에서는 예를 들어
+
+```text
+SV₀ = -5
+SV₁ = +5
+SV₂ = -8
+SV₃ = +8
+```
+
+을 저장할 수 있음.
+
+앞의 **Fine-grained Data Type Adaptation**에서 Weight Group마다 어떤 Special Value가 가장 좋은지를 결정했음.
+
+그리고 Group마다 저장된 2-bit Metadata를 이용해 `SV_reg`에서 해당 값을 선택함.
+
+예를 들어
+
+```text
+00 → -5
+01 → +5
+10 → -8
+11 → +8
+```
+
+처럼 사용할 수 있음.
+
+따라서 앞에서 Software Quantization 단계에서
+
+```text
+Group 1 → +5
+Group 2 → -8
+Group 3 → +8
+```
+
+과 같이 결정한 정보가 실제 Hardware에서는 Figure 4(b)의 `SV_reg + MUX`를 통해 사용되는 것임.
+
+### LOD(Leading-One Detector)
+
+Figure 4(b)의 오른쪽에는 두 개의 **LOD(Leading-One Detector)**가 존재함.
+
+BitMoD가 LOD를 사용할 수 있는 이유는 Extended FP4의 모든 값이 Fixed-Point로 변환된 후 **최대 두 개의 `1` Bit만 가지기 때문임.**
+
+따라서 FP4 값을 복잡한 Floating-Point Multiplier로 처리하는 대신, `1`이 존재하는 위치를 최대 두 개만 찾아내면 됨.
+
+#### 예시 1 — FP4 값 6
+
+$$
+6=4+2
+$$
+
+이므로 Fixed-Point에서는
+
+```text
+        I₃  I₂  I₁  I₀  F₀
+        8   4   2   1   0.5
+
+6   →   0   1   1   0    0
+            ↑   ↑
+          Term1 Term2
+```
+
+가 됨.
+
+즉
+
+$$
+6=2^2+2^1
+$$
+
+이므로 두 개의 Bit-serial Term만 필요함.
+
+#### 예시 2 — FP4 값 1.5
+
+$$
+1.5=1+0.5
+$$
+
+이므로
+
+```text
+        I₃  I₂  I₁  I₀  F₀
+
+1.5 →   0   0   0   1    1
+                    ↑    ↑
+                  Term1 Term2
+```
+
+가 됨.
+
+역시 두 개의 Bit-serial Term으로 표현 가능함.
+
+### Figure 4의 두 LOD가 보는 영역
+
+Figure를 보면 두 LOD가 동일한 Bit 전체를 보는 것이 아니라 서로 조금 다른 영역을 검사함.
+
+첫 번째 LOD는
+
+$$
+\{I_3,I_2,I_1,I_0\}
+$$
+
+을 검사하고,
+
+두 번째 LOD는
+
+$$
+\{I_2,I_1,I_0,F_0\}
+$$
+
+을 검사함.
+
+```text
+Fixed-Point
+
+S | I₃ I₂ I₁ I₀ F₀
+      └───────┘
+        LOD 1
+
+         └────────┘
+           LOD 2
+```
+
+이를 통해 Fixed-Point Value 안에 존재하는 최대 두 개의 `1` 위치를 찾아냄.
+
+Figure 오른쪽에서 각 LOD가
+
+```text
+Exp
+Man
+```
+
+을 출력하는 이유도 이 때문임.
+
+LOD가 찾은 `1`의 위치를 이용하여 해당 Bit-serial Term의 Exponent와 Mantissa 정보를 생성함.
+
+그리고 Sign은 Fixed-Point Value의 `S` Bit에서 가져옴.
+
+최종적으로 FP4도
+
+```text
+Sign | Exp | Man | Bsig
+```
+
+형태의 Bit-serial Term으로 변환됨.
+
+### FP3의 처리
+
+Extended FP3에서 사용하는 값은 Extended FP4로 표현 가능한 값의 부분집합임.
+
+따라서 별도의 FP3 Decoder를 만들 필요 없이 Figure 4(b)의 **FP4 Decoder Hardware를 그대로 재사용**할 수 있음.
+
+```text
+FP3
+ ↓
+FP → Fixed
+ ↓
+Special Value 처리
+ ↓
+LOD
+ ↓
+Bit-serial Terms
+```
+
+즉 FP3와 FP4가 동일한 Hardware Decoder를 공유함.
+
+### Programmable Special Value
+
+BitMoD의 `SV_reg`는 특정 Special Value가 Hardware에 완전히 고정되어 있는 구조가 아님.
+
+현재 논문에서는
+
+```text
+FP3 → ±3, ±6
+FP4 → ±5, ±8
+```
+
+을 사용하지만, 다른 LLM에서 다른 Special Value가 더 좋은 Quantization 결과를 보인다면 Register에 다른 값을 Programming할 수도 있음.
+
+예를 들어 Special Value가 `7`이라고 하면 일반적인 Binary 표현은
+
+$$
+7=4+2+1
+$$
+
+이므로
+
+$$
+7=2^2+2^1+2^0
+$$
+
+으로 총 3개의 Term이 필요함.
+
+하지만 Decoder를 약간 수정하여
+
+$$
+7=8-1
+$$
+
+로 표현하면
+
+$$
+7=2^3-2^0
+$$
+
+이므로 두 개의 Term만 필요함.
+
+```text
+일반적인 표현
+
+7 = 4 + 2 + 1
+→ 3 Bit-serial Terms
+
+
+최적화된 표현
+
+7 = 8 - 1
+→ 2 Bit-serial Terms
+```
+
+따라서 다른 Special Value를 사용하더라도 Decoder를 간단히 수정하여 필요한 Bit-serial Term 수를 줄일 수 있음.
+
+| Data Type | 변환 방법 | Bit-serial Term 수 |
+|---|---|---:|
+| **INT8** | Booth Encoding | 4 |
+| **INT6** | Booth Encoding | 3 |
+| **FP4** | FP→Fixed + LOD | 최대 2 |
+| **FP3** | FP→Fixed + LOD | 최대 2 |
+
+<div class="bitmod-demo">
+
+  <!-- =============================================
+       Mode
+  ============================================== -->
+
+  <div class="bm-tabs">
+    <button class="bm-tab active" data-mode="int8">INT8</button>
+    <button class="bm-tab" data-mode="int6">INT6</button>
+    <button class="bm-tab" data-mode="fp4">FP4</button>
+    <button class="bm-tab" data-mode="fp4sv">FP4 -0 → SV</button>
+    <button class="bm-tab" data-mode="fp3">FP3</button>
+  </div>
+
+
+  <!-- =============================================
+       Input Controls
+  ============================================== -->
+
+  <div class="bm-controls">
+
+    <label id="int-control" class="bm-control">
+      <span class="bm-control-label">Integer Value</span>
+
+      <input
+        id="int-input"
+        type="number"
+        value="45"
+        min="-128"
+        max="127"
+      >
+    </label>
+
+
+    <label
+      id="fp4-control"
+      class="bm-control"
+      style="display:none;"
+    >
+      <span class="bm-control-label">FP4 Value</span>
+
+      <select id="fp4-input">
+        <option value="0.5">+0.5</option>
+        <option value="1">+1</option>
+        <option value="1.5">+1.5</option>
+        <option value="2">+2</option>
+        <option value="3">+3</option>
+        <option value="4">+4</option>
+        <option value="6" selected>+6</option>
+
+        <option value="-0.5">-0.5</option>
+        <option value="-1">-1</option>
+        <option value="-1.5">-1.5</option>
+        <option value="-2">-2</option>
+        <option value="-3">-3</option>
+        <option value="-4">-4</option>
+        <option value="-6">-6</option>
+      </select>
+    </label>
+
+
+    <label
+      id="fp4sv-control"
+      class="bm-control"
+      style="display:none;"
+    >
+      <span class="bm-control-label">Special Value</span>
+
+      <select id="fp4sv-input">
+        <option value="5">+5</option>
+        <option value="-5">-5</option>
+        <option value="8" selected>+8</option>
+        <option value="-8">-8</option>
+      </select>
+    </label>
+
+
+    <label
+      id="fp3-control"
+      class="bm-control"
+      style="display:none;"
+    >
+      <span class="bm-control-label">FP3 Value</span>
+
+      <select id="fp3-input">
+
+        <optgroup label="Basic FP3">
+          <option value="1">+1</option>
+          <option value="2">+2</option>
+          <option value="4" selected>+4</option>
+          <option value="-1">-1</option>
+          <option value="-2">-2</option>
+          <option value="-4">-4</option>
+        </optgroup>
+
+        <optgroup label="Special Value (-0 Encoding)">
+          <option value="sv3">+3</option>
+          <option value="sv-3">-3</option>
+          <option value="sv6">+6</option>
+          <option value="sv-6">-6</option>
+        </optgroup>
+
+      </select>
+    </label>
+
+  </div>
+
+
+  <!-- =============================================
+       Step Title
+  ============================================== -->
+
+  <div class="bm-step-label">
+    <span id="bm-step-number"></span>
+    <strong id="bm-step-title"></strong>
+  </div>
+
+
+  <!-- =============================================
+       Flow
+  ============================================== -->
+
+  <div class="bm-flow-wrapper">
+
+    <div
+      class="bm-flow"
+      id="bm-flow"
+    ></div>
+
+  </div>
+
+
+  <!-- =============================================
+       Navigation
+  ============================================== -->
+
+  <div class="bm-buttons">
+
+    <button id="bm-prev">
+      ← Previous
+    </button>
+
+    <button id="bm-next">
+      Next Step →
+    </button>
+
+  </div>
+
+
+  <!-- =============================================
+       Explanation
+  ============================================== -->
+
+  <div class="bm-explanation">
+
+    <p id="bm-desc"></p>
+
+    <div
+      class="bm-calc"
+      id="bm-calc"
+    ></div>
+
+  </div>
+
+</div>
+
+
+<style>
+
+/* =========================================================
+   BitMoD Figure 4 Demo
+========================================================= */
+
+.bitmod-demo {
+
+  --bm-accent: #a9bfdf;
+
+  --bm-text:
+    rgba(242, 245, 250, 0.94);
+
+  --bm-text-secondary:
+    rgba(226, 231, 240, 0.76);
+
+  --bm-text-inactive:
+    rgba(219, 225, 235, 0.46);
+
+  --bm-border:
+    rgba(215, 222, 234, 0.23);
+
+  --bm-border-strong:
+    rgba(215, 222, 234, 0.38);
+
+  --bm-bg:
+    rgba(255, 255, 255, 0.025);
+
+  --bm-bg-active:
+    rgba(169, 191, 223, 0.10);
+
+
+  width: 100%;
+  max-width: 1000px;
+
+  margin: 32px auto;
+
+  color: var(--bm-text);
+
+  box-sizing: border-box;
+}
+
+
+.bitmod-demo *,
+.bitmod-demo *::before,
+.bitmod-demo *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   Tabs
+========================================================= */
+
+.bm-tabs {
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 8px;
+
+  margin-bottom: 28px;
+}
+
+
+.bm-tab,
+.bm-buttons button {
+
+  padding: 7px 14px;
+
+  border:
+    1px solid
+    var(--bm-border-strong);
+
+  border-radius: 6px;
+
+  background:
+    rgba(255,255,255,.015);
+
+  color:
+    var(--bm-text);
+
+  font: inherit;
+
+  cursor: pointer;
+
+  transition:
+    border-color .2s ease,
+    background .2s ease,
+    color .2s ease;
+}
+
+
+.bm-tab:hover,
+.bm-buttons button:hover {
+
+  background:
+    rgba(255,255,255,.05);
+}
+
+
+.bm-tab.active {
+
+  color:
+    var(--bm-accent);
+
+  border-color:
+    var(--bm-accent);
+
+  background:
+    rgba(169,191,223,.07);
+}
+
+
+/* =========================================================
+   Controls
+========================================================= */
+
+.bm-controls {
+
+  min-height: 75px;
+
+  margin-bottom: 28px;
+
+  display: flex;
+  align-items: flex-start;
+}
+
+
+.bm-control {
+
+  display: inline-flex;
+  flex-direction: column;
+
+  gap: 8px;
+
+  color:
+    var(--bm-text) !important;
+}
+
+
+/*
+  여기 중요함.
+
+  screenshot에서 안 보이던
+  FP4 Value / Special Value 글씨
+*/
+
+.bm-control-label {
+
+  color:
+    rgba(242,245,250,.90) !important;
+
+  font-weight: 600;
+
+  opacity: 1 !important;
+}
+
+
+/*
+  닫혀 있는 select의 현재 선택값까지
+  밝은색으로 강제 지정
+*/
+
+.bm-controls input,
+.bm-controls select {
+
+  min-width: 100px;
+
+  padding: 7px 12px;
+
+  border:
+    1px solid
+    var(--bm-border-strong);
+
+  border-radius: 6px;
+
+  background:
+    #252c37 !important;
+
+  color:
+    #eef2f8 !important;
+
+  font: inherit;
+
+  opacity: 1 !important;
+
+  color-scheme: dark;
+}
+
+
+/*
+  일부 브라우저가 select 내부 text에
+  별도 색상을 적용하는 경우 방지
+*/
+
+.bm-controls select {
+
+  -webkit-text-fill-color:
+    #eef2f8 !important;
+}
+
+
+.bm-controls input {
+
+  -webkit-text-fill-color:
+    #eef2f8 !important;
+}
+
+
+/* Dropdown을 펼쳤을 때 */
+
+.bm-controls option,
+.bm-controls optgroup {
+
+  background:
+    #252c37;
+
+  color:
+    #eef2f8;
+}
+
+
+/* Focus */
+
+.bm-controls input:focus,
+.bm-controls select:focus {
+
+  outline:
+    1px solid
+    var(--bm-accent);
+
+  border-color:
+    var(--bm-accent);
+}
+
+
+/* =========================================================
+   Step title
+========================================================= */
+
+.bm-step-label {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 22px;
+
+  color:
+    var(--bm-text);
+}
+
+
+#bm-step-number {
+
+  padding: 4px 8px;
+
+  color:
+    var(--bm-accent);
+
+  border:
+    1px solid
+    rgba(169,191,223,.48);
+
+  border-radius: 5px;
+
+  background:
+    rgba(169,191,223,.045);
+
+  white-space: nowrap;
+}
+
+
+#bm-step-title {
+
+  color:
+    rgba(245,247,251,.97);
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   Horizontal Flow Wrapper
+========================================================= */
+
+.bm-flow-wrapper {
+
+  width: 100%;
+
+  overflow: hidden;
+
+  margin-bottom: 14px;
+}
+
+
+/*
+  flex-start가 중요함.
+
+  center + overflow-x 조합에서
+  첫 번째 박스가 잘리는 문제 방지.
+*/
+
+.bm-flow {
+
+  display: flex;
+
+  align-items: stretch;
+
+  justify-content: flex-start;
+
+  gap: 0;
+
+  width: 100%;
+
+  min-height: 180px;
+
+  overflow-x: auto;
+  overflow-y: visible;
+
+  padding:
+    20px 20px
+    24px 20px;
+
+  scroll-padding-left: 20px;
+  scroll-padding-right: 20px;
+
+  scrollbar-width: auto;
+}
+
+
+/* =========================================================
+   Nodes
+========================================================= */
+
+.bm-box {
+
+  flex:
+    0 0 125px;
+
+  min-width:
+    125px;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content:
+    space-between;
+
+  gap: 12px;
+
+  padding:
+    15px 12px;
+
+  text-align:
+    center;
+
+  border:
+    1px solid
+    rgba(215,222,234,.12);
+
+  border-radius:
+    8px;
+
+  background:
+    rgba(255,255,255,.012);
+
+  /*
+    박스 전체 opacity를 낮추지 않음.
+    이게 기존 dark mode 문제의 핵심이었음.
+  */
+  opacity: 1;
+
+  color:
+    var(--bm-text-inactive);
+
+  transition:
+    color .25s ease,
+    border-color .25s ease,
+    background .25s ease,
+    transform .25s ease;
+}
+
+
+/* 이미 지나간 단계 */
+
+.bm-box.done {
+
+  color:
+    var(--bm-text-secondary);
+
+  border-color:
+    var(--bm-border);
+
+  background:
+    rgba(255,255,255,.025);
+}
+
+
+/* 현재 단계 */
+
+.bm-box.active {
+
+  color:
+    rgba(248,250,253,.98);
+
+  border-color:
+    var(--bm-accent);
+
+  background:
+    var(--bm-bg-active);
+
+  transform:
+    translateY(-4px);
+}
+
+
+/* title */
+
+.bm-title {
+
+  color: inherit;
+
+  font-weight: 700;
+
+  line-height: 1.55;
+}
+
+
+/* 실제 숫자 */
+
+.bm-value {
+
+  color: inherit;
+
+  font-family:
+    "Times New Roman",
+    Times,
+    serif;
+
+  line-height: 1.75;
+
+  white-space: pre-line;
+
+  word-break: normal;
+}
+
+
+/* =========================================================
+   Arrows
+========================================================= */
+
+.bm-arrow {
+
+  position: relative;
+
+  flex:
+    0 0 40px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color:
+    rgba(220,226,236,.47);
+
+  font-size: 21px;
+}
+
+
+.bm-arrow.active {
+
+  color:
+    var(--bm-accent);
+}
+
+
+/* Moving dot */
+
+.bm-arrow.active::after {
+
+  content: "";
+
+  position: absolute;
+
+  left: 7px;
+
+  top: 50%;
+
+  width: 5px;
+  height: 5px;
+
+  border-radius: 50%;
+
+  background:
+    var(--bm-accent);
+
+  animation:
+    bmMove .9s linear infinite;
+}
+
+
+@keyframes bmMove {
+
+  from {
+
+    transform:
+      translate(0,-50%);
+  }
+
+  to {
+
+    transform:
+      translate(25px,-50%);
+  }
+
+}
+
+
+/* =========================================================
+   Navigation
+========================================================= */
+
+.bm-buttons {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  margin:
+    10px 0
+    24px;
+}
+
+
+/* =========================================================
+   Explanation
+========================================================= */
+
+.bm-explanation {
+
+  padding-top:
+    20px;
+
+  border-top:
+    1px solid
+    rgba(215,222,234,.16);
+
+  color:
+    var(--bm-text);
+}
+
+
+.bm-explanation p {
+
+  margin:
+    0 0 14px;
+
+  color:
+    var(--bm-text);
+
+  opacity: 1;
+}
+
+
+.bm-calc {
+
+  padding:
+    14px 16px;
+
+  border-left:
+    2px solid
+    rgba(169,191,223,.58);
+
+  background:
+    rgba(255,255,255,.035);
+
+  color:
+    rgba(240,243,249,.94);
+
+  font-family:
+    "Times New Roman",
+    Times,
+    serif;
+
+  line-height:
+    1.8;
+
+  white-space:
+    pre-line;
+
+  overflow-x:
+    auto;
+}
+
+
+/* =========================================================
+   Mobile
+========================================================= */
+
+@media (max-width: 700px) {
+
+  .bm-flow {
+
+    flex-direction:
+      column;
+
+    overflow:
+      visible;
+
+    padding:
+      10px 0 20px;
+  }
+
+
+  .bm-box {
+
+    width:
+      100%;
+
+    min-width:
+      0;
+
+    flex:
+      none;
+  }
+
+
+  .bm-arrow {
+
+    width:
+      100%;
+
+    flex:
+      0 0 30px;
+
+    transform:
+      rotate(90deg);
+  }
+
+
+  .bm-controls {
+
+    min-height:
+      80px;
+  }
+
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .bm-arrow.active::after {
+
+    animation:
+      none;
+  }
+
+
+  .bm-box {
+
+    transition:
+      none;
+  }
+
+}
+
+</style>
+
+
+<script>
+
+/* =========================================================
+   Booth Table
+========================================================= */
+
+const boothTable = {
+
+  "000": {
+    op: "0",
+    coefficient: 0,
+    sign: 0,
+    exp: 0,
+    man: 0
+  },
+
+  "111": {
+    op: "0",
+    coefficient: 0,
+    sign: 0,
+    exp: 0,
+    man: 0
+  },
+
+  "001": {
+    op: "+x",
+    coefficient: 1,
+    sign: 0,
+    exp: 0,
+    man: 1
+  },
+
+  "010": {
+    op: "+x",
+    coefficient: 1,
+    sign: 0,
+    exp: 0,
+    man: 1
+  },
+
+  "101": {
+    op: "−x",
+    coefficient: -1,
+    sign: 1,
+    exp: 0,
+    man: 1
+  },
+
+  "110": {
+    op: "−x",
+    coefficient: -1,
+    sign: 1,
+    exp: 0,
+    man: 1
+  },
+
+  "011": {
+    op: "+2x",
+    coefficient: 2,
+    sign: 0,
+    exp: 1,
+    man: 1
+  },
+
+  "100": {
+    op: "−2x",
+    coefficient: -2,
+    sign: 1,
+    exp: 1,
+    man: 1
+  }
+
+};
+
+
+/* =========================================================
+   Integer → Two's Complement
+========================================================= */
+
+function toBinary(value,bits) {
+
+  const range =
+    Math.pow(2,bits);
+
+  let unsigned =
+    value;
+
+
+  if (value < 0) {
+
+    unsigned =
+      range + value;
+  }
+
+
+  return unsigned
+    .toString(2)
+    .padStart(bits,"0");
+}
+
+
+/* =========================================================
+   Radix-4 Booth Encoding
+========================================================= */
+
+function boothEncode(value,width) {
+
+  const binary =
+    toBinary(value,width);
+
+
+  const lsb =
+    binary
+      .split("")
+      .reverse();
+
+
+  const count =
+    width / 2;
+
+
+  const result =
+    [];
+
+
+  for (
+    let k=0;
+    k<count;
+    k++
+  ) {
+
+    const previous =
+      k === 0
+      ? "0"
+      : lsb[2*k-1];
+
+
+    const current =
+      lsb[2*k] !== undefined
+      ? lsb[2*k]
+      : binary[0];
+
+
+    const next =
+      lsb[2*k+1] !== undefined
+      ? lsb[2*k+1]
+      : binary[0];
+
+
+    const string =
+      next +
+      current +
+      previous;
+
+
+    const decoded =
+      boothTable[string];
+
+
+    const bsig =
+      2*k;
+
+
+    const contribution =
+      decoded.coefficient *
+      Math.pow(2,bsig);
+
+
+    result.push({
+
+      string,
+
+      bsig,
+
+      ...decoded,
+
+      contribution
+
+    });
+
+  }
+
+
+  return {
+
+    binary,
+
+    terms: result
+
+  };
+
+}
+
+
+/* =========================================================
+   Fixed Point
+
+   I3 I2 I1 I0 F0
+    8  4  2  1  0.5
+========================================================= */
+
+function fixedPoint(value) {
+
+  const sign =
+    value < 0
+    ? 1
+    : 0;
+
+
+  let remaining =
+    Math.abs(value);
+
+
+  const powers =
+    [8,4,2,1,0.5];
+
+
+  const bits =
+    [];
+
+
+  const terms =
+    [];
+
+
+  powers.forEach(power => {
+
+    if (
+      remaining >=
+      power - 0.00001
+    ) {
+
+      bits.push(1);
+
+      remaining -=
+        power;
+
+
+      terms.push(
+
+        sign
+        ? -power
+        : power
+
+      );
+
+    }
+
+    else {
+
+      bits.push(0);
+
+    }
+
+  });
+
+
+  return {
+
+    sign,
+
+    bits,
+
+    terms,
+
+    text:
+
+      sign +
+
+      " | " +
+
+      bits
+        .slice(0,4)
+        .join(" ") +
+
+      " | " +
+
+      bits[4]
+
+  };
+
+}
+
+
+/* =========================================================
+   FP4 Encoding
+========================================================= */
+
+const fp4Magnitude = {
+
+  "0.5": "001",
+  "1":   "010",
+  "1.5": "011",
+  "2":   "100",
+  "3":   "101",
+  "4":   "110",
+  "6":   "111"
+
+};
+
+
+function fp4Encoding(value) {
+
+  const sign =
+    value < 0
+    ? "1"
+    : "0";
+
+
+  const magnitude =
+    fp4Magnitude[
+      String(
+        Math.abs(value)
+      )
+    ];
+
+
+  return (
+    sign +
+    magnitude
+  );
+
+}
+
+
+/* =========================================================
+   INT8 / INT6 Data
+========================================================= */
+
+function createIntegerData(width) {
+
+  const input =
+    document
+      .getElementById(
+        "int-input"
+      );
+
+
+  const min =
+    -Math.pow(
+      2,
+      width-1
+    );
+
+
+  const max =
+    Math.pow(
+      2,
+      width-1
+    ) - 1;
+
+
+  let value =
+    Number(
+      input.value
+    );
+
+
+  value =
+    Math.max(
+      min,
+      Math.min(
+        max,
+        value
+      )
+    );
+
+
+  input.value =
+    value;
+
+
+  const result =
+    boothEncode(
+      value,
+      width
+    );
+
+
+  const terms =
+    result
+      .terms
+      .slice()
+      .reverse();
+
+
+  const termString =
+    terms
+      .map(t =>
+
+        (
+          t.contribution >= 0
+          ? "+"
+          : ""
+        )
+
+        +
+
+        t.contribution
+
+      )
+      .join(" ");
+
+
+  const fieldString =
+    terms
+      .map(t =>
+
+`${t.string}
+
+Sign = ${t.sign}
+Exp  = ${t.exp}
+Man  = ${t.man}
+Bsig = ${t.bsig}`
+
+      )
+      .join("\n\n");
+
+
+  const sum =
+    terms.reduce(
+
+      (total,term) =>
+        total +
+        term.contribution,
+
+      0
+
+    );
+
+
+  return [
+
+    {
+
+      title:
+        `${width === 8 ? "INT8" : "INT6"} Value`,
+
+      value:
+        value,
+
+      desc:
+        `${width}-bit Integer Weight가 입력됨.`,
+
+      calc:
+        `Input Weight = ${value}`
+
+    },
+
+
+    {
+
+      title:
+        "Binary",
+
+      value:
+        result.binary,
+
+      desc:
+        `${value}를 ${width}-bit Two's Complement Binary로 변환함.`,
+
+      calc:
+        `${value} → ${result.binary}`
+
+    },
+
+
+    {
+
+      title:
+        "Booth Encoding",
+
+      value:
+
+        terms
+          .map(t =>
+
+`${t.string}
+Bsig=${t.bsig}`
+
+          )
+          .join("\n"),
+
+      desc:
+
+        width === 8
+
+        ? "INT8은 Figure 4(a)와 같이 4개의 3-bit Booth String으로 분해됨."
+
+        : "INT6은 Figure 4(a)와 같이 3개의 3-bit Booth String으로 분해됨.",
+
+
+      calc:
+
+        terms
+          .map(t =>
+
+`${t.string}
+→ ${t.op}
+Bsig = ${t.bsig}`
+
+          )
+          .join("\n\n")
+
+    },
+
+
+    {
+
+      title:
+        "Terms",
+
+      value:
+        termString,
+
+      desc:
+        "각 Booth String의 Operation과 Bsig를 이용하여 실제 numerical contribution을 계산함.",
+
+      calc:
+
+        terms
+          .map(t =>
+
+`${t.op} × 2^${t.bsig}
+
+= ${t.contribution}`
+
+          )
+          .join("\n\n")
+
+    },
+
+
+    {
+
+      title:
+        "Unified Fields",
+
+      value:
+`Sign
+Exp
+Man
+Bsig`,
+
+      desc:
+        "각 Booth Term은 최종적으로 Sign / Exp / Man / Bsig 형태로 변환됨.",
+
+      calc:
+        fieldString
+
+    },
+
+
+    {
+
+      title:
+        "Result",
+
+      value:
+`${termString}
+
+= ${sum}`,
+
+      desc:
+        "각 Bit-serial Term을 합하면 원래 Integer Weight가 복원됨.",
+
+      calc:
+`${termString}
+
+= ${sum}
+
+Original Weight = ${value}`
+
+    }
+
+  ];
+
+}
+
+
+/* =========================================================
+   FP4 Normal
+========================================================= */
+
+function createFP4Data() {
+
+  const value =
+    Number(
+
+      document
+        .getElementById(
+          "fp4-input"
+        )
+        .value
+
+    );
+
+
+  const encoding =
+    fp4Encoding(value);
+
+
+  const fixed =
+    fixedPoint(value);
+
+
+  const termString =
+    fixed
+      .terms
+      .map(v =>
+
+        (
+          v > 0
+          ? "+"
+          : ""
+        )
+
+        + v
+
+      )
+      .join(" ");
+
+
+  return [
+
+    {
+
+      title:
+        "FP4 Value",
+
+      value:
+        value,
+
+      desc:
+        "Extended FP4의 일반 Quantized Value가 입력됨.",
+
+      calc:
+        `FP4 Value = ${value}`
+
+    },
+
+
+    {
+
+      title:
+        "FP4 Encoding",
+
+      value:
+`${encoding[0]} | ${encoding.slice(1,3)} | ${encoding[3]}`,
+
+      desc:
+        "FP4의 Sign / Exponent / Mantissa Encoding으로 표현함.",
+
+      calc:
+`S | E₁E₀ | M
+
+${encoding[0]} | ${encoding.slice(1,3)} | ${encoding[3]}`
+
+    },
+
+
+    {
+
+      title:
+        "FP → Fixed",
+
+      value:
+        fixed.text,
+
+      desc:
+        "Figure 4(b)의 FP→Fixed 블록에서 Sign-Magnitude Fixed-Point 형태로 변환함.",
+
+      calc:
+`S | I₃ I₂ I₁ I₀ | F₀
+
+${fixed.text}
+
+    8  4  2  1  0.5`
+
+    },
+
+
+    {
+
+      title:
+        "-0 Check",
+
+      value:
+`eq =
+false`,
+
+      desc:
+        "현재 값은 Redundant -0가 아니므로 Special Value 경로를 사용하지 않음.",
+
+      calc:
+`${encoding} ≠ -0
+
+MUX → Normal Fixed Value`
+
+    },
+
+
+    {
+
+      title:
+        "LOD",
+
+      value:
+
+        fixed
+          .terms
+          .map(
+            (v,index) =>
+              `Term ${index+1} = ${v}`
+          )
+          .join("\n"),
+
+      desc:
+        "LOD가 Fixed-Point에서 1이 존재하는 위치를 찾아 최대 두 개의 Bit-serial Term으로 분해함.",
+
+      calc:
+`${value}
+
+= ${termString}`
+
+    },
+
+
+    {
+
+      title:
+        "Result",
+
+      value:
+`${termString}
+
+= ${value}`,
+
+      desc:
+        "추출된 Term을 더하면 원래 FP4 값이 됨.",
+
+      calc:
+`${termString}
+
+= ${value}
+
+→ Sign / Exp / Man / Bsig`
+
+    }
+
+  ];
+
+}
+
+
+/* =========================================================
+   FP4 -0 → Special Value
+========================================================= */
+
+function createFP4SVData() {
+
+  const sv =
+    Number(
+
+      document
+        .getElementById(
+          "fp4sv-input"
+        )
+        .value
+
+    );
+
+
+  const fixed =
+    fixedPoint(sv);
+
+
+  const termString =
+    fixed
+      .terms
+      .map(v =>
+
+        (
+          v > 0
+          ? "+"
+          : ""
+        )
+
+        + v
+
+      )
+      .join(" ");
+
+
+  return [
+
+    {
+
+      title:
+        "Stored FP4",
+
+      value:
+`1 | 00 | 0`,
+
+      desc:
+        "Weight에는 Redundant Negative Zero(-0)의 Bit Pattern이 저장되어 있다고 가정함.",
+
+      calc:
+`S | E₁E₀ | M
+
+1 | 00 | 0
+
+= -0`
+
+    },
+
+
+    {
+
+      title:
+        "-0 Check",
+
+      value:
+`eq =
+
+TRUE`,
+
+      desc:
+        "Figure 4(b)의 eq Comparator가 Redundant -0를 검출함.",
+
+      calc:
+`Input == -0
+
+→ TRUE`
+
+    },
+
+
+    {
+
+      title:
+        "SV_reg",
+
+      value:
+        `${sv > 0 ? "+" : ""}${sv}`,
+
+      desc:
+        "현재 Weight Group의 2-bit Metadata를 이용해 SV_reg의 Special Value 중 하나를 선택함.",
+
+      calc:
+`FP4 Special Values
+
+-5
++5
+-8
++8
+
+Selected
+→ ${sv > 0 ? "+" : ""}${sv}`
+
+    },
+
+
+    {
+
+      title:
+        "MUX",
+
+      value:
+`-0 → ${sv > 0 ? "+" : ""}${sv}`,
+
+      desc:
+        "eq 결과가 TRUE이므로 Redundant -0 대신 선택된 Special Value를 사용함.",
+
+      calc:
+`Stored Value = -0
+
+Actual Value = ${sv}`
+
+    },
+
+
+    {
+
+      title:
+        "Fixed",
+
+      value:
+        fixed.text,
+
+      desc:
+        "선택된 Special Value를 Fixed-Point Representation으로 변환함.",
+
+      calc:
+`${sv}
+
+↓
+
+${fixed.text}`
+
+    },
+
+
+    {
+
+      title:
+        "LOD",
+
+      value:
+
+        fixed
+          .terms
+          .map(
+            (v,index) =>
+              `Term ${index+1} = ${v}`
+          )
+          .join("\n"),
+
+      desc:
+        "Special Value 역시 동일한 LOD를 통해 Bit-serial Term으로 Decode됨.",
+
+      calc:
+`${sv}
+
+= ${termString}`
+
+    },
+
+
+    {
+
+      title:
+        "Result",
+
+      value:
+`${termString}
+
+= ${sv}`,
+
+      desc:
+        "결국 -0 Encoding이 현재 Group에서 선택된 Special Value의 실제 numerical value로 계산됨.",
+
+      calc:
+`Stored Weight
+= -0 Pattern
+
+↓
+
+SV_reg
+
+↓
+
+Actual Value
+= ${sv}
+
+↓
+
+${termString}`
+
+    }
+
+  ];
+
+}
+
+
+/* =========================================================
+   FP3
+========================================================= */
+
+function createFP3Data() {
+
+  const raw =
+    document
+      .getElementById(
+        "fp3-input"
+      )
+      .value;
+
+
+  const isSpecial =
+    raw.startsWith(
+      "sv"
+    );
+
+
+  const value =
+    Number(
+
+      isSpecial
+      ? raw.substring(2)
+      : raw
+
+    );
+
+
+  const fixed =
+    fixedPoint(value);
+
+
+  const termString =
+    fixed
+      .terms
+      .map(v =>
+
+        (
+          v > 0
+          ? "+"
+          : ""
+        )
+
+        + v
+
+      )
+      .join(" ");
+
+
+  /* -----------------------------------------
+     Basic FP3
+  ------------------------------------------ */
+
+  if (!isSpecial) {
+
+    return [
+
+      {
+
+        title:
+          "FP3 Value",
+
+        value:
+          value,
+
+        desc:
+          "Basic FP3 값이 입력됨.",
+
+        calc:
+`Basic FP3
+
+{0, ±1, ±2, ±4}
+
+Selected = ${value}`
+
+      },
+
+
+      {
+
+        title:
+          "FP3 ⊂ FP4",
+
+        value:
+`Same
+Decoder`,
+
+        desc:
+          "Extended FP3 값은 FP4의 부분집합이므로 Figure 4(b)의 동일한 Decoder Hardware를 사용할 수 있음.",
+
+        calc:
+`FP3
+
+↓
+
+FP4 Decoder 재사용`
+
+      },
+
+
+      {
+
+        title:
+          "Fixed",
+
+        value:
+          fixed.text,
+
+        desc:
+          "FP4와 동일한 Sign-Magnitude Fixed-Point Representation으로 변환함.",
+
+        calc:
+`${value}
+
+↓
+
+S | I₃ I₂ I₁ I₀ | F₀
+
+${fixed.text}`
+
+      },
+
+
+      {
+
+        title:
+          "LOD",
+
+        value:
+
+          fixed
+            .terms
+            .map(
+              (v,index) =>
+                `Term ${index+1} = ${v}`
+            )
+            .join("\n"),
+
+        desc:
+          "동일한 LOD Hardware를 사용하여 Bit-serial Term으로 Decode함.",
+
+        calc:
+`${value}
+
+= ${termString}`
+
+      },
+
+
+      {
+
+        title:
+          "Result",
+
+        value:
+`${termString}
+
+= ${value}`,
+
+        desc:
+          "FP3 역시 최종적으로 Unified Bit-serial Representation으로 전달됨.",
+
+        calc:
+`${termString}
+
+↓
+
+Sign / Exp / Man / Bsig`
+
+      }
+
+    ];
+
+  }
+
+
+  /* -----------------------------------------
+     FP3 Special Value
+  ------------------------------------------ */
+
+  return [
+
+    {
+
+      title:
+        "Stored FP3",
+
+      value:
+`Redundant
+-0`,
+
+      desc:
+        "FP3에서도 Redundant -0 Encoding을 Special Value 표시로 재사용함.",
+
+      calc:
+`Stored Pattern
+
+= Redundant -0`
+
+    },
+
+
+    {
+
+      title:
+        "-0 Check",
+
+      value:
+`eq =
+TRUE`,
+
+      desc:
+        "Redundant -0를 검출하면 현재 Group에 할당된 FP3 Special Value를 선택함.",
+
+      calc:
+`-0 detected
+
+↓
+
+Select Special Value`
+
+    },
+
+
+    {
+
+      title:
+        "FP3 SV",
+
+      value:
+        `${value > 0 ? "+" : ""}${value}`,
+
+      desc:
+        "FP3의 Special Value는 ER의 ±3 또는 EA의 ±6임.",
+
+      calc:
+`FP3-ER → ±3
+
+FP3-EA → ±6
+
+Selected
+= ${value}`
+
+    },
+
+
+    {
+
+      title:
+        "FP3 ⊂ FP4",
+
+      value:
+`Same
+Decoder`,
+
+      desc:
+        "Special Value를 포함한 Extended FP3 값 역시 FP4 Decoder Hardware에서 처리함.",
+
+      calc:
+`${value}
+
+↓
+
+FP4-Compatible
+Fixed Decoder`
+
+    },
+
+
+    {
+
+      title:
+        "Fixed",
+
+      value:
+        fixed.text,
+
+      desc:
+        "선택된 FP3 Special Value를 Fixed-Point 형태로 변환함.",
+
+      calc:
+`${value}
+
+↓
+
+${fixed.text}`
+
+    },
+
+
+    {
+
+      title:
+        "LOD",
+
+      value:
+
+        fixed
+          .terms
+          .map(
+            (v,index) =>
+              `Term ${index+1} = ${v}`
+          )
+          .join("\n"),
+
+      desc:
+        "LOD를 이용해 최대 두 개의 Bit-serial Term으로 분해함.",
+
+      calc:
+`${value}
+
+= ${termString}`
+
+    },
+
+
+    {
+
+      title:
+        "Result",
+
+      value:
+`${termString}
+
+= ${value}`,
+
+      desc:
+        "FP3 Special Value도 최종적으로 Unified Bit-serial Representation으로 전달됨.",
+
+      calc:
+`${termString}
+
+↓
+
+Sign / Exp / Man / Bsig`
+
+    }
+
+  ];
+
+}
+
+
+/* =========================================================
+   UI
+========================================================= */
+
+let currentMode =
+  "int8";
+
+
+let currentStep =
+  0;
+
+
+const flow =
+  document
+    .getElementById(
+      "bm-flow"
+    );
+
+
+const desc =
+  document
+    .getElementById(
+      "bm-desc"
+    );
+
+
+const calc =
+  document
+    .getElementById(
+      "bm-calc"
+    );
+
+
+const title =
+  document
+    .getElementById(
+      "bm-step-title"
+    );
+
+
+const stepNumber =
+  document
+    .getElementById(
+      "bm-step-number"
+    );
+
+
+/* =========================================================
+   Current Data
+========================================================= */
+
+function currentData() {
+
+  switch(
+    currentMode
+  ) {
+
+    case "int8":
+
+      return createIntegerData(8);
+
+
+    case "int6":
+
+      return createIntegerData(6);
+
+
+    case "fp4":
+
+      return createFP4Data();
+
+
+    case "fp4sv":
+
+      return createFP4SVData();
+
+
+    case "fp3":
+
+      return createFP3Data();
+
+  }
+
+}
+
+
+/* =========================================================
+   Control Visibility
+========================================================= */
+
+function updateControls() {
+
+  document
+    .getElementById(
+      "int-control"
+    )
+    .style
+    .display =
+
+      (
+        currentMode === "int8" ||
+        currentMode === "int6"
+      )
+
+      ? "inline-flex"
+
+      : "none";
+
+
+  document
+    .getElementById(
+      "fp4-control"
+    )
+    .style
+    .display =
+
+      currentMode === "fp4"
+
+      ? "inline-flex"
+
+      : "none";
+
+
+  document
+    .getElementById(
+      "fp4sv-control"
+    )
+    .style
+    .display =
+
+      currentMode === "fp4sv"
+
+      ? "inline-flex"
+
+      : "none";
+
+
+  document
+    .getElementById(
+      "fp3-control"
+    )
+    .style
+    .display =
+
+      currentMode === "fp3"
+
+      ? "inline-flex"
+
+      : "none";
+
+
+  const input =
+    document
+      .getElementById(
+        "int-input"
+      );
+
+
+  if (
+    currentMode === "int8"
+  ) {
+
+    input.min =
+      -128;
+
+    input.max =
+      127;
+
+
+    if (
+      Number(input.value) < -128 ||
+      Number(input.value) > 127
+    ) {
+
+      input.value =
+        45;
+
+    }
+
+  }
+
+
+  if (
+    currentMode === "int6"
+  ) {
+
+    input.min =
+      -32;
+
+    input.max =
+      31;
+
+
+    if (
+      Number(input.value) < -32 ||
+      Number(input.value) > 31
+    ) {
+
+      input.value =
+        21;
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   Render
+========================================================= */
+
+function render(
+  resetScroll = false
+) {
+
+  const data =
+    currentData();
+
+
+  if (
+    currentStep >=
+    data.length
+  ) {
+
+    currentStep =
+      data.length - 1;
+
+  }
+
+
+  flow.innerHTML =
+    "";
+
+
+  data.forEach(
+    (step,index) => {
+
+      const box =
+        document.createElement(
+          "div"
+        );
+
+
+      box.className =
+        "bm-box";
+
+
+      if (
+        index <
+        currentStep
+      ) {
+
+        box
+          .classList
+          .add(
+            "done"
+          );
+
+      }
+
+
+      if (
+        index ===
+        currentStep
+      ) {
+
+        box
+          .classList
+          .add(
+            "active"
+          );
+
+      }
+
+
+      box.innerHTML = `
+
+        <div class="bm-title">
+
+          ${step.title}
+
+        </div>
+
+        <div class="bm-value">
+
+          ${step.value}
+
+        </div>
+
+      `;
+
+
+      flow.appendChild(
+        box
+      );
+
+
+      if (
+        index <
+        data.length - 1
+      ) {
+
+        const arrow =
+          document.createElement(
+            "div"
+          );
+
+
+        arrow.className =
+          "bm-arrow";
+
+
+        if (
+          index ===
+          currentStep
+        ) {
+
+          arrow
+            .classList
+            .add(
+              "active"
+            );
+
+        }
+
+
+        arrow.textContent =
+          "→";
+
+
+        flow.appendChild(
+          arrow
+        );
+
+      }
+
+    }
+
+  );
+
+
+  const step =
+    data[currentStep];
+
+
+  stepNumber.textContent =
+
+    `Step ${currentStep+1}/${data.length}`;
+
+
+  title.textContent =
+    step.title;
+
+
+  desc.textContent =
+    step.desc;
+
+
+  calc.textContent =
+    step.calc;
+
+
+  /* -----------------------------------------
+     탭 변경 시 반드시 맨 왼쪽부터 보여줌.
+
+     FP4 -0 → SV에서
+     Stored FP4가 잘리던 문제 해결.
+  ------------------------------------------ */
+
+  if (
+    resetScroll
+  ) {
+
+    flow.scrollLeft =
+      0;
+
+  }
+
+
+  /* -----------------------------------------
+     현재 Step이 화면 밖으로 가면
+     해당 Step이 보이도록 이동.
+  ------------------------------------------ */
+
+  requestAnimationFrame(
+    () => {
+
+      const active =
+        flow.querySelector(
+          ".bm-box.active"
+        );
+
+
+      if (
+        active &&
+        !resetScroll
+      ) {
+
+        const activeLeft =
+          active.offsetLeft;
+
+
+        const activeRight =
+          activeLeft +
+          active.offsetWidth;
+
+
+        const visibleLeft =
+          flow.scrollLeft;
+
+
+        const visibleRight =
+          visibleLeft +
+          flow.clientWidth;
+
+
+        if (
+          activeLeft <
+          visibleLeft + 15
+        ) {
+
+          flow.scrollTo({
+
+            left:
+              Math.max(
+                0,
+                activeLeft - 20
+              ),
+
+            behavior:
+              "smooth"
+
+          });
+
+        }
+
+
+        else if (
+          activeRight >
+          visibleRight - 15
+        ) {
+
+          flow.scrollTo({
+
+            left:
+              activeRight -
+              flow.clientWidth +
+              20,
+
+            behavior:
+              "smooth"
+
+          });
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   Tabs
+========================================================= */
+
+document
+  .querySelectorAll(
+    ".bm-tab"
+  )
+  .forEach(button => {
+
+    button
+      .addEventListener(
+        "click",
+        () => {
+
+          document
+            .querySelectorAll(
+              ".bm-tab"
+            )
+            .forEach(btn =>
+
+              btn
+                .classList
+                .remove(
+                  "active"
+                )
+
+            );
+
+
+          button
+            .classList
+            .add(
+              "active"
+            );
+
+
+          currentMode =
+            button.dataset.mode;
+
+
+          currentStep =
+            0;
+
+
+          updateControls();
+
+
+          /*
+            반드시 scrollLeft = 0부터
+            새 Mode 표시
+          */
+
+          render(true);
+
+        }
+      );
+
+  });
+
+
+/* =========================================================
+   Next
+========================================================= */
+
+document
+  .getElementById(
+    "bm-next"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const data =
+        currentData();
+
+
+      if (
+        currentStep <
+        data.length - 1
+      ) {
+
+        currentStep++;
+
+        render(false);
+
+      }
+
+      else {
+
+        currentStep =
+          0;
+
+        render(true);
+
+      }
+
+    }
+  );
+
+
+/* =========================================================
+   Previous
+========================================================= */
+
+document
+  .getElementById(
+    "bm-prev"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentStep =
+        Math.max(
+          0,
+          currentStep - 1
+        );
+
+
+      render(false);
+
+    }
+  );
+
+
+/* =========================================================
+   Value Changes
+========================================================= */
+
+document
+  .getElementById(
+    "int-input"
+  )
+  .addEventListener(
+    "input",
+    () => {
+
+      currentStep =
+        0;
+
+      render(true);
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "fp4-input"
+  )
+  .addEventListener(
+    "change",
+    () => {
+
+      currentStep =
+        0;
+
+      render(true);
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "fp4sv-input"
+  )
+  .addEventListener(
+    "change",
+    () => {
+
+      currentStep =
+        0;
+
+      render(true);
+
+    }
+  );
+
+
+document
+  .getElementById(
+    "fp3-input"
+  )
+  .addEventListener(
+    "change",
+    () => {
+
+      currentStep =
+        0;
+
+      render(true);
+
+    }
+  );
+
+
+/* =========================================================
+   Start
+========================================================= */
+
+updateControls();
+
+render(true);
+
+</script>
+
+## B. BitMoD Processing Element
+
+앞의 **Unified Bit-serial Representation**에서는 INT8, INT6, FP4, FP3 Weight를 모두 다음과 같은 공통 Bit-serial Term으로 변환했음.
+
+$$
+w=(w_s,w_e,w_m,w_{bsig})
+$$
+
+여기서
+
+- $w_s$ : Weight Term의 Sign
+- $w_e$ : Weight Term의 Exponent
+- $w_m$ : 1-bit Mantissa
+- $w_{bsig}$ : 원래 Weight에서 해당 Term이 가지는 Bit-significance
+
+를 의미함.
+
+하지만 BitMoD에서는 **Weight만 Low-Precision으로 Quantization하고 Activation은 FP16으로 유지**함.
+
+따라서 실제 PE가 처리해야 하는 연산은
+
+$$
+\text{Bit-serial Low-Precision Weight}
+\times
+\text{FP16 Activation}
+$$
+
+이라는 **Mixed-Precision 연산**임.
+
+이를 위해 BitMoD는 Figure 5와 같은 **Mixed-Precision Bit-serial Processing Element(PE)**를 제안함.
+
+<center><img src="/images/PR/BitMoD/figure5.png" width = "1000"><br></center>
+
+BitMoD PE는 한 Cycle마다
+
+- 4개의 Bit-serial Weight Term
+- 4개의 FP16 Activation
+
+을 입력으로 받아 **4-way Dot Product**를 수행함.
+
+전체 연산은 Figure 5의 흐름에 따라 크게 네 단계로 구성됨.
+
+```text
+Bit-serial Weight Terms
+           +
+    FP16 Activations
+           │
+           ▼
+Step 1. Exponent Alignment
+           │
+           ▼
+Step 2. Bit-serial Multiplication
+           │
+           ▼
+Step 3. Group Accumulation
+           │
+           ▼
+Step 4. Bit-serial Dequantization
+           │
+           ▼
+Dequantized Group Partial Sum
+```
+
+---
+
+### Weight와 Activation의 표현
+
+Figure 5의 Weight는 앞의 Figure 4에서 생성된 Bit-serial Term임.
+
+$$
+w=(w_s,w_e,w_m,w_{bsig})
+$$
+
+반면 Activation은 FP16이므로 원래부터 Floating-Point 형식인
+
+$$
+a=(a_s,a_e,a_m)
+$$
+
+으로 구성됨.
+
+즉 Activation에 새로운 Exponent를 만들어 저장하는 것이 아니라, **원래 FP16 Activation이 가지고 있던 Sign / Exponent / Mantissa를 그대로 사용하는 것**임.
+
+FP16은 기본적으로
+
+```text
+FP16 Activation
+
+┌──────┬────────────┬────────────────────┐
+│ Sign │  Exponent  │      Fraction      │
+│ 1bit │   5bit     │       10bit        │
+└──────┴────────────┴────────────────────┘
+```
+
+형태임.
+
+Mantissa 연산에서는 10-bit Fraction에 Hidden Bit를 포함하기 때문에 **11-bit Activation Mantissa**를 사용함.
+
+즉 Figure 5의 PE 입력을 간단히 보면
+
+```text
+Weight Term
+ws | we | wm | wbsig
+          +
+FP16 Activation
+as | ae | am
+
+        ↓
+
+BitMoD PE
+```
+
+구조임.
+
+---
+
+### Step 1. Exponent Alignment
+
+Figure 5의 첫 번째 단계에서는 각 Weight Term과 Activation을 곱했을 때 발생하는 **Product Exponent와 Sign을 먼저 계산함.**
+
+Floating-Point 곱셈에서
+
+$$
+A=M_A2^{E_A}
+$$
+
+$$
+W=M_W2^{E_W}
+$$
+
+라면
+
+$$
+A\times W
+=
+(M_AM_W)2^{E_A+E_W}
+$$
+
+가 됨.
+
+따라서 Weight Term과 Activation의 Product Exponent는
+
+$$
+e_{product}=a_e+w_e
+$$
+
+로 계산할 수 있음.
+
+Figure 5에서는 4개의 Weight-Activation Pair에 대해 이 연산을 동시에 수행함.
+
+```text
+Weight 0 + Activation 0
+→ ae₀ + we₀
+
+Weight 1 + Activation 1
+→ ae₁ + we₁
+
+Weight 2 + Activation 2
+→ ae₂ + we₂
+
+Weight 3 + Activation 3
+→ ae₃ + we₃
+```
+
+하지만 이 네 Product를 이후 하나의 Dot Product로 더하려면 **Exponent를 동일하게 맞춰야 함.**
+
+#### Exponent Alignment 예시
+
+설명을 위해 네 Product의 Exponent가 다음과 같다고 가정함.
+
+$$
+[5,\;3,\;4,\;5]
+$$
+
+가장 큰 Exponent는
+
+$$
+e_{max}=5
+$$
+
+임.
+
+따라서 각 Product가 최대 Exponent와 얼마나 차이가 나는지 계산함.
+
+$$
+\delta e_i=e_{max}-e_i
+$$
+
+결과는
+
+$$
+\delta e=[0,\;2,\;1,\;0]
+$$
+
+이 됨.
+
+```text
+Product 0
+Exponent = 5
+δe = 0
+
+Product 1
+Exponent = 3
+δe = 2
+
+Product 2
+Exponent = 4
+δe = 1
+
+Product 3
+Exponent = 5
+δe = 0
+```
+
+이 $\delta e$는 다음 Step의 Right Shifter가 각 Mantissa를 얼마나 Shift해야 하는지 결정함.
+
+즉,
+
+```text
+ae + we
+   ↓
+Product Exponent
+   ↓
+4개 중 Maximum Exponent 탐색
+   ↓
+δe 계산
+   ↓
+Step 2의 Right Shift Amount
+```
+
+가 됨.
+
+---
+
+#### Product Sign 계산
+
+Step 1에서는 Product Sign $y_s$도 함께 계산함.
+
+Weight와 Activation의 Sign이 각각
+
+$$
+w_s,\qquad a_s
+$$
+
+라고 하면
+
+$$
+y_s=w_s\oplus a_s
+$$
+
+로 계산할 수 있음.
+
+```text
+Weight + × Activation + → +
+Weight - × Activation + → -
+Weight + × Activation - → -
+Weight - × Activation - → +
+```
+
+따라서 Step 1에서는 크게
+
+```text
+Exponent
+ae + we
+   ↓
+δe
+
+Sign
+as XOR ws
+   ↓
+ys
+```
+
+두 가지 정보를 생성함.
+
+---
+
+### Step 2. Bit-serial Multiplication
+
+Step 2에서는 실제 Mantissa Multiplication을 수행함.
+
+BitMoD의 Weight Term은 Figure 4에서 이미 단순한 Bit-serial Term으로 분해되어 있기 때문에 Weight Mantissa $w_m$은 **1-bit**임.
+
+반면 FP16 Activation의 Mantissa $a_m$은 Hidden Bit를 포함하여 **11-bit**임.
+
+따라서 실제 연산은
+
+$$
+1\text{-bit }w_m
+\times
+11\text{-bit }a_m
+$$
+
+이 됨.
+
+#### Weight Mantissa가 1-bit인 이유
+
+Bit-serial Term의 Mantissa는 사실상
+
+$$
+w_m\in\{0,1\}
+$$
+
+임.
+
+따라서
+
+$$
+w_m=0
+$$
+
+이면
+
+$$
+w_m\times a_m=0
+$$
+
+이고,
+
+$$
+w_m=1
+$$
+
+이면
+
+$$
+w_m\times a_m=a_m
+$$
+
+임.
+
+즉 일반적인 복잡한 Multiplier 대신 개념적으로
+
+```text
+wm = 0
+→ Activation Mantissa 사용 안 함
+
+wm = 1
+→ Activation Mantissa 그대로 통과
+```
+
+처럼 처리할 수 있음.
+
+이것이 Bit-serial Representation을 사용하는 Hardware상의 중요한 장점임.
+
+---
+
+### Right Shift를 통한 Exponent Alignment
+
+Step 1에서 계산한 $\delta e$를 이용해 각 Product Mantissa를 Right Shift함.
+
+앞의 예시에서
+
+$$
+\delta e=[0,2,1,0]
+$$
+
+이었음.
+
+Activation Mantissa를 설명 편의를 위해 각각
+
+$$
+[1.5,\;1.25,\;1.0,\;1.5]
+$$
+
+라고 가정하면 다음처럼 정렬됨.
+
+#### Product 0
+
+$$
+\delta e=0
+$$
+
+이므로
+
+$$
+1.5\times2^{-0}=1.5
+$$
+
+#### Product 1
+
+$$
+\delta e=2
+$$
+
+이므로
+
+$$
+1.25\times2^{-2}=0.3125
+$$
+
+#### Product 2
+
+$$
+\delta e=1
+$$
+
+이므로
+
+$$
+1.0\times2^{-1}=0.5
+$$
+
+#### Product 3
+
+$$
+\delta e=0
+$$
+
+이므로
+
+$$
+1.5
+$$
+
+그 결과
+
+```text
+Before Alignment
+
+1.5      1.25      1.0      1.5
+ ↓         ↓        ↓        ↓
+shift 0  shift 2  shift 1  shift 0
+ ↓         ↓        ↓        ↓
+1.5     0.3125     0.5      1.5
+
+        ↓
+
+같은 Exponent 기준으로 정렬
+```
+
+하게 됨.
+
+---
+
+### Rounding을 위한 3 Extra Bits
+
+Right Shift를 수행하면 낮은 Bit가 잘려 나가면서 Rounding Error가 발생할 수 있음.
+
+이를 처리하기 위해 BitMoD에서는 Shifter 결과에 **3개의 Extra Bit**를 추가함.
+
+이 Extra Bit는 **Round-to-Nearest-Even**을 지원하기 위한 것임.
+
+즉 Mantissa를 Shift하면서 발생하는 Precision Loss를 줄이기 위한 Hardware임.
+
+---
+
+### 4-way Adder Tree
+
+Exponent가 맞춰진 네 개의 Mantissa Product는 이후 **Adder Tree**로 들어감.
+
+```text
+Product 0 ─┐
+           ├── +
+Product 1 ─┘     │
+                 ├── + → Bit-serial Dot Product
+Product 2 ─┐     │
+           ├── +
+Product 3 ─┘
+```
+
+즉 한 Cycle에서
+
+$$
+P
+=
+P_0+P_1+P_2+P_3
+$$
+
+형태의 **4-way Bit-serial Dot Product**를 계산함.
+
+---
+
+### Step 3. Group Accumulation
+
+Step 2에서 계산한 것은 아직 **현재 Bit-serial Term에 대한 Dot Product**임.
+
+하나의 원래 Weight는 여러 Bit-serial Term으로 나뉠 수 있기 때문에 각 Term의 결과를 다시 합쳐야 함.
+
+예를 들어 Figure 4에서 FP4 값
+
+$$
+6
+$$
+
+은
+
+$$
+6=4+2
+$$
+
+의 두 Term으로 표현되었음.
+
+따라서
+
+```text
+Cycle 1
+Weight Term = 4
+      ↓
+Dot Product
+      ↓
+ACC에 저장
+
+
+Cycle 2
+Weight Term = 2
+      ↓
+Dot Product
+      ↓
+기존 ACC에 추가
+```
+
+하는 과정이 필요함.
+
+이 역할을 Step 3의 **Group Accumulation**이 수행함.
+
+---
+
+### Bit-significance 적용
+
+현재 Bit-serial Term이 원래 Weight에서 어느 위치를 나타내는지는
+
+$$
+w_{bsig}
+$$
+
+에 저장되어 있음.
+
+예를 들어 Step 2의 Dot Product 결과가
+
+$$
+P=3
+$$
+
+이고 현재 Term의
+
+$$
+w_{bsig}=2
+$$
+
+라면 실제 Contribution은
+
+$$
+3\times2^2
+$$
+
+이므로
+
+$$
+12
+$$
+
+가 됨.
+
+Hardware에서는 이를 일반 Multiplication 대신 Left Shift로 처리할 수 있음.
+
+```text
+Dot Product
+     3
+     │
+     │ Bsig = 2
+     ▼
+   << 2
+     │
+     ▼
+    12
+```
+
+---
+
+### 기존 Accumulator와 합산
+
+현재 결과는 기존 Accumulator Mantissa $m_{ACC}$와 더해짐.
+
+예를 들어 기존 Accumulator가
+
+$$
+m_{ACC}=20
+$$
+
+이라면
+
+$$
+20+12=32
+$$
+
+가 됨.
+
+```text
+Current Dot Product
+        3
+        │
+      Bsig=2
+        │
+        ▼
+       12
+        │
+        │
+mACC=20 │
+    ────┘
+        ↓
+       ADD
+        ↓
+       32
+```
+
+이 과정을 여러 Bit-serial Term에 대해 반복함으로써 원래 Weight를 사용한 전체 Dot Product가 복원됨.
+
+---
+
+### Normalize와 Accumulator Exponent
+
+Mantissa를 계속 더하면 Mantissa의 범위가 정규화 범위를 벗어날 수 있음.
+
+따라서 Figure 5에서는 누적된 Mantissa를 **Normalize**하고 그에 맞게 Accumulator Exponent
+
+$$
+e_{ACC}
+$$
+
+를 갱신함.
+
+즉 Step 3 이후에는
+
+```text
+Accumulated Mantissa
+mACC
+    +
+Current Bit-serial Dot Product
+    ↓
+Normalize
+    ↓
+mACC / eACC 갱신
+```
+
+이 이루어짐.
+
+이 결과가 해당 Weight Group의 **Group Partial Sum**이 됨.
+
+---
+
+### Step 4. Bit-serial Dequantization
+
+BitMoD는 **Per-Group Quantization**을 사용하기 때문에 각 Group의 Dot Product가 끝난 뒤에는 해당 Group의 Scaling Factor를 적용해야 함.
+
+즉 Group $g$의 Partial Sum을 $P_g$라고 하면
+
+$$
+P_g\Delta_g
+$$
+
+형태의 Dequantization이 필요함.
+
+문제는 Group마다
+
+$$
+\Delta_1,\Delta_2,\Delta_3,\ldots
+$$
+
+가 서로 다르기 때문에 전체 Channel 연산이 끝날 때까지 Scaling을 미룰 수 없다는 것임.
+
+따라서 Group 단위로 Dequantization을 수행해야 함.
+
+---
+
+### Section III-C와 연결
+
+앞의 **Efficient Per-group Dequantization**에서 BitMoD가 Scaling Factor를 FP16이 아니라 **INT8로 다시 Quantization한 이유가 바로 Step 4 때문임.**
+
+기존 방식이라면
+
+$$
+\text{Group Partial Sum}
+\times
+\text{FP16 Scaling Factor}
+$$
+
+가 필요하므로 Floating-Point Multiplier가 필요함.
+
+BitMoD에서는 Scaling Factor를 INT8로 만들어
+
+```text
+FP16 Scaling Factor
+        ↓
+Second-Level Quantization
+        ↓
+INT8 Scaling Factor
+```
+
+형태로 사용함.
+
+그러면 Scaling Factor를 한 번에 곱하지 않고 **한 Bit씩 Bit-serial 방식으로 처리할 수 있음.**
+
+---
+
+### INT8 Scaling Factor를 Bit-serial로 처리하는 예시
+
+동작을 이해하기 위한 예시로 Scaling Factor의 Integer 값이
+
+$$
+\Delta_q=13
+$$
+
+이라고 가정함.
+
+Binary로 표현하면
+
+$$
+13=00001101_2
+$$
+
+이고,
+
+$$
+13=8+4+1
+$$
+
+임.
+
+따라서
+
+$$
+m_{ACC}\times13
+$$
+
+을 한 번에 계산하는 대신,
+
+```text
+INT8 Scaling Factor
+
+00001101
+       ↑
+bit 단위로 순차 처리
+```
+
+할 수 있음.
+
+각 Bit 위치를 보면
+
+```text
+bit 0 = 1
+→ mACC × 1
+
+bit 1 = 0
+→ 0
+
+bit 2 = 1
+→ mACC × 4
+
+bit 3 = 1
+→ mACC × 8
+```
+
+이므로
+
+$$
+m_{ACC}\times13
+=
+m_{ACC}
++
+(m_{ACC}<<2)
++
+(m_{ACC}<<3)
+$$
+
+으로 계산할 수 있음.
+
+즉 큰 FP Multiplier 대신
+
+```text
+mACC
+ │
+ ├─ Scaling bit = 1 → 사용
+ ├─ Scaling bit = 0 → Skip
+ ├─ Shift
+ └─ Add
+       ↓
+Dequantized Partial Sum
+```
+
+방식을 사용함.
+
+> 위의 $\Delta_q=13$은 Bit-serial Dequantization 동작을 이해하기 위한 예시이며 논문에서 사용한 실제 Scaling Factor 값은 아님.
+
+---
+
+### 8-cycle Dequantization이 Bottleneck이 되지 않는 이유
+
+Per-Group Scaling Factor는 INT8이므로 Bit를 하나씩 처리하면
+
+$$
+8\text{ cycles}
+$$
+
+이 필요함.
+
+여기서
+
+> **“Dequantization 때문에 PE Pipeline이 기다리는 것 아닌가?”**
+
+라는 문제가 생길 수 있음.
+
+하지만 논문에서는 Group Dot Product 자체가 훨씬 오래 걸리기 때문에 문제가 되지 않는다고 설명함.
+
+BitMoD의 기본 Group Size는
+
+$$
+G=128
+$$
+
+이며 하나의 PE는 한 번에 4개의 Weight에 대해 Dot Product를 수행함.
+
+따라서 Group의 Weight 128개를 처리하려면
+
+$$
+\frac{128}{4}=32
+$$
+
+번의 처리가 필요함.
+
+가장 낮은 Precision인 FP3도 Weight 하나를 **2개의 Bit-serial Term**으로 처리하므로
+
+$$
+32\times2
+=
+64\text{ cycles}
+$$
+
+이 필요함.
+
+즉,
+
+```text
+FP3 Group Dot Product
+
+128 / 4 × 2
+= 64 cycles
+
+
+INT8 Scaling Factor Dequantization
+
+= 8 cycles
+```
+
+임.
+
+따라서
+
+$$
+64\text{ cycles}
+\gg
+8\text{ cycles}
+$$
+
+이므로 Bit-serial Dequantization이 Computing Pipeline을 Stall시키지 않음.
+
+---
+
+### Precision에 따른 연산 Cycle 감소
+
+BitMoD의 또 다른 장점은 **Weight Precision이 낮아질수록 처리해야 하는 Bit-serial Term의 개수가 감소한다는 것**임.
+
+앞의 Figure 4에서
+
+| Data Type | Bit-serial Term 수 |
+|---|---:|
+| INT8 | 4 |
+| INT6 | 3 |
+| FP4 | 2 |
+| FP3 | 2 |
+
+였음.
+
+BitMoD PE에서는 각 Term을 Cycle 단위로 처리하기 때문에 4개의 MAC 연산을 수행하는 데 필요한 Cycle 수도 달라짐.
+
+```text
+INT8
+4 Terms
+→ 4 cycles
+
+INT6
+3 Terms
+→ 3 cycles
+
+FP4
+2 Terms
+→ 2 cycles
+
+FP3
+2 Terms
+→ 2 cycles
+```
+
+따라서 INT6에서는
+
+$$
+\frac{4}{3}
+\approx
+1.33\times
+$$
+
+의 Throughput Improvement를 얻고,
+
+FP4와 FP3에서는
+
+$$
+\frac{4}{2}
+=
+2\times
+$$
+
+의 Throughput Improvement를 얻을 수 있음.
+
+즉 BitMoD에서 Low-Precision은 단순히 Weight Memory만 줄이는 것이 아니라 **실제 PE의 연산 Cycle까지 감소시킴.**
+
+---
+
+### PE Area 측면의 장점
+
+논문에서는 이후 Hardware Evaluation을 통해 BitMoD PE가 일반 FP16 PE보다 **24% 적은 Area**를 사용한다고 설명함.
+
+즉,
+
+```text
+Low Precision
+     ↓
+Bit-serial Term 수 감소
+     ↓
+연산 Cycle 감소
+
++
+
+BitMoD PE 자체도
+FP16 PE보다 작은 Area 사용
+     ↓
+같은 Compute Area에
+더 많은 PE 배치 가능
+```
+
+이라는 추가적인 장점이 있음.
+
+---
+
+### Self-Attention 연산 지원
+
+LLM에서는 Weight × Activation Matrix Multiplication뿐 아니라 Self-Attention 내부에서
+
+$$
+QK^T
+$$
+
+와
+
+$$
+PV
+$$
+
+처럼 **Activation Tensor끼리의 Matrix Multiplication**도 수행해야 함.
+
+즉 Self-Attention에서는
+
+```text
+Query
+Key
+Value
+```
+
+세 개의 Activation Tensor가 사용됨.
+
+하지만 BitMoD PE는 기본적으로
+
+```text
+한 Operand
+→ FP16
+
+다른 Operand
+→ Low-Precision Bit-serial
+```
+
+형태의 Mixed-Precision 연산을 위해 설계됨.
+
+따라서 세 Activation Tensor를 모두 FP16으로 유지하면서 계산하는 구조는 아님.
+
+논문에서는 **Key와 Value Tensor가 Quantization에 비교적 강하다**는 기존 연구 결과를 이용함.
+
+Key와 Value는
+
+$$
+INT8
+$$
+
+또는 심지어
+
+$$
+INT4
+$$
+
+까지 Quantization해도 Accuracy Loss가 매우 작다고 설명함.
+
+따라서 Self-Attention에서는 개념적으로
+
+```text
+Query
+→ FP16
+
+Key
+→ Low-Precision Integer
+
+Value
+→ Low-Precision Integer
+```
+
+형태로 처리할 수 있음.
+
+이렇게 하면 기존 BitMoD Bit-serial PE를 Self-Attention 연산에도 활용할 수 있음.
+
+---
+
+### Figure 4와 Figure 5의 관계
+
+Figure 4와 Figure 5는 서로 독립적인 구조가 아니라 **연속된 하나의 Data Path**임.
+
+먼저 Figure 4에서
+
+```text
+INT8
+INT6
+FP4
+FP3
+ │
+ ▼
+Unified Bit-serial Representation
+ │
+ ▼
+ws | we | wm | wbsig
+```
+
+을 생성함.
+
+그리고 그 결과가 Figure 5의 PE 입력으로 들어감.
+
+<center><img src="/images/PR/BitMoD/figure5.png" width = "1000"><br></center>
+
+Figure 5에서는
+
+```text
+Figure 4 Output
+
+Bit-serial Weight Term
+ws | we | wm | wbsig
+
+          +
+
+FP16 Activation
+as | ae | am
+
+          ↓
+
+       BitMoD PE
+
+          ↓
+
+Step 1
+Exponent Alignment
+ae + we
+Sign 계산
+          ↓
+
+Step 2
+wm × am
+Right Shift
+4-way Adder Tree
+          ↓
+
+Step 3
+Bsig 적용
+Group Accumulation
+Normalize
+          ↓
+
+Step 4
+INT8 Scaling Factor
+Bit-serial Dequantization
+          ↓
+
+Dequantized
+Group Partial Sum
+```
+
+순서로 처리됨.
+
+---
+
+### 전체 흐름 정리
+
+BitMoD PE의 핵심 동작을 한 번에 정리하면 다음과 같음.
+
+```text
+① Figure 4
+
+FP3 / FP4 / INT6 / INT8
+           ↓
+Unified Bit-serial Term
+ws | we | wm | wbsig
+
+
+② Figure 5 — Step 1
+
+Bit-serial Weight
+       +
+FP16 Activation
+       ↓
+ae + we
+       ↓
+Exponent Alignment
++
+Product Sign 계산
+
+
+③ Figure 5 — Step 2
+
+1-bit Weight Mantissa
+       ×
+11-bit Activation Mantissa
+       ↓
+Right Shift by δe
+       ↓
+4-way Adder Tree
+       ↓
+Bit-serial Dot Product
+
+
+④ Figure 5 — Step 3
+
+Dot Product
+       ↓
+× 2^Bsig
+       ↓
+기존 ACC와 합산
+       ↓
+Normalize
+       ↓
+Group Partial Sum
+
+
+⑤ Figure 5 — Step 4
+
+Group Partial Sum
+       ×
+INT8 Scaling Factor
+       ↓
+Scaling Factor를
+1 bit / cycle로 처리
+       ↓
+Shift + Add
+       ↓
+Dequantized
+Group Partial Sum
+```
+
+---
+
+### 핵심 정리
+
+BitMoD Processing Element의 핵심은 **Low-Precision Weight와 FP16 Activation 사이의 Mixed-Precision 연산을 Bit-serial 방식으로 수행하는 것**임.
+
+특히 네 단계가 각각 다음 역할을 담당함.
+
+| Step | 역할 |
+|---|---|
+| **Step 1** | Weight와 Activation의 Product Exponent 및 Sign 계산 |
+| **Step 2** | 1-bit Weight Mantissa × 11-bit Activation Mantissa 연산 및 4-way Dot Product |
+| **Step 3** | Bsig를 반영하여 여러 Bit-serial Term 결과를 Group 단위로 누적 |
+| **Step 4** | INT8 Per-Group Scaling Factor를 이용해 Bit-serial Dequantization 수행 |
+
+결국 BitMoD는
+
+$$
+\boxed{
+\text{Low-Precision Weight}
+\times
+\text{FP16 Activation}
+}
+$$
+
+을 하나의 PE에서 처리하면서 동시에
+
+$$
+\boxed{
+\text{Per-Group Dequantization}
+}
+$$
+
+까지 Hardware 내부에서 효율적으로 수행함.
+
+특히 **Section III-C에서 Scaling Factor를 INT8로 Quantization한 이유가 Figure 5의 Step 4에서 실제 Hardware 이점으로 연결됨.**
+
+FP16 Scaling Factor를 그대로 사용했다면 Group마다 FP Multiplication이 필요하지만, INT8 Scaling Factor를 사용하면 이를 **Bit-serial Shift-and-Add**로 처리할 수 있음.
+
+또한 FP3/FP4처럼 낮은 Precision에서는 처리할 Bit-serial Term 자체가 줄어들기 때문에 **Weight Precision 감소 → Memory 감소 → 연산 Cycle 감소 → Throughput 증가**로 직접 연결되는 것이 BitMoD PE의 핵심임.
+<center><img src="/images/PR/BitMoD/figure6.png" width = "700"><br></center>
