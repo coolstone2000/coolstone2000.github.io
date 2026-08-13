@@ -9,7 +9,7 @@
 
   <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ page.url | absolute_url | url_encode }}" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="{{ site.data.ui-text[site.locale].share_on_label | default: 'Share on' }} LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 
-  <button type="button" id="kakao-share-btn" class="btn" style="background-color:#A08C00;color:#fff;border-color:#A08C00;cursor:pointer;">
+  <button type="button" id="kakao-share-btn" class="btn" style="background-color:#C8A800;color:#fff;border-color:#C8A800;cursor:pointer;">
     <i class="fas fa-comment" aria-hidden="true"></i><span> 카카오톡 공유</span>
   </button>
 
@@ -18,9 +18,7 @@
   </button>
 
   <!-- Kakao SDK -->
-  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"
-          integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4"
-          crossorigin="anonymous"></script>
+  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
   <script>
     (function() {
       // Kakao SDK 초기화 (중복 방지)
