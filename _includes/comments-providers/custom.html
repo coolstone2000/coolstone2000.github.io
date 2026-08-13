@@ -1,13 +1,20 @@
-<div id="cusdis_thread"
-  data-host="https://cusdis.com"
-  data-app-id="db03d51a-2972-422f-ad0a-e9c1760dc064"
-  data-page-id="{{ page.url }}"
-  data-page-url="{{ page.url | absolute_url }}"
-  data-page-title="{{ page.title | escape }}">
+<div class="cusdis-wrapper">
+  <h4 class="cusdis-wrapper__title">
+    <i class="fas fa-comment-dots" aria-hidden="true"></i>
+    <span>Comments</span>
+  </h4>
+
+  <div id="cusdis_thread"
+    data-host="https://cusdis.com"
+    data-app-id="db03d51a-2972-422f-ad0a-e9c1760dc064"
+    data-page-id="{{ page.url }}"
+    data-page-url="{{ page.url | absolute_url }}"
+    data-page-title="{{ page.title | escape }}">
+  </div>
 </div>
+
 <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
 <script>
-  /* 다크모드 연동 */
   (function () {
     function setCusdisTheme() {
       var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -16,11 +23,9 @@
       }
     }
 
-    /* 테마 토글 감지 */
     var observer = new MutationObserver(setCusdisTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-    /* Cusdis 로드 완료 후 초기 테마 적용 */
     document.addEventListener('cusdis.initial', setCusdisTheme);
   })();
 </script>

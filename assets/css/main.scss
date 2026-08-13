@@ -250,11 +250,55 @@ nav.toc .toc__menu ul a {
 }
 
 /* ==========================================
-   📌 Cusdis 댓글 다크모드 대응
+   📌 Cusdis 댓글 래퍼 스타일
    ========================================== */
+.cusdis-wrapper {
+  margin-top: 2em;
+  padding-top: 1.5em;
+  border-top: 1px solid mix(#000, #fff, 12%);
+}
+
+.cusdis-wrapper__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  margin: 0 0 1.2em;
+  font-size: 1em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: mix(#000, #fff, 55%);
+
+  i { font-size: 0.9em; }
+}
+
+#cusdis_thread {
+  width: 100% !important;
+}
+
+#cusdis_thread iframe {
+  width: 100% !important;
+  min-width: 100% !important;
+  border: none !important;
+  border-radius: 10px;
+  background: mix(#000, #fff, 3%);
+  transition: background 0.2s;
+}
+
+/* 다크모드 */
+html[data-theme='dark'] .cusdis-wrapper {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme='dark'] .cusdis-wrapper__title {
+  color: rgba(255, 255, 255, 0.45);
+}
+
 html[data-theme='dark'] #cusdis_thread iframe {
   color-scheme: dark;
+  background: rgba(255, 255, 255, 0.03);
 }
+
 
 /* ==========================================
    📌 다크모드 하단 공유(Share) 버튼 글씨 흰색 변경
