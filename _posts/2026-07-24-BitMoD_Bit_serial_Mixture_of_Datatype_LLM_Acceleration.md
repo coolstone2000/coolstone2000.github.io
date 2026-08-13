@@ -8968,8 +8968,6 @@ Step 4. Bit-serial Dequantization
 Dequantized Group Partial Sum
 ```
 
----
-
 ### Weight와 Activation의 표현
 
 Figure 5의 Weight는 앞의 Figure 4에서 생성된 Bit-serial Term임.
@@ -9996,79 +9994,6 @@ Group Partial Sum
 
 순서로 처리됨.
 
----
-
-### 전체 흐름 정리
-
-BitMoD PE의 핵심 동작을 한 번에 정리하면 다음과 같음.
-
-```text
-① Figure 4
-
-FP3 / FP4 / INT6 / INT8
-           ↓
-Unified Bit-serial Term
-ws | we | wm | wbsig
-
-
-② Figure 5 — Step 1
-
-Bit-serial Weight
-       +
-FP16 Activation
-       ↓
-ae + we
-       ↓
-Exponent Alignment
-+
-Product Sign 계산
-
-
-③ Figure 5 — Step 2
-
-1-bit Weight Mantissa
-       ×
-11-bit Activation Mantissa
-       ↓
-Right Shift by δe
-       ↓
-4-way Adder Tree
-       ↓
-Bit-serial Dot Product
-
-
-④ Figure 5 — Step 3
-
-Dot Product
-       ↓
-× 2^Bsig
-       ↓
-기존 ACC와 합산
-       ↓
-Normalize
-       ↓
-Group Partial Sum
-
-
-⑤ Figure 5 — Step 4
-
-Group Partial Sum
-       ×
-INT8 Scaling Factor
-       ↓
-Scaling Factor를
-1 bit / cycle로 처리
-       ↓
-Shift + Add
-       ↓
-Dequantized
-Group Partial Sum
-```
-
----
-
-### 핵심 정리
-
 BitMoD Processing Element의 핵심은 **Low-Precision Weight와 FP16 Activation 사이의 Mixed-Precision 연산을 Bit-serial 방식으로 수행하는 것**임.
 
 특히 네 단계가 각각 다음 역할을 담당함.
@@ -10105,4 +10030,643 @@ $$
 FP16 Scaling Factor를 그대로 사용했다면 Group마다 FP Multiplication이 필요하지만, INT8 Scaling Factor를 사용하면 이를 **Bit-serial Shift-and-Add**로 처리할 수 있음.
 
 또한 FP3/FP4처럼 낮은 Precision에서는 처리할 Bit-serial Term 자체가 줄어들기 때문에 **Weight Precision 감소 → Memory 감소 → 연산 Cycle 감소 → Throughput 증가**로 직접 연결되는 것이 BitMoD PE의 핵심임.
+
+
+## C. BitMoD Accelerator
+
+앞의 Section IV-A에서는 여러 Low-Precision Weight를 **Unified Bit-serial Term**으로 변환하는 방법을 설명했고, Section IV-B에서는 해당 Term을 FP16 Activation과 계산하는 **BitMoD PE**를 설명했음.
+
 <center><img src="/images/PR/BitMoD/figure6.png" width = "700"><br></center>
+
+BitMoD Accelerator는 크게 다음 구조로 구성됨.
+
+```text
+Input Buffer
+Weight Buffer
+     │
+     ▼
+Bit-serial Term Generator
+     │
+     ▼
+4 × 4 PE Tile Array
+     │
+     ▼
+Local Output Buffer
++
+Accumulator
+     │
+     ▼
+Output Activation
+```
+
+### 1. Banked Input / Weight Buffer
+
+BitMoD에서는 **Input Buffer와 Weight Buffer를 여러 Bank로 나누어 구성**함.
+
+이는 많은 PE가 동시에 Input과 Weight에 접근할 때 충분한 Memory Bandwidth를 제공하기 위함임.
+
+```text
+Input Buffer                 Weight Buffer
+
+Bank 0                       Bank 0
+Bank 1                       Bank 1
+Bank 2                       Bank 2
+  ⋮                            ⋮
+     ↓                          ↓
+          Parallel Access
+                ↓
+              PE Array
+```
+
+즉 PE의 Parallelism이 높아지더라도 하나의 Buffer Access가 Bottleneck이 되지 않도록 하는 구조임.
+
+### 2. Bit-serial Term Generator
+
+Weight Buffer에서 읽어온 Weight는 바로 PE로 들어가는 것이 아니라 **Bit-serial Term Generator**를 거침.
+
+### 3. PE Array 구조
+
+BitMoD의 Main PE Array는
+
+$$4\times4$$
+
+개의 **PE Tile**로 구성되며, Tile들은 Systolic 방식으로 연결됨.
+
+또한 하나의 PE Tile은
+
+$$8\times8$$
+
+개의 PE로 구성됨.
+
+따라서 구조적으로는
+
+```text
+Main PE Array
+4 × 4 Tiles
+
+┌────────┬────────┬────────┬────────┐
+│ Tile   │ Tile   │ Tile   │ Tile   │
+├────────┼────────┼────────┼────────┤
+│ Tile   │ Tile   │ Tile   │ Tile   │
+├────────┼────────┼────────┼────────┤
+│ Tile   │ Tile   │ Tile   │ Tile   │
+├────────┼────────┼────────┼────────┤
+│ Tile   │ Tile   │ Tile   │ Tile   │
+└────────┴────────┴────────┴────────┘
+
+Tile 하나
+      ↓
+8 × 8 PEs
+```
+
+전체 PE 수는
+
+$$
+4\times4\times8\times8
+=
+1024
+$$
+
+### 4. Output-Stationary Dataflow
+
+각 PE Tile은 **Output-Stationary Dataflow**를 사용함.
+
+Matrix Multiplication의 하나의 Output은
+
+$$
+Y_{ij}
+=
+\sum_k W_{ik}A_{kj}
+$$
+
+처럼 여러 Multiplication 결과를 계속 누적해서 생성됨.
+
+Output-Stationary 방식에서는 이 중간 결과인 **Partial Sum을 PE 내부에 유지**하고 Weight와 Input을 계속 공급함.
+
+```text
+W × A
+  ↓
+Partial Sum
+  ↓
++ W × A
+  ↓
+Partial Sum
+  ↓
++ W × A
+  ↓
+  ...
+  ↓
+Final Output
+```
+
+즉 Partial Sum을 매번 Buffer로 내보냈다가 다시 읽는 동작을 줄일 수 있음.
+
+### 5. Weight와 Input의 Broadcast
+
+Figure 6에서 중요한 부분은 **Weight와 Input이 서로 다른 방향으로 Broadcast된다는 것**임.
+
+- **Bit-serial Weight Term → PE Column 전체로 Broadcast**
+- **Input → PE Row 전체로 Broadcast**
+
+```text
+                Weight
+                  ↓
+          W0      W1      W2
+          ↓       ↓       ↓
+
+A0 →     [PE]    [PE]    [PE]
+
+A1 →     [PE]    [PE]    [PE]
+
+A2 →     [PE]    [PE]    [PE]
+
+↑
+Input은 Row 방향으로 전달
+```
+
+즉 하나의 Weight Term은 같은 Column의 여러 PE에서 재사용되고, 하나의 Input은 같은 Row의 여러 PE에서 재사용됨.
+
+### 6. Weight-sharing / Input-sharing
+
+위의 Broadcast 구조를 통해 BitMoD는 두 종류의 Data Reuse를 얻음.
+
+#### Weight-sharing
+
+같은 Weight Term을 Column 전체에서 공유함.
+
+```text
+Weight W0
+   ↓
+┌─────┐
+│ PE  │
+├─────┤
+│ PE  │
+├─────┤
+│ PE  │
+├─────┤
+│ PE  │
+└─────┘
+```
+
+Weight를 PE마다 Memory에서 따로 읽을 필요가 없음.
+
+#### Input-sharing
+
+같은 Input Activation을 Row 전체에서 공유함.
+
+```text
+Input A0
+   ↓
+[PE] → [PE] → [PE] → [PE]
+```
+
+따라서 하나의 Input 역시 여러 PE에서 재사용할 수 있음.
+
+결과적으로
+
+$$
+\boxed{\text{Weight-sharing + Input-sharing}}
+$$
+
+을 통해 Memory Access를 줄이면서 PE의 Parallelism을 유지할 수 있음.
+
+### 7. Local Output Buffer와 Accumulator
+
+각 **PE Column에는 Local Output Buffer와 Accumulator**가 존재함.
+
+BitMoD는 Per-Group Quantization을 사용하기 때문에 Figure 5의 PE가 계산하는 결과는 전체 Channel Output이 아니라 **Group 단위의 Partial Sum**임.
+
+예를 들어 하나의 Channel이 여러 Group으로 나뉘어 있다면
+
+```text
+Group 0
+→ PE
+→ Partial Sum P0
+
+Group 1
+→ PE
+→ Partial Sum P1
+
+Group 2
+→ PE
+→ Partial Sum P2
+
+Group 3
+→ PE
+→ Partial Sum P3
+```
+
+가 생성됨.
+
+최종 Per-Channel Output은 이 결과들을 다시 합쳐야 함.
+
+$$
+Y=P_0+P_1+P_2+P_3
+$$
+
+따라서 Column의 Accumulator에서
+
+```text
+P0
+ ↓
+ACC = P0
+ ↓
++ P1
+ ↓
+ACC = P0 + P1
+ ↓
++ P2
+ ↓
+ACC = P0 + P1 + P2
+ ↓
+...
+ ↓
+Final Per-Channel Output
+```
+
+### 8. Shared Accumulator를 하나만 사용하는 이유
+
+논문에서는 PE Column 전체가 **하나의 Accumulator를 공유**하도록 설계함.
+
+이는 하나의 Weight Group을 계산하는 데 많은 Cycle이 필요하기 때문임.
+
+즉 새로운 Group Partial Sum이 매 Cycle마다 계속 생성되는 것이 아니므로, 한 Group을 처리하는 동안 하나의 Accumulator가 Column의 결과들을 순차적으로 처리할 충분한 시간이 존재함.
+
+```text
+PE 0 ─┐
+PE 1 ─┤
+PE 2 ─┼──→ Shared Accumulator
+PE 3 ─┤
+ ...  ─┘
+```
+
+따라서 PE마다 별도의 Accumulator를 배치하지 않아도 됨.
+
+```text
+PE마다 ACC 사용
+
+PE0 → ACC0
+PE1 → ACC1
+PE2 → ACC2
+
+        ↓
+
+Hardware Cost 증가
+```
+
+대신
+
+```text
+여러 PE
+   ↓
+Shared ACC 하나
+```
+
+를 사용함으로써 **Accumulator Hardware Overhead를 줄임.**
+
+BitMoD Accelerator는 **4×4 PE Tile Array**로 구성되고, 각 Tile은 **8×8 BitMoD PE**를 포함함.
+
+또한
+
+$$
+\boxed{\text{Weight Term → Column Broadcast}}
+$$
+
+$$
+\boxed{\text{Input → Row Broadcast}}
+$$
+
+방식을 사용하여 Weight-sharing과 Input-sharing을 동시에 활용함.
+
+각 PE는 Figure 5에서 설명한 방식으로 Group Partial Sum을 계산하고, PE Column의 Shared Accumulator가 여러 Group의 Partial Sum을 누적하여 최종 **Per-Channel Output Activation**을 생성함.
+
+즉 BitMoD의 전체 Hardware 흐름은
+
+$$
+\boxed{
+\text{Quantized Weight}
+\rightarrow
+\text{Bit-serial Term}
+\rightarrow
+\text{BitMoD PE}
+\rightarrow
+\text{Group Partial Sum}
+\rightarrow
+\text{Channel Output}
+}
+$$
+
+으로 정리할 수 있음.
+
+핵심은 단순히 PE의 개수를 늘리는 것이 아니라, **Bit-serial Weight Representation + Systolic PE Array + Weight/Input Data Reuse + Shared Accumulator**를 결합하여 Low-Precision LLM 연산을 Hardware 효율적으로 수행하는 것임.
+
+# ◼︎ Evaluation
+
+BitMoD의 Evaluation에서는 크게
+
+1. **Low-Precision Quantization의 Model Accuracy**
+2. **Accelerator의 Speedup / Energy Efficiency**
+3. **Bit-serial Architecture의 Hardware Efficiency**
+4. **기존 Quantization 기법과의 결합 가능성**
+
+을 평가함.
+
+## A. Experimental Methodology
+
+총 6개의 LLM을 대상으로 평가함.
+
+- OPT-1.3B
+- Phi-2B
+- Yi-6B
+- Llama-2-7B
+- Llama-2-13B
+- Llama-3-8B
+
+Task는 두 종류로 나눔.
+
+### Discriminative Tasks
+
+Zero-shot 환경에서 다음 Benchmark의 Accuracy를 측정함.
+
+- HellaSwag
+- WinoGrande
+- PIQA
+
+### Generative Tasks
+
+다음 Dataset에서 **Perplexity(PPL)**를 측정함.
+
+- Wikitext-2
+- C4
+
+비교 대상은 ANT, OliVe, Microscaling(MX), Per-group Asymmetric Integer Quantization 등임.
+
+Hardware는 SystemVerilog RTL로 구현하고 **TSMC 28nm 공정**으로 합성함.  
+End-to-End Performance는 Cycle-level Simulator를 이용해 평가하며, 모든 Accelerator는 동일한 Compute Area 조건에서 비교함.
+
+## B. Model Accuracy
+
+### 4-bit Quantization
+
+BitMoD는 4-bit Weight Quantization에서 FP16 대비 Accuracy와 Perplexity 저하가 매우 작았음.
+
+Discriminative Task에서는 평균 Accuracy Loss가
+
+$$
+<0.5\%
+$$
+
+수준으로 유지됨.
+
+Generative Task에서도 평균 Perplexity 증가가
+
+$$
+<0.5
+$$
+
+수준임.
+
+즉 **4-bit에서는 FP16과 거의 유사한 Model Quality를 유지할 수 있음.**
+
+### 3-bit Quantization
+
+3-bit로 Precision을 더 낮추면 기존 방식들의 성능 저하가 크게 증가함.
+
+특히 ANT, OliVe, MX 및 INT3-Asym과 비교했을 때 BitMoD가 더 낮은 Perplexity를 유지함.
+
+```text
+기존 3-bit Quantization
+        ↓
+Quantization Error 크게 증가
+        ↓
+Model Quality 감소
+
+BitMoD
+        ↓
+Group별로 적절한 Special Value 선택
+        ↓
+Range / Resolution 보완
+        ↓
+Quantization Error 감소
+```
+
+Generative Task에서 BitMoD의 평균 Perplexity Loss는 FP16 대비
+
+$$
+<3
+$$
+
+수준으로 유지됨.
+
+따라서 **BitMoD의 장점은 Precision이 매우 낮아지는 3-bit 환경에서 더욱 크게 나타남.**
+
+### Data Type Adaptation의 효과
+
+Basic FP3/FP4 하나만 사용하는 것보다
+
+- Extended Range
+- Extended Resolution
+
+을 Group별로 선택하는 BitMoD가 더 좋은 결과를 보임.
+
+즉
+
+```text
+하나의 고정 Data Type
+        ↓
+모든 Weight Group에 동일하게 적용
+
+BitMoD
+        ↓
+각 Group Distribution에 맞춰
+Special Value 선택
+        ↓
+더 낮은 Quantization Error
+```
+
+가 됨.
+
+이는 **Fine-grained Data Type Adaptation이 실제 Model Accuracy 개선으로 이어짐**을 보여줌.
+
+## C. Accelerator Performance
+
+BitMoD는 Low-Precision Weight를 사용함으로써
+
+1. Weight Memory Traffic 감소
+2. Bit-serial PE의 연산 Cycle 감소
+
+두 가지 효과를 동시에 얻음.
+
+특히 Memory-bound인 Generative Task에서는 Weight Precision 감소에 따른 Memory Traffic 감소 효과가 크게 나타남.
+
+### FP16 Baseline 대비
+
+Lossless BitMoD는 FP16 Accelerator 대비 평균적으로
+
+- **Discriminative Task : 1.99× Speedup**
+- **Generative Task : 2.41× Speedup**
+
+을 달성함.
+
+즉 Model Accuracy를 거의 유지하면서도 상당한 성능 향상을 얻음.
+
+### ANT / OliVe 대비
+
+Accuracy Loss를 허용하여 더 낮은 Precision을 사용하는 설정에서는 BitMoD가 ANT와 OliVe보다 더 높은 성능을 보임.
+
+논문의 전체 평균 결과에서 BitMoD는
+
+$$
+\boxed{1.69\times}
+$$
+
+ANT 대비 Speedup,
+
+$$
+\boxed{1.48\times}
+$$
+
+OliVe 대비 Speedup을 달성함.
+
+이러한 차이는 BitMoD가 **Per-group Quantization을 사용하면서도 매우 낮은 Weight Precision을 안정적으로 사용할 수 있기 때문**임.
+
+## D. Energy Efficiency & Hardware Efficiency
+
+BitMoD의 Energy Saving은 주로 두 부분에서 발생함.
+
+```text
+Low-Precision Weight
+        ↓
+DRAM Weight Traffic 감소
+
++
+
+Bit-serial PE
+        ↓
+Compute Energy 감소
+```
+
+FP16 Baseline과 비교하면 BitMoD는 전체 Task에서 평균
+
+$$
+\boxed{2.31\times}
+$$
+
+더 높은 Energy Efficiency를 달성함.
+
+기존 Accelerator와 비교하면
+
+- ANT 대비 **1.48×**
+- OliVe 대비 **1.31×**
+
+더 높은 Energy Efficiency를 보임.
+
+### Bit-serial PE의 장점
+
+기존 Bit-parallel 방식에서는 여러 Precision을 지원하기 위해 추가 Hardware가 필요함.
+
+예를 들어 INT8과 INT4를 동시에 지원하려면 별도의 연산 경로나 Accumulator가 추가되어 Area와 Power가 증가할 수 있음.
+
+반면 BitMoD는
+
+```text
+INT8 → 4 Terms
+INT6 → 3 Terms
+FP4  → 2 Terms
+FP3  → 2 Terms
+```
+
+처럼 **같은 PE를 사용하면서 처리 Cycle만 변경**함.
+
+따라서 하나의 Hardware로 다양한 Precision을 지원하면서 Area Overhead를 줄일 수 있음.
+
+BitMoD PE는 일반 FP16 PE보다 약 **24% 적은 Area**를 사용함.
+
+## E. Combining BitMoD with Other Quantization Schemes
+
+BitMoD의 Data Type은 기존 Software Quantization 기법과도 결합할 수 있음.
+
+논문에서는 다음 기법과 결합하여 평가함.
+
+- AWQ
+- OmniQuant
+- SmoothQuant
+
+핵심은 기존 Quantization Algorithm을 모두 바꾸는 것이 아니라,
+
+```text
+기존 방식
+
+Weight Optimization
+        ↓
+INT Quantizer
+
+
+BitMoD 결합
+
+Weight Optimization
+        ↓
+BitMoD FP4 / FP3 Quantizer
+```
+
+처럼 **기존 Integer Quantizer를 BitMoD Data Type으로 교체하는 것**임.
+
+### AWQ / OmniQuant와 결합
+
+BitMoD를 OmniQuant에 적용했을 때 기존 OmniQuant 대비 평균 Perplexity Loss가
+
+- 4-bit : **28% 감소**
+- 3-bit : **31% 감소**
+
+함.
+
+또한 BitMoD + AWQ / OmniQuant는 4-bit뿐 아니라 **3-bit에서도 평균 Perplexity Loss를 1 이하 수준까지 낮춤.**
+
+즉 BitMoD의 Data Type 설계와 기존 Quantization Optimization은 서로 경쟁하는 방식이 아니라 **함께 사용할 수 있는 Orthogonal한 기법**임.
+
+### SmoothQuant와 결합
+
+SmoothQuant를 사용해 Activation을 INT8로 Quantization한 경우에도 BitMoD Weight Quantization의 장점이 유지됨.
+
+따라서 BitMoD는
+
+```text
+Weight
+→ FP4 / FP3 BitMoD
+
+Activation
+→ FP16
+또는
+→ INT8 SmoothQuant
+```
+
+과 같이 Weight-only Quantization뿐 아니라 Activation Quantization과도 결합 가능함.
+
+| 항목 | 결과 |
+|---|---|
+| **4-bit Accuracy** | FP16 대비 평균 Accuracy Loss < 0.5% |
+| **4-bit Generative** | 평균 PPL Loss < 0.5 |
+| **3-bit Generative** | 평균 PPL Loss < 3 |
+| **FP16 대비 Speedup** | 1.99× Discriminative / 2.41× Generative |
+| **ANT 대비 Speedup** | 평균 1.69× |
+| **OliVe 대비 Speedup** | 평균 1.48× |
+| **FP16 대비 Energy Efficiency** | 2.31× |
+| **ANT 대비 Energy Efficiency** | 1.48× |
+| **OliVe 대비 Energy Efficiency** | 1.31× |
+| **BitMoD PE Area** | FP16 PE 대비 약 24% 감소 |
+
+결국 BitMoD는 단순히 Weight Precision을 낮추는 것이 아니라,
+
+$$
+\boxed{
+\text{Model Accuracy}
++
+\text{Low-Precision Memory Saving}
++
+\text{Bit-serial Hardware Efficiency}
+}
+$$
+
+를 동시에 확보함.
+
+특히 **3-bit와 같이 매우 낮은 Precision에서도 기존 방식보다 Model Quality를 잘 유지하면서 실제 Hardware Speedup과 Energy Saving까지 얻는 것**이 Evaluation의 핵심 결과임.
