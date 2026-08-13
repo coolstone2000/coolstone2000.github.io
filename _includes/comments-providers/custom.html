@@ -23,9 +23,36 @@
       }
     }
 
+    // iframe 높이 자동 조절
+    function resizeCusdis() {
+      var iframe = document.querySelector('#cusdis_thread iframe');
+      if (!iframe) return;
+      try {
+        var h = iframe.contentWindow.document.body.scrollHeight;
+        if (h && h > 200) {
+          iframe.style.height = (h + 40) + 'px';
+        }
+      } catch(e) {}
+    }
+
+    // postMessage로 Cusdis가 보내는 높이 메시지 수신
+    window.addEventListener('message', function(e) {
+      if (e.origin !== 'https://cusdis.com') return;
+      try {
+        var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+        if (data && data.from === 'cusdis' && data.height) {
+          var iframe = document.querySelector('#cusdis_thread iframe');
+          if (iframe) iframe.style.height = (parseInt(data.height) + 40) + 'px';
+        }
+      } catch(e) {}
+    });
+
     var observer = new MutationObserver(setCusdisTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
-    document.addEventListener('cusdis.initial', setCusdisTheme);
+    document.addEventListener('cusdis.initial', function() {
+      setCusdisTheme();
+      setTimeout(resizeCusdis, 800);
+    });
   })();
 </script>
