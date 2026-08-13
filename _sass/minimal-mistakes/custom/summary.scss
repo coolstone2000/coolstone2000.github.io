@@ -1,4 +1,236 @@
+/* ==========================================================
+   details / summary 커스텀
+   ========================================================== */
+
+details {
+  border: 1px solid mix(#000, #fff, 20%);
+  border-radius: 8px;
+  padding: 0;
+  margin: 1.2em 0;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+
+  &[open] {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
 summary {
+  color: $link-color;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.7em 1em;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  background: mix(#000, #fff, 4%);
+  border-radius: 8px;
+  transition: background 0.15s ease;
+
+  &::-webkit-details-marker { display: none; }
+
+  &::before {
+    content: "▶";
+    font-size: 0.7em;
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+
+  &:hover {
+    background: mix(#000, #fff, 8%);
+  }
+}
+
+details[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+details > *:not(summary) {
+  padding: 0.8em 1em;
+}
+
+/* 다크모드 */
+html[data-theme='dark'] details {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+html[data-theme='dark'] summary {
+  background: rgba(255, 255, 255, 0.05);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.10);
+  }
+}
+
+
+/* ==========================================================
+   논문 메타 정보 박스
+   ========================================================== */
+
+.paper-meta-box {
+  border: 1px solid mix(#000, #fff, 15%);
+  border-left: 4px solid $link-color;
+  border-radius: 8px;
+  padding: 1em 1.2em;
+  margin: 0.5em 0 1.8em;
+  background: mix(#000, #fff, 3%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  font-size: 0.9em;
+}
+
+.paper-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4em;
+}
+
+.paper-meta-badge {
+  display: inline-block;
+  padding: 0.2em 0.7em;
+  border-radius: 20px;
+  font-size: 0.8em;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  &.venue {
+    background: $link-color;
+    color: #fff;
+  }
+
+  &.year {
+    background: mix($link-color, #fff, 25%);
     color: $link-color;
-    cursor: pointer;
+    border: 1px solid $link-color;
+  }
+}
+
+.paper-meta-authors,
+.paper-meta-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  color: mix(#000, #fff, 50%);
+
+  i { margin-top: 0.15em; flex-shrink: 0; }
+  a { color: $link-color; }
+}
+
+/* 다크모드 */
+html[data-theme='dark'] .paper-meta-box {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.12);
+  border-left-color: $link-color;
+}
+
+html[data-theme='dark'] .paper-meta-badge.year {
+  background: rgba(0, 173, 181, 0.15);
+}
+
+html[data-theme='dark'] .paper-meta-authors,
+html[data-theme='dark'] .paper-meta-link {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+
+/* ==========================================================
+   같은 카테고리 이전/다음 네비게이션
+   ========================================================== */
+
+.category-pagination {
+  margin-top: 1.5em;
+  border: 1px solid mix(#000, #fff, 12%);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.category-pagination__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.5em 1em;
+  font-size: 0.75em;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: mix(#000, #fff, 5%);
+  color: mix(#000, #fff, 50%);
+  border-bottom: 1px solid mix(#000, #fff, 12%);
+}
+
+.category-pagination__links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.category-pagination--pager {
+  display: flex;
+  flex-direction: column;
+  padding: 0.8em 1.1em;
+  text-decoration: none;
+  transition: background 0.15s ease;
+  gap: 0.2em;
+  min-width: 0;
+
+  &.prev {
+    border-right: 1px solid mix(#000, #fff, 12%);
+    align-items: flex-start;
+  }
+
+  &.next {
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  &:hover:not(.disabled) {
+    background: mix(#000, #fff, 4%);
+    text-decoration: none;
+  }
+
+  &.disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .pager-dir {
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: $link-color;
+    text-transform: uppercase;
+  }
+
+  .pager-title {
+    font-size: 0.85em;
+    color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+}
+
+/* 다크모드 */
+html[data-theme='dark'] .category-pagination {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme='dark'] .category-pagination__label {
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+html[data-theme='dark'] .category-pagination--pager {
+  &.prev { border-right-color: rgba(255, 255, 255, 0.12); }
+
+  &:hover:not(.disabled) {
+    background: rgba(255, 255, 255, 0.05);
+  }
 }

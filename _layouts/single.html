@@ -37,6 +37,8 @@ layout: default
         </header>
       {% endunless %}
 
+      {% include paper-meta.html %}
+
       <section class="page__content e-content" itemprop="text">
         {% if page.toc %}
           <aside class="sidebar__right {% if page.toc_sticky %}sticky{% endif %}">
@@ -61,6 +63,60 @@ layout: default
       {% if page.share %}{% include social-share.html %}{% endif %}
 
       {% include post_pagination.html %}
+
+      {% comment %}같은 카테고리 내 이전/다음{% endcomment %}
+      {% if page.categories.size > 0 %}
+        {% assign current_category = page.categories[0] %}
+        {% assign cat_posts = site.posts | where_exp: "p", "p.categories contains current_category" %}
+        {% assign cat_size = cat_posts | size %}
+        {% if cat_size > 1 %}
+          {% assign prev_post = nil %}
+          {% assign next_post = nil %}
+          {% for p in cat_posts %}
+            {% if p.id == page.id %}
+              {% unless forloop.first %}
+                {% assign prev_post = cat_posts[forloop.index] %}
+              {% endunless %}
+              {% unless forloop.last %}
+                {% assign idx = forloop.index0 | minus: 1 %}
+                {% assign next_post = cat_posts[idx] %}
+              {% endunless %}
+            {% endif %}
+          {% endfor %}
+          {% if prev_post or next_post %}
+          <nav class="category-pagination">
+            <div class="category-pagination__label">
+              <i class="fas fa-layer-group" aria-hidden="true"></i>
+              <span>{{ current_category }} 시리즈</span>
+            </div>
+            <div class="category-pagination__links">
+              {% if prev_post %}
+                <a href="{{ prev_post.url | relative_url }}" class="category-pagination--pager prev">
+                  <span class="pager-dir">← 이전 글</span>
+                  <span class="pager-title">{{ prev_post.title | truncate: 45 }}</span>
+                </a>
+              {% else %}
+                <span class="category-pagination--pager disabled prev">
+                  <span class="pager-dir">← 이전 글</span>
+                  <span class="pager-title">없음</span>
+                </span>
+              {% endif %}
+              {% if next_post %}
+                <a href="{{ next_post.url | relative_url }}" class="category-pagination--pager next">
+                  <span class="pager-dir">다음 글 →</span>
+                  <span class="pager-title">{{ next_post.title | truncate: 45 }}</span>
+                </a>
+              {% else %}
+                <span class="category-pagination--pager disabled next">
+                  <span class="pager-dir">다음 글 →</span>
+                  <span class="pager-title">없음</span>
+                </span>
+              {% endif %}
+            </div>
+          </nav>
+          {% endif %}
+        {% endif %}
+      {% endif %}
     </div>
 
     {% if jekyll.environment == 'production' and site.comments.provider and page.comments %}

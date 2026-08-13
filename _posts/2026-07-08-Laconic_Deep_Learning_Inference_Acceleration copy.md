@@ -5,6 +5,10 @@ categories: Paper_review
 tags: PR
 toc: true
 author_profile: false
+paper_venue: "ISCA 2019"
+paper_year: 2019
+paper_authors: "Sayeh Sharify, Alberto Delmas Lascorz, Patrick Judd, Andreas Moshovos"
+paper_link: "https://dl.acm.org/doi/10.1145/3307650.3322255"
 ---
 
 # ◼︎ Abstract
