@@ -1,0 +1,1026 @@
+{% if include.kind == "mode" %}
+
+<div class="laplace-widget laplace-mode-widget">
+  <div class="laplace-widget-title">
+    <strong>\(e^{st}\) 모드 탐색기</strong>
+    <span>\(s=\sigma+j\omega\)</span>
+  </div>
+
+  <div class="laplace-controls">
+    <label>
+      \(\sigma\) = <span class="sigma-value">-0.50</span>
+      <input
+        class="sigma-slider"
+        type="range"
+        min="-2"
+        max="1"
+        step="0.05"
+        value="-0.5"
+      >
+    </label>
+
+    <label>
+      \(\omega\) = <span class="omega-value">2.00</span>
+      <input
+        class="omega-slider"
+        type="range"
+        min="0"
+        max="6"
+        step="0.05"
+        value="2"
+      >
+    </label>
+  </div>
+
+  <canvas class="mode-canvas" width="760" height="360"></canvas>
+
+  <div class="laplace-widget-desc">
+    <span class="mode-description"></span>
+  </div>
+</div>
+
+<script>
+(() => {
+  const widget = document.currentScript.previousElementSibling;
+  const canvas = widget.querySelector(".mode-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const sigmaSlider = widget.querySelector(".sigma-slider");
+  const omegaSlider = widget.querySelector(".omega-slider");
+
+  const sigmaValue = widget.querySelector(".sigma-value");
+  const omegaValue = widget.querySelector(".omega-value");
+  const description = widget.querySelector(".mode-description");
+
+  function cssColor() {
+    return getComputedStyle(widget).color;
+  }
+
+  function draw() {
+    const sigma = Number(sigmaSlider.value);
+    const omega = Number(omegaSlider.value);
+
+    sigmaValue.textContent = sigma.toFixed(2);
+    omegaValue.textContent = omega.toFixed(2);
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const fg = cssColor();
+
+    const left = 55;
+    const right = 20;
+    const top = 25;
+    const bottom = 45;
+
+    const plotW = width - left - right;
+    const plotH = height - top - bottom;
+
+    const tMax = 6;
+
+    // 값 범위 계산
+    let maxAbs = 1;
+
+    for (let i = 0; i <= 500; i++) {
+      const t = tMax * i / 500;
+      const envelope = Math.exp(sigma * t);
+      const y = envelope * Math.cos(omega * t);
+      maxAbs = Math.max(maxAbs, Math.abs(y), envelope);
+    }
+
+    // 지나치게 커지는 경우 화면 범위 제한
+    maxAbs = Math.min(maxAbs, 15);
+
+    function X(t) {
+      return left + (t / tMax) * plotW;
+    }
+
+    function Y(y) {
+      return top + plotH / 2 - y / maxAbs * (plotH * 0.42);
+    }
+
+    ctx.strokeStyle = fg;
+    ctx.globalAlpha = 0.35;
+    ctx.lineWidth = 1;
+
+    // x축
+    ctx.beginPath();
+    ctx.moveTo(left, Y(0));
+    ctx.lineTo(width - right, Y(0));
+    ctx.stroke();
+
+    // y축
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.lineTo(left, height - bottom);
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+
+    // envelope +
+    ctx.strokeStyle = "#888";
+    ctx.setLineDash([6, 5]);
+
+    ctx.beginPath();
+    for (let i = 0; i <= 500; i++) {
+      const t = tMax * i / 500;
+      const env = Math.min(Math.exp(sigma * t), maxAbs);
+      if (i === 0) ctx.moveTo(X(t), Y(env));
+      else ctx.lineTo(X(t), Y(env));
+    }
+    ctx.stroke();
+
+    // envelope -
+    ctx.beginPath();
+    for (let i = 0; i <= 500; i++) {
+      const t = tMax * i / 500;
+      const env = Math.min(Math.exp(sigma * t), maxAbs);
+      if (i === 0) ctx.moveTo(X(t), Y(-env));
+      else ctx.lineTo(X(t), Y(-env));
+    }
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+
+    // real part
+    ctx.strokeStyle = "#4c9aff";
+    ctx.lineWidth = 2.5;
+
+    ctx.beginPath();
+
+    for (let i = 0; i <= 700; i++) {
+      const t = tMax * i / 700;
+
+      let y =
+        Math.exp(sigma * t) *
+        Math.cos(omega * t);
+
+      y = Math.max(-maxAbs, Math.min(maxAbs, y));
+
+      if (i === 0) {
+        ctx.moveTo(X(t), Y(y));
+      } else {
+        ctx.lineTo(X(t), Y(y));
+      }
+    }
+
+    ctx.stroke();
+
+    // label
+    ctx.fillStyle = fg;
+    ctx.font = "14px sans-serif";
+    ctx.fillText("t", width - 28, Y(0) - 8);
+    ctx.fillText("Re{eˢᵗ}", left + 8, top + 14);
+
+    let text = "";
+
+    if (sigma < -0.02 && omega > 0.02) {
+      text = "감쇠하면서 진동하는 모드";
+    } else if (sigma > 0.02 && omega > 0.02) {
+      text = "진폭이 증가하면서 진동하는 모드";
+    } else if (Math.abs(sigma) <= 0.02 && omega > 0.02) {
+      text = "진폭이 일정한 순수 진동";
+    } else if (sigma < -0.02) {
+      text = "진동 없이 지수적으로 감소";
+    } else if (sigma > 0.02) {
+      text = "진동 없이 지수적으로 증가";
+    } else {
+      text = "상수 모드";
+    }
+
+    description.innerHTML =
+      `현재 <b>σ=${sigma.toFixed(2)}</b>, ` +
+      `<b>ω=${omega.toFixed(2)}</b> → ${text}`;
+  }
+
+  sigmaSlider.addEventListener("input", draw);
+  omegaSlider.addEventListener("input", draw);
+
+  draw();
+})();
+</script>
+
+{% elsif include.kind == "integral" %}
+
+<div class="laplace-widget laplace-integral-widget">
+  <div class="laplace-widget-title">
+    <strong>라플라스 적분 수렴 탐색기</strong>
+    <span>\(f(t)=e^{0.5t}\)</span>
+  </div>
+
+  <div class="laplace-controls">
+    <label>
+      \(\sigma\) = <span class="sigma-value">1.00</span>
+      <input
+        class="sigma-slider"
+        type="range"
+        min="0"
+        max="1.5"
+        step="0.05"
+        value="1"
+      >
+    </label>
+
+    <label>
+      \(\omega\) = <span class="omega-value">2.00</span>
+      <input
+        class="omega-slider"
+        type="range"
+        min="0"
+        max="6"
+        step="0.05"
+        value="2"
+      >
+    </label>
+  </div>
+
+  <canvas class="integral-canvas" width="760" height="360"></canvas>
+
+  <div class="laplace-widget-desc">
+    <span class="integral-description"></span>
+  </div>
+</div>
+
+<script>
+(() => {
+  const widget = document.currentScript.previousElementSibling;
+  const canvas = widget.querySelector(".integral-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const sigmaSlider = widget.querySelector(".sigma-slider");
+  const omegaSlider = widget.querySelector(".omega-slider");
+
+  const sigmaValue = widget.querySelector(".sigma-value");
+  const omegaValue = widget.querySelector(".omega-value");
+  const description =
+    widget.querySelector(".integral-description");
+
+  function cssColor() {
+    return getComputedStyle(widget).color;
+  }
+
+  function draw() {
+    const sigma = Number(sigmaSlider.value);
+    const omega = Number(omegaSlider.value);
+
+    sigmaValue.textContent = sigma.toFixed(2);
+    omegaValue.textContent = omega.toFixed(2);
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const fg = cssColor();
+
+    const left = 55;
+    const right = 20;
+    const top = 25;
+    const bottom = 45;
+
+    const plotW = width - left - right;
+    const plotH = height - top - bottom;
+
+    const tMax = 12;
+
+    function X(t) {
+      return left + t / tMax * plotW;
+    }
+
+    // weighted real part
+    let maxAbs = 1;
+
+    for (let i = 0; i <= 700; i++) {
+      const t = tMax * i / 700;
+
+      const y =
+        Math.exp((0.5 - sigma) * t) *
+        Math.cos(omega * t);
+
+      maxAbs = Math.max(maxAbs, Math.abs(y));
+    }
+
+    maxAbs = Math.min(maxAbs, 20);
+
+    function Y(y) {
+      return top + plotH / 2 -
+        y / maxAbs * plotH * 0.42;
+    }
+
+    ctx.strokeStyle = fg;
+    ctx.globalAlpha = 0.35;
+
+    ctx.beginPath();
+    ctx.moveTo(left, Y(0));
+    ctx.lineTo(width - right, Y(0));
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(left, top);
+    ctx.lineTo(left, height - bottom);
+    ctx.stroke();
+
+    ctx.globalAlpha = 1;
+
+    ctx.strokeStyle = "#4c9aff";
+    ctx.lineWidth = 2.5;
+
+    ctx.beginPath();
+
+    for (let i = 0; i <= 700; i++) {
+      const t = tMax * i / 700;
+
+      let y =
+        Math.exp((0.5 - sigma) * t) *
+        Math.cos(omega * t);
+
+      y = Math.max(-maxAbs, Math.min(maxAbs, y));
+
+      if (i === 0) {
+        ctx.moveTo(X(t), Y(y));
+      } else {
+        ctx.lineTo(X(t), Y(y));
+      }
+    }
+
+    ctx.stroke();
+
+    ctx.fillStyle = fg;
+    ctx.font = "14px sans-serif";
+    ctx.fillText("t", width - 28, Y(0) - 8);
+    ctx.fillText(
+      "Re{f(t)e⁻ˢᵗ}",
+      left + 8,
+      top + 14
+    );
+
+    if (sigma > 0.5 + 0.001) {
+      description.innerHTML =
+        `<b>σ > 0.5</b>이므로 ` +
+        `\(e^{(0.5-σ)t}\)가 감쇠한다. ` +
+        `이 예제의 라플라스 적분은 수렴한다.`;
+    } else if (Math.abs(sigma - 0.5) < 0.001) {
+      description.innerHTML =
+        `<b>σ = 0.5</b>이므로 진폭이 감소하지 않는다. ` +
+        `일반적인 라플라스 적분은 수렴하지 않는다.`;
+    } else {
+      description.innerHTML =
+        `<b>σ < 0.5</b>이므로 ` +
+        `\(e^{(0.5-σ)t}\)의 크기가 증가한다. ` +
+        `라플라스 적분이 발산한다.`;
+    }
+
+    if (
+      window.MathJax &&
+      window.MathJax.typesetPromise
+    ) {
+      MathJax.typesetPromise([description]);
+    }
+  }
+
+  sigmaSlider.addEventListener("input", draw);
+  omegaSlider.addEventListener("input", draw);
+
+  draw();
+})();
+</script>
+
+{% elsif include.kind == "helix" %}
+
+<div class="laplace-widget laplace-helix-widget">
+  <div class="laplace-helix-head">
+    <div>
+      <div class="laplace-helix-title">
+        <strong>\(e^{j\omega t}\) 3차원 표현</strong>
+      </div>
+      <div class="laplace-helix-subtitle">
+        시간축까지 포함하면 \(e^{j\omega t}\)는 원운동이 아니라 <b>나선(helix)</b>으로 보인다.
+      </div>
+    </div>
+
+    <div class="laplace-helix-formula">
+      \((t,\cos\omega t,\sin\omega t)\)
+    </div>
+  </div>
+
+  <div class="laplace-helix-stats">
+    <div class="laplace-stat-card">
+      <div class="laplace-stat-label">각주파수</div>
+      <div class="laplace-stat-value">\(\omega =\) <span class="omega-value">2.00</span></div>
+    </div>
+
+    <div class="laplace-stat-card">
+      <div class="laplace-stat-label">표시 시간</div>
+      <div class="laplace-stat-value"><span class="time-value">12.0</span></div>
+    </div>
+
+    <div class="laplace-stat-card">
+      <div class="laplace-stat-label">주기</div>
+      <div class="laplace-stat-value"><span class="period-value">3.14</span></div>
+    </div>
+
+    <div class="laplace-stat-card">
+      <div class="laplace-stat-label">회전 수</div>
+      <div class="laplace-stat-value"><span class="turns-value">3.82</span></div>
+    </div>
+  </div>
+
+  <div class="laplace-helix-controls">
+    <div class="laplace-control-card">
+      <div class="laplace-control-top">
+        <span>\(\omega\)</span>
+        <strong><span class="omega-value-inline">2.00</span></strong>
+      </div>
+      <input
+        class="omega-slider"
+        type="range"
+        min="0.3"
+        max="6"
+        step="0.1"
+        value="2"
+      >
+      <div class="laplace-control-help">
+        값이 커질수록 같은 시간 동안 더 많이 회전함
+      </div>
+    </div>
+
+    <div class="laplace-control-card">
+      <div class="laplace-control-top">
+        <span>표시 시간</span>
+        <strong><span class="time-value-inline">12.0</span></strong>
+      </div>
+      <input
+        class="time-slider"
+        type="range"
+        min="4"
+        max="20"
+        step="0.5"
+        value="12"
+      >
+      <div class="laplace-control-help">
+        시간이 길수록 나선이 더 길게 그려짐
+      </div>
+    </div>
+  </div>
+
+  <div class="laplace-canvas-toolbar">
+    <button type="button" class="laplace-btn reset-view-btn">Reset View</button>
+    <button type="button" class="laplace-btn auto-rotate-btn">Auto Rotate: Off</button>
+  </div>
+
+  <div class="laplace-canvas-shell">
+    <canvas
+      class="helix-canvas"
+      width="960"
+      height="560">
+    </canvas>
+
+    <div class="laplace-canvas-hint">
+      드래그해서 회전 · 슬라이더로 주파수/시간 조절
+    </div>
+  </div>
+
+  <div class="laplace-helix-bottom">
+    <div class="laplace-note-card">
+      <div class="laplace-note-title">이 그래프가 의미하는 것</div>
+      <div class="laplace-note-body">
+        파란 곡선은
+        \(e^{j\omega t}=\cos\omega t+j\sin\omega t\) 를
+        \((t,\mathrm{Re},\mathrm{Im})\) 공간에서 그린 것이다.
+      </div>
+    </div>
+
+    <div class="laplace-note-card">
+      <div class="laplace-note-title">핵심 해석</div>
+      <div class="laplace-note-body">
+        복소평면에서는 <b>원운동</b>, 시간축을 함께 보면 <b>나선</b>이 된다.
+        실수부는 \(\cos\omega t\), 허수부는 \(\sin\omega t\) 이다.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const script = document.currentScript;
+  const widget = script.previousElementSibling;
+
+  const canvas = widget.querySelector(".helix-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const omegaSlider = widget.querySelector(".omega-slider");
+  const timeSlider = widget.querySelector(".time-slider");
+
+  const omegaValue = widget.querySelector(".omega-value");
+  const timeValue = widget.querySelector(".time-value");
+  const periodValue = widget.querySelector(".period-value");
+  const turnsValue = widget.querySelector(".turns-value");
+
+  const omegaValueInline = widget.querySelector(".omega-value-inline");
+  const timeValueInline = widget.querySelector(".time-value-inline");
+
+  const resetBtn = widget.querySelector(".reset-view-btn");
+  const autoRotateBtn = widget.querySelector(".auto-rotate-btn");
+
+  let yaw = -0.65;
+  let pitch = 0.42;
+
+  let dragging = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  let autoRotate = false;
+  let rafId = null;
+
+  function getColor() {
+    return getComputedStyle(widget).color;
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+
+    const cssWidth = rect.width;
+    const cssHeight = rect.height;
+
+    canvas.width = Math.round(cssWidth * ratio);
+    canvas.height = Math.round(cssHeight * ratio);
+
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    draw();
+  }
+
+  function rotatePoint(x, y, z) {
+    const x1 = x * Math.cos(yaw) - z * Math.sin(yaw);
+    const z1 = x * Math.sin(yaw) + z * Math.cos(yaw);
+
+    const y2 = y * Math.cos(pitch) - z1 * Math.sin(pitch);
+    const z2 = y * Math.sin(pitch) + z1 * Math.cos(pitch);
+
+    return { x: x1, y: y2, z: z2 };
+  }
+
+  function project(x, y, z, width, height) {
+    const p = rotatePoint(x, y, z);
+    const cameraDistance = 8;
+    const depth = cameraDistance + p.z;
+    const perspective = cameraDistance / depth;
+    const scale = Math.min(width, height) * 0.16;
+
+    return {
+      x: width / 2 + p.x * scale * perspective,
+      y: height / 2 - p.y * scale * perspective,
+      depth: p.z
+    };
+  }
+
+  function drawAxis(start, end, label, width, height, color) {
+    const a = project(start[0], start[1], start[2], width, height);
+    const b = project(end[0], end[1], end[2], width, height);
+
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 0.45;
+    ctx.lineWidth = 1.3;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = color;
+    ctx.font = "14px sans-serif";
+    ctx.fillText(label, b.x + 8, b.y - 6);
+  }
+
+  function drawGrid(width, height, color) {
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 0.05;
+    ctx.lineWidth = 1;
+
+    for (let x = 0; x < width; x += 28) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, height);
+      ctx.stroke();
+    }
+
+    for (let y = 0; y < height; y += 28) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+  }
+
+  function draw() {
+    const omega = Number(omegaSlider.value);
+    const tMax = Number(timeSlider.value);
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    omegaValue.textContent = omega.toFixed(2);
+    timeValue.textContent = tMax.toFixed(1);
+    omegaValueInline.textContent = omega.toFixed(2);
+    timeValueInline.textContent = tMax.toFixed(1);
+
+    const period = (2 * Math.PI) / omega;
+    const turns = omega * tMax / (2 * Math.PI);
+
+    periodValue.textContent = period.toFixed(2);
+    turnsValue.textContent = turns.toFixed(2);
+
+    ctx.clearRect(0, 0, width, height);
+
+    const fg = getColor();
+
+    drawGrid(width, height, fg);
+
+    function timeToX(t) {
+      return (t / tMax) * 8 - 4;
+    }
+
+    drawAxis([-4.3, 0, 0], [4.6, 0, 0], "t", width, height, fg);
+    drawAxis([0, -1.6, 0], [0, 1.8, 0], "Re", width, height, fg);
+    drawAxis([0, 0, -1.6], [0, 0, 1.8], "Im", width, height, fg);
+
+    ctx.beginPath();
+    for (let i = 0; i <= 100; i++) {
+      const theta = 2 * Math.PI * i / 100;
+      const p = project(-4, Math.cos(theta), Math.sin(theta), width, height);
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+    ctx.strokeStyle = fg;
+    ctx.globalAlpha = 0.14;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    const samples = 1400;
+    ctx.beginPath();
+
+    for (let i = 0; i <= samples; i++) {
+      const t = tMax * i / samples;
+      const x = timeToX(t);
+      const re = Math.cos(omega * t);
+      const im = Math.sin(omega * t);
+
+      const p = project(x, re, im, width, height);
+
+      if (i === 0) ctx.moveTo(p.x, p.y);
+      else ctx.lineTo(p.x, p.y);
+    }
+
+    ctx.strokeStyle = "#4c9aff";
+    ctx.lineWidth = 2.8;
+    ctx.stroke();
+
+    const endPoint = project(
+      timeToX(tMax),
+      Math.cos(omega * tMax),
+      Math.sin(omega * tMax),
+      width,
+      height
+    );
+
+    ctx.beginPath();
+    ctx.arc(endPoint.x, endPoint.y, 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = "#ff7373";
+    ctx.fill();
+
+    ctx.fillStyle = fg;
+    ctx.globalAlpha = 0.85;
+    ctx.font = "13px sans-serif";
+    ctx.fillText(`T = 2π/ω ≈ ${period.toFixed(2)}`, 18, 26);
+    ctx.fillText(`회전 수 ≈ ${turns.toFixed(2)}`, 18, 46);
+    ctx.globalAlpha = 1;
+  }
+
+  function animate() {
+    if (autoRotate && !dragging) {
+      yaw += 0.008;
+      draw();
+    }
+    rafId = requestAnimationFrame(animate);
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    dragging = true;
+    lastX = e.clientX;
+    lastY = e.clientY;
+    canvas.setPointerCapture(e.pointerId);
+  });
+
+  canvas.addEventListener("pointermove", (e) => {
+    if (!dragging) return;
+
+    const dx = e.clientX - lastX;
+    const dy = e.clientY - lastY;
+
+    yaw += dx * 0.008;
+    pitch += dy * 0.008;
+
+    pitch = Math.max(-1.35, Math.min(1.35, pitch));
+
+    lastX = e.clientX;
+    lastY = e.clientY;
+
+    draw();
+  });
+
+  canvas.addEventListener("pointerup", () => {
+    dragging = false;
+  });
+
+  canvas.addEventListener("pointercancel", () => {
+    dragging = false;
+  });
+
+  omegaSlider.addEventListener("input", draw);
+  timeSlider.addEventListener("input", draw);
+
+  resetBtn.addEventListener("click", () => {
+    yaw = -0.65;
+    pitch = 0.42;
+    draw();
+  });
+
+  autoRotateBtn.addEventListener("click", () => {
+    autoRotate = !autoRotate;
+    autoRotateBtn.textContent = `Auto Rotate: ${autoRotate ? "On" : "Off"}`;
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    if (!rafId) animate();
+  });
+
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    MathJax.typesetPromise([widget]);
+  }
+})();
+</script>
+
+{% endif %}
+
+<style>
+.laplace-widget {
+  margin: 28px 0;
+  padding: 20px;
+  border: 1px solid rgba(127, 127, 127, 0.3);
+  border-radius: 14px;
+  background: rgba(127, 127, 127, 0.06);
+  color: inherit;
+}
+
+.laplace-widget-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.laplace-widget-title span {
+  opacity: .75;
+  font-size: .92rem;
+}
+
+.laplace-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.laplace-controls label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: .92rem;
+}
+
+.laplace-controls input[type="range"] {
+  width: 100%;
+}
+
+.laplace-widget canvas {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  display: block;
+}
+
+.laplace-widget-desc {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(127, 127, 127, 0.25);
+  font-size: .92rem;
+  line-height: 1.65;
+}
+
+@media (max-width: 650px) {
+  .laplace-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .laplace-widget-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+.laplace-helix-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.laplace-helix-title {
+  font-size: 1.08rem;
+  margin-bottom: 6px;
+}
+
+.laplace-helix-subtitle {
+  font-size: .93rem;
+  line-height: 1.6;
+  opacity: .82;
+}
+
+.laplace-helix-formula {
+  white-space: nowrap;
+  font-size: 1rem;
+  opacity: .88;
+  padding-top: 2px;
+}
+
+.laplace-helix-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.laplace-stat-card {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(127,127,127,.22);
+}
+
+.laplace-stat-label {
+  font-size: .82rem;
+  opacity: .72;
+  margin-bottom: 6px;
+}
+
+.laplace-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.laplace-helix-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.laplace-control-card {
+  padding: 14px 15px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(127,127,127,.22);
+}
+
+.laplace-control-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: .94rem;
+}
+
+.laplace-control-help {
+  margin-top: 8px;
+  font-size: .82rem;
+  opacity: .7;
+  line-height: 1.5;
+}
+
+.laplace-canvas-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.laplace-btn {
+  border: 1px solid rgba(127,127,127,.28);
+  background: rgba(255,255,255,.04);
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: .18s ease;
+}
+
+.laplace-btn:hover {
+  background: rgba(255,255,255,.08);
+  transform: translateY(-1px);
+}
+
+.laplace-canvas-shell {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(127,127,127,.18);
+  background:
+    radial-gradient(circle at top left, rgba(76,154,255,.08), transparent 35%),
+    rgba(255,255,255,.02);
+}
+
+.laplace-helix-widget .helix-canvas {
+  width: 100%;
+  height: 500px;
+  display: block;
+}
+
+.laplace-canvas-hint {
+  position: absolute;
+  right: 14px;
+  bottom: 12px;
+  font-size: .8rem;
+  opacity: .72;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.18);
+  backdrop-filter: blur(4px);
+}
+
+.laplace-helix-bottom {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.laplace-note-card {
+  padding: 14px 15px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.035);
+  border: 1px solid rgba(127,127,127,.22);
+}
+
+.laplace-note-title {
+  font-size: .9rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.laplace-note-body {
+  font-size: .9rem;
+  line-height: 1.7;
+  opacity: .9;
+}
+
+@media (max-width: 900px) {
+  .laplace-helix-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .laplace-helix-controls,
+  .laplace-helix-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .laplace-helix-head {
+    flex-direction: column;
+  }
+
+  .laplace-canvas-toolbar {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .laplace-helix-widget .helix-canvas {
+    height: 360px;
+  }
+
+  .laplace-helix-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
