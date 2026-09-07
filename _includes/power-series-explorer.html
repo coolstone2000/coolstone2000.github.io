@@ -1,0 +1,887 @@
+<div class="ps-explorer" data-power-series-explorer>
+  <div class="ps-head">
+    <div>
+      <div class="ps-title">멱급수 근사 탐색기</div>
+      <div class="ps-subtitle">
+        시간에 따라 저항이 변하는 RC 회로의 정확해와 원점 중심 멱급수 근사를 비교한다.
+      </div>
+    </div>
+
+    <div class="ps-main-formula">
+      \[
+      u(x)=1-(1+x)^{-\alpha}
+      \]
+    </div>
+  </div>
+
+  <div class="ps-stats">
+    <div class="ps-stat">
+      <div class="ps-stat-label">\(\alpha\)</div>
+      <div class="ps-stat-value alpha-output">1.00</div>
+      <div class="ps-stat-note">\(T/(R_0C)\)</div>
+    </div>
+
+    <div class="ps-stat">
+      <div class="ps-stat-label">근사 차수</div>
+      <div class="ps-stat-value order-output">3</div>
+      <div class="ps-stat-note">\(N\)</div>
+    </div>
+
+    <div class="ps-stat">
+      <div class="ps-stat-label">관찰 위치</div>
+      <div class="ps-stat-value x-output">0.20</div>
+      <div class="ps-stat-note">\(x=t/T\)</div>
+    </div>
+
+    <div class="ps-stat">
+      <div class="ps-stat-label">절대오차</div>
+      <div class="ps-stat-value error-output">-</div>
+      <div class="ps-stat-note">\(\vert u-S_N\vert\)</div>
+    </div>
+  </div>
+
+  <div class="ps-controls">
+    <div class="ps-control">
+      <div class="ps-control-row">
+        <span>회로 파라미터 \(\alpha\)</span>
+        <strong class="alpha-inline">1.00</strong>
+      </div>
+      <input class="alpha-slider" type="range" min="0.25" max="4" step="0.05" value="1">
+      <div class="ps-control-note">
+        \(\alpha=T/(R_0C)\). 값에 따라 응답의 곡률과 급수 계수가 달라진다.
+      </div>
+    </div>
+
+    <div class="ps-control">
+      <div class="ps-control-row">
+        <span>급수 근사 차수 \(N\)</span>
+        <strong class="order-inline">3</strong>
+      </div>
+      <input class="order-slider" type="range" min="1" max="16" step="1" value="3">
+      <div class="ps-control-note">
+        차수를 높이면 더 많은 멱급수 항을 사용한다.
+      </div>
+    </div>
+
+    <div class="ps-control">
+      <div class="ps-control-row">
+        <span>오차를 확인할 위치 \(x\)</span>
+        <strong class="x-inline">0.20</strong>
+      </div>
+      <input class="x-slider" type="range" min="0" max="1.5" step="0.01" value="0.2">
+      <div class="ps-control-note">
+        원점 중심 Taylor 급수의 기본 수렴반경은 \(\vert x\vert&lt;1\)이다.
+      </div>
+    </div>
+  </div>
+
+  <div class="ps-equation-panel">
+    <div class="ps-equation-title">현재 급수 근사</div>
+    <div class="ps-equation series-equation"></div>
+  </div>
+
+  <div class="ps-graph-head">
+    <div class="ps-legend">
+      <span class="ps-legend-item"><span class="ps-dot ps-dot-exact"></span>정확해</span>
+      <span class="ps-legend-item"><span class="ps-dot ps-dot-series"></span>\(N\)차 급수</span>
+      <span class="ps-legend-item"><span class="ps-dot ps-dot-point"></span>현재 \(x\)</span>
+    </div>
+    <button type="button" class="ps-reset">기본값으로</button>
+  </div>
+
+  <div class="ps-canvas-wrap">
+    <canvas class="ps-canvas" width="900" height="500"></canvas>
+    <div class="ps-canvas-caption">실선과 급수 근사를 비교해 보자.</div>
+  </div>
+
+  <div class="ps-values">
+    <div class="ps-value-box">
+      <div class="ps-value-label">정확해</div>
+      <div class="ps-value-number exact-value">-</div>
+      <div class="ps-value-formula">\(u(x)=1-(1+x)^{-\alpha}\)</div>
+    </div>
+
+    <div class="ps-value-box">
+      <div class="ps-value-label">급수 근사</div>
+      <div class="ps-value-number approx-value">-</div>
+      <div class="ps-value-formula">\(S_N(x)\)</div>
+    </div>
+
+    <div class="ps-value-box">
+      <div class="ps-value-label">상대오차</div>
+      <div class="ps-value-number relative-error">-</div>
+      <div class="ps-value-formula">%</div>
+    </div>
+  </div>
+
+  <div class="ps-explanation">
+    <div class="ps-info-card">
+      <div class="ps-info-title">왜 \(x=1\) 부근에서 문제가 생길까?</div>
+      <div class="ps-info-body">
+        정확해는
+        \[
+        u(x)=1-(1+x)^{-\alpha}
+        \]
+        이다. 이 함수는 복소평면에서 \(x=-1\)에 특이점을 가진다.
+        원점 \(x=0\)에서 가장 가까운 특이점까지의 거리가 1이므로,
+        원점 중심 Taylor 급수의 수렴반경은
+        \[
+        R=1
+        \]
+        이다. 따라서 기본적으로
+        \[
+        \vert x\vert<1
+        \]
+        영역에서 급수해가 수렴한다.
+      </div>
+    </div>
+
+    <div class="ps-info-card">
+      <div class="ps-info-title">실제 회로는 \(x>1\)에서도 존재한다</div>
+      <div class="ps-info-body">
+        급수가 \(x=1\)을 넘어 수렴하지 않는다고 해서 실제 커패시터 전압이 그 시점에서 사라지는 것은 아니다.
+        정확해
+        \[
+        u(x)=1-(1+x)^{-\alpha}
+        \]
+        는 \(x\ge0\)에서 계속 정의된다.
+        즉,
+        <strong>
+          해가 존재하는 범위와 한 점에서 만든 멱급수의 수렴범위는 서로 다르다.
+        </strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="ps-status"></div>
+</div>
+
+<script>
+(() => {
+  const script = document.currentScript;
+  const root = script.previousElementSibling;
+  if (!root) return;
+
+  const canvas = root.querySelector(".ps-canvas");
+  const ctx = canvas.getContext("2d");
+
+  const alphaSlider = root.querySelector(".alpha-slider");
+  const orderSlider = root.querySelector(".order-slider");
+  const xSlider = root.querySelector(".x-slider");
+
+  const alphaOutput = root.querySelector(".alpha-output");
+  const orderOutput = root.querySelector(".order-output");
+  const xOutput = root.querySelector(".x-output");
+  const errorOutput = root.querySelector(".error-output");
+
+  const alphaInline = root.querySelector(".alpha-inline");
+  const orderInline = root.querySelector(".order-inline");
+  const xInline = root.querySelector(".x-inline");
+
+  const exactValue = root.querySelector(".exact-value");
+  const approxValue = root.querySelector(".approx-value");
+  const relativeError = root.querySelector(".relative-error");
+
+  const seriesEquation = root.querySelector(".series-equation");
+  const status = root.querySelector(".ps-status");
+  const resetButton = root.querySelector(".ps-reset");
+
+  function exact(x, alpha) {
+    return 1 - Math.pow(1 + x, -alpha);
+  }
+
+  function coefficients(alpha, N) {
+    const c = [0];
+    if (N < 1) return c;
+    c[1] = alpha;
+
+    for (let n = 1; n < N; n++) {
+      c[n + 1] = -c[n] * (alpha + n) / (n + 1);
+    }
+
+    return c;
+  }
+
+  function approximation(x, alpha, N) {
+    const c = coefficients(alpha, N);
+    let sum = 0;
+
+    for (let n = 1; n <= N; n++) {
+      sum += c[n] * Math.pow(x, n);
+    }
+
+    return sum;
+  }
+
+  function number(value, digits = 6) {
+    if (!Number.isFinite(value)) return "—";
+
+    if (
+      Math.abs(value) !== 0 &&
+      (Math.abs(value) < 0.0001 || Math.abs(value) > 9999)
+    ) {
+      return value.toExponential(3);
+    }
+
+    return Number(value.toFixed(digits)).toString();
+  }
+
+  function coefficientText(value) {
+    return Number(Math.abs(value).toFixed(4)).toString();
+  }
+
+  function makeEquation(alpha, N) {
+    const c = coefficients(alpha, N);
+    let text = "\\[S_{" + N + "}(x)=";
+
+    for (let n = 1; n <= N; n++) {
+      const value = c[n];
+
+      if (n > 1) {
+        text += value >= 0 ? "+" : "-";
+      } else if (value < 0) {
+        text += "-";
+      }
+
+      const abs = Math.abs(value);
+
+      if (Math.abs(abs - 1) > 1e-10) {
+        text += coefficientText(abs);
+      }
+
+      text += n === 1 ? "x" : "x^{" + n + "}";
+    }
+
+    text += "\\]";
+    return text;
+  }
+
+  function getForeground() {
+    return getComputedStyle(root).color;
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    canvas.width = Math.round(rect.width * dpr);
+    canvas.height = Math.round(rect.height * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  function draw() {
+    const alpha = Number(alphaSlider.value);
+    const N = Number(orderSlider.value);
+    const probeX = Number(xSlider.value);
+
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const fg = getForeground();
+
+    const margin = {
+      left: 58,
+      right: 24,
+      top: 28,
+      bottom: 48
+    };
+
+    const plotWidth = width - margin.left - margin.right;
+    const plotHeight = height - margin.top - margin.bottom;
+
+    const xMin = 0;
+    const xMax = 1.5;
+
+    const exactData = [];
+    const approxData = [];
+
+    let yMin = 0;
+    let yMax = 1;
+
+    const samples = 500;
+
+    for (let i = 0; i <= samples; i++) {
+      const x = xMin + (xMax - xMin) * i / samples;
+      const ye = exact(x, alpha);
+      const ya = approximation(x, alpha, N);
+
+      exactData.push([x, ye]);
+      approxData.push([x, ya]);
+
+      if (Number.isFinite(ya) && Math.abs(ya) < 20) {
+        yMin = Math.min(yMin, ya, ye);
+        yMax = Math.max(yMax, ya, ye);
+      }
+    }
+
+    const pad = Math.max(0.12, (yMax - yMin) * 0.12);
+
+    yMin -= pad;
+    yMax += pad;
+
+    yMin = Math.max(yMin, -5);
+    yMax = Math.min(yMax, 5);
+
+    function X(x) {
+      return margin.left + (x - xMin) / (xMax - xMin) * plotWidth;
+    }
+
+    function Y(y) {
+      return margin.top + (yMax - y) / (yMax - yMin) * plotHeight;
+    }
+
+    ctx.save();
+    ctx.strokeStyle = fg;
+    ctx.globalAlpha = 0.07;
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 6; i++) {
+      const x = margin.left + plotWidth * i / 6;
+      ctx.beginPath();
+      ctx.moveTo(x, margin.top);
+      ctx.lineTo(x, height - margin.bottom);
+      ctx.stroke();
+    }
+
+    for (let i = 0; i <= 5; i++) {
+      const y = margin.top + plotHeight * i / 5;
+      ctx.beginPath();
+      ctx.moveTo(margin.left, y);
+      ctx.lineTo(width - margin.right, y);
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    const boundaryX = X(1);
+
+    ctx.save();
+    ctx.strokeStyle = "#f5a623";
+    ctx.globalAlpha = 0.65;
+    ctx.setLineDash([6, 5]);
+    ctx.lineWidth = 1.5;
+
+    ctx.beginPath();
+    ctx.moveTo(boundaryX, margin.top);
+    ctx.lineTo(boundaryX, height - margin.bottom);
+    ctx.stroke();
+
+    ctx.setLineDash([]);
+    ctx.fillStyle = "#f5a623";
+    ctx.font = "12px sans-serif";
+    ctx.fillText("x = 1", boundaryX + 7, margin.top + 16);
+    ctx.restore();
+
+    ctx.save();
+    ctx.strokeStyle = fg;
+    ctx.globalAlpha = 0.45;
+    ctx.lineWidth = 1.3;
+
+    ctx.beginPath();
+    ctx.moveTo(margin.left, Y(0));
+    ctx.lineTo(width - margin.right, Y(0));
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(margin.left, margin.top);
+    ctx.lineTo(margin.left, height - margin.bottom);
+    ctx.stroke();
+
+    ctx.restore();
+
+    ctx.beginPath();
+    let started = false;
+
+    for (const [x, y] of exactData) {
+      const px = X(x);
+      const py = Y(y);
+
+      if (!started) {
+        ctx.moveTo(px, py);
+        started = true;
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+
+    ctx.strokeStyle = "#4c9aff";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.beginPath();
+    started = false;
+
+    for (const [x, y] of approxData) {
+      if (
+        !Number.isFinite(y) ||
+        y < yMin - 1 ||
+        y > yMax + 1
+      ) {
+        started = false;
+        continue;
+      }
+
+      const px = X(x);
+      const py = Y(y);
+
+      if (!started) {
+        ctx.moveTo(px, py);
+        started = true;
+      } else {
+        ctx.lineTo(px, py);
+      }
+    }
+
+    ctx.strokeStyle = "#b96cff";
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([7, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    const ye = exact(probeX, alpha);
+    const probePX = X(probeX);
+
+    ctx.save();
+    ctx.strokeStyle = "#ff7373";
+    ctx.globalAlpha = 0.45;
+    ctx.setLineDash([4, 4]);
+
+    ctx.beginPath();
+    ctx.moveTo(probePX, margin.top);
+    ctx.lineTo(probePX, height - margin.bottom);
+    ctx.stroke();
+
+    ctx.restore();
+
+    if (ye >= yMin && ye <= yMax) {
+      ctx.beginPath();
+      ctx.arc(probePX, Y(ye), 5, 0, 2 * Math.PI);
+      ctx.fillStyle = "#ff7373";
+      ctx.fill();
+    }
+
+    ctx.fillStyle = fg;
+    ctx.globalAlpha = 0.72;
+    ctx.font = "13px sans-serif";
+
+    ctx.fillText(
+      "x = t/T",
+      width - margin.right - 42,
+      height - 14
+    );
+
+    ctx.fillText(
+      "u",
+      margin.left + 8,
+      margin.top + 4
+    );
+
+    ctx.globalAlpha = 1;
+  }
+
+  function update() {
+    const alpha = Number(alphaSlider.value);
+    const N = Number(orderSlider.value);
+    const x = Number(xSlider.value);
+
+    alphaOutput.textContent = alpha.toFixed(2);
+    alphaInline.textContent = alpha.toFixed(2);
+
+    orderOutput.textContent = N;
+    orderInline.textContent = N;
+
+    xOutput.textContent = x.toFixed(2);
+    xInline.textContent = x.toFixed(2);
+
+    const ye = exact(x, alpha);
+    const ya = approximation(x, alpha, N);
+    const err = Math.abs(ye - ya);
+
+    errorOutput.textContent = number(err);
+    exactValue.textContent = number(ye);
+    approxValue.textContent = number(ya);
+
+    if (Math.abs(ye) > 1e-12) {
+      relativeError.textContent =
+        number(100 * err / Math.abs(ye), 4) + "%";
+    } else {
+      relativeError.textContent = "—";
+    }
+
+    seriesEquation.innerHTML = makeEquation(alpha, N);
+
+    if (x < 1 - 1e-9) {
+      status.className = "ps-status ps-status-good";
+      status.innerHTML =
+        "<strong>현재 위치는 수렴반경 내부이다.</strong> " +
+        "\\(\\vert x\\vert<1\\)이므로 차수를 충분히 높이면 " +
+        "원점 중심 급수가 정확해에 가까워진다.";
+    } else if (Math.abs(x - 1) < 1e-9) {
+      status.className = "ps-status ps-status-warn";
+      status.innerHTML =
+        "<strong>현재 위치는 수렴구간의 끝점이다.</strong> " +
+        "끝점 \\(x=1\\)의 수렴 여부는 별도로 판정해야 한다.";
+    } else {
+      status.className = "ps-status ps-status-bad";
+      status.innerHTML =
+        "<strong>현재 위치는 원점 중심 급수의 수렴반경 밖이다.</strong> " +
+        "차수를 높인다고 반드시 근사가 좋아지는 것이 아니다. " +
+        "하지만 실제 회로의 정확해 자체는 계속 존재한다.";
+    }
+
+    draw();
+
+    if (
+      window.MathJax &&
+      window.MathJax.typesetPromise
+    ) {
+      MathJax.typesetClear &&
+      MathJax.typesetClear([
+        seriesEquation,
+        status
+      ]);
+
+      MathJax.typesetPromise([
+        seriesEquation,
+        status
+      ]);
+    }
+  }
+
+  alphaSlider.addEventListener("input", update);
+  orderSlider.addEventListener("input", update);
+  xSlider.addEventListener("input", update);
+
+  resetButton.addEventListener("click", () => {
+    alphaSlider.value = 1;
+    orderSlider.value = 3;
+    xSlider.value = 0.2;
+    update();
+  });
+
+  window.addEventListener("resize", resizeCanvas);
+
+  requestAnimationFrame(() => {
+    resizeCanvas();
+    update();
+  });
+})();
+</script>
+
+<style>
+.ps-explorer {
+  margin: 30px 0;
+  padding: 22px;
+  border: 1px solid rgba(127,127,127,.28);
+  border-radius: 16px;
+  background: rgba(127,127,127,.045);
+  color: inherit;
+}
+
+.ps-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.ps-title {
+  font-size: 1.1rem;
+  font-weight: 750;
+  margin-bottom: 6px;
+}
+
+.ps-subtitle {
+  max-width: 580px;
+  font-size: .9rem;
+  line-height: 1.65;
+  opacity: .76;
+}
+
+.ps-main-formula {
+  white-space: nowrap;
+}
+
+.ps-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.ps-stat {
+  padding: 13px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(127,127,127,.20);
+  background: rgba(127,127,127,.05);
+}
+
+.ps-stat-label {
+  font-size: .77rem;
+  opacity: .65;
+  margin-bottom: 6px;
+}
+
+.ps-stat-value {
+  font-size: 1.05rem;
+  font-weight: 750;
+}
+
+.ps-stat-note {
+  margin-top: 4px;
+  font-size: .72rem;
+  opacity: .55;
+}
+
+.ps-controls {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 12px;
+}
+
+.ps-control {
+  padding: 14px;
+  border: 1px solid rgba(127,127,127,.20);
+  border-radius: 12px;
+  background: rgba(127,127,127,.035);
+}
+
+.ps-control-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 11px;
+  font-size: .88rem;
+}
+
+.ps-control input {
+  width: 100%;
+}
+
+.ps-control-note {
+  margin-top: 8px;
+  font-size: .73rem;
+  line-height: 1.5;
+  opacity: .6;
+}
+
+.ps-equation-panel {
+  margin-top: 15px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(127,127,127,.18);
+  background: rgba(127,127,127,.025);
+}
+
+.ps-equation-title {
+  font-size: .78rem;
+  opacity: .62;
+}
+
+.ps-equation {
+  overflow-x: auto;
+}
+
+.ps-graph-head {
+  margin-top: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.ps-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: .8rem;
+}
+
+.ps-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ps-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+.ps-dot-exact {
+  background: #4c9aff;
+}
+
+.ps-dot-series {
+  background: #b96cff;
+}
+
+.ps-dot-point {
+  background: #ff7373;
+}
+
+.ps-reset {
+  border: 1px solid rgba(127,127,127,.25);
+  background: rgba(127,127,127,.05);
+  color: inherit;
+  border-radius: 9px;
+  padding: 7px 11px;
+  cursor: pointer;
+  font-size: .78rem;
+}
+
+.ps-reset:hover {
+  background: rgba(127,127,127,.12);
+}
+
+.ps-canvas-wrap {
+  position: relative;
+  margin-top: 10px;
+  height: 440px;
+  overflow: hidden;
+  border-radius: 13px;
+  border: 1px solid rgba(127,127,127,.16);
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(76,154,255,.055),
+      transparent 45%
+    );
+}
+
+.ps-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.ps-canvas-caption {
+  position: absolute;
+  right: 12px;
+  bottom: 9px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.18);
+  font-size: .69rem;
+  opacity: .62;
+}
+
+.ps-values {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 11px;
+  margin-top: 14px;
+}
+
+.ps-value-box {
+  padding: 13px 14px;
+  border: 1px solid rgba(127,127,127,.18);
+  border-radius: 12px;
+  background: rgba(127,127,127,.03);
+}
+
+.ps-value-label {
+  font-size: .74rem;
+  opacity: .62;
+}
+
+.ps-value-number {
+  margin-top: 5px;
+  font-size: 1.05rem;
+  font-weight: 730;
+}
+
+.ps-value-formula {
+  margin-top: 3px;
+  font-size: .7rem;
+  opacity: .5;
+}
+
+.ps-explanation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ps-info-card {
+  padding: 15px;
+  border: 1px solid rgba(127,127,127,.18);
+  border-radius: 12px;
+  background: rgba(127,127,127,.03);
+}
+
+.ps-info-title {
+  margin-bottom: 8px;
+  font-size: .86rem;
+  font-weight: 720;
+}
+
+.ps-info-body {
+  font-size: .82rem;
+  line-height: 1.75;
+  opacity: .83;
+}
+
+.ps-status {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 11px;
+  font-size: .8rem;
+  line-height: 1.65;
+}
+
+.ps-status-good {
+  border: 1px solid rgba(82,190,120,.30);
+  background: rgba(82,190,120,.075);
+}
+
+.ps-status-warn {
+  border: 1px solid rgba(245,166,35,.33);
+  background: rgba(245,166,35,.075);
+}
+
+.ps-status-bad {
+  border: 1px solid rgba(255,100,100,.30);
+  background: rgba(255,100,100,.07);
+}
+
+@media (max-width: 900px) {
+  .ps-head {
+    flex-direction: column;
+  }
+
+  .ps-stats {
+    grid-template-columns: repeat(2,1fr);
+  }
+
+  .ps-controls {
+    grid-template-columns: 1fr;
+  }
+
+  .ps-explanation {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .ps-explorer {
+    padding: 15px;
+  }
+
+  .ps-values {
+    grid-template-columns: 1fr;
+  }
+
+  .ps-canvas-wrap {
+    height: 340px;
+  }
+}
+</style>

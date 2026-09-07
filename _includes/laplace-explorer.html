@@ -8,7 +8,7 @@
 
   <div class="laplace-controls">
     <label>
-      \(\sigma\) = <span class="sigma-value">-0.50</span>
+      <span class="laplace-control-top"><span>감쇠·성장 계수 σ</span><strong class="sigma-value">-0.50</strong></span>
       <input
         class="sigma-slider"
         type="range"
@@ -20,7 +20,7 @@
     </label>
 
     <label>
-      \(\omega\) = <span class="omega-value">2.00</span>
+      <span class="laplace-control-top"><span>각주파수 ω</span><strong class="omega-value">2.00</strong></span>
       <input
         class="omega-slider"
         type="range"
@@ -63,8 +63,8 @@
     sigmaValue.textContent = sigma.toFixed(2);
     omegaValue.textContent = omega.toFixed(2);
 
-    const width = canvas.width;
-    const height = canvas.height;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
 
     ctx.clearRect(0, 0, width, height);
 
@@ -198,7 +198,20 @@
   sigmaSlider.addEventListener("input", draw);
   omegaSlider.addEventListener("input", draw);
 
-  draw();
+  new MutationObserver(draw).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"]
+  });
+
+  function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.round(canvas.clientWidth * ratio);
+    canvas.height = Math.round(canvas.clientHeight * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    draw();
+  }
+
+  new ResizeObserver(resizeCanvas).observe(canvas);
+  resizeCanvas();
 })();
 </script>
 
@@ -212,7 +225,7 @@
 
   <div class="laplace-controls">
     <label>
-      \(\sigma\) = <span class="sigma-value">1.00</span>
+      <span class="laplace-control-top"><span>감쇠 계수 σ</span><strong class="sigma-value">1.00</strong></span>
       <input
         class="sigma-slider"
         type="range"
@@ -224,7 +237,7 @@
     </label>
 
     <label>
-      \(\omega\) = <span class="omega-value">2.00</span>
+      <span class="laplace-control-top"><span>각주파수 ω</span><strong class="omega-value">2.00</strong></span>
       <input
         class="omega-slider"
         type="range"
@@ -268,8 +281,8 @@
     sigmaValue.textContent = sigma.toFixed(2);
     omegaValue.textContent = omega.toFixed(2);
 
-    const width = canvas.width;
-    const height = canvas.height;
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
 
     ctx.clearRect(0, 0, width, height);
 
@@ -359,7 +372,7 @@
     if (sigma > 0.5 + 0.001) {
       description.innerHTML =
         `<b>σ > 0.5</b>이므로 ` +
-        `\(e^{(0.5-σ)t}\)가 감쇠한다. ` +
+        `<span class="laplace-inline-formula">e<sup>(0.5−σ)t</sup></span>가 감쇠한다. ` +
         `이 예제의 라플라스 적분은 수렴한다.`;
     } else if (Math.abs(sigma - 0.5) < 0.001) {
       description.innerHTML =
@@ -368,22 +381,29 @@
     } else {
       description.innerHTML =
         `<b>σ < 0.5</b>이므로 ` +
-        `\(e^{(0.5-σ)t}\)의 크기가 증가한다. ` +
+        `<span class="laplace-inline-formula">e<sup>(0.5−σ)t</sup></span>의 크기가 증가한다. ` +
         `라플라스 적분이 발산한다.`;
     }
 
-    if (
-      window.MathJax &&
-      window.MathJax.typesetPromise
-    ) {
-      MathJax.typesetPromise([description]);
-    }
   }
 
   sigmaSlider.addEventListener("input", draw);
   omegaSlider.addEventListener("input", draw);
 
-  draw();
+  new MutationObserver(draw).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"]
+  });
+
+  function resizeCanvas() {
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.round(canvas.clientWidth * ratio);
+    canvas.height = Math.round(canvas.clientHeight * ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    draw();
+  }
+
+  new ResizeObserver(resizeCanvas).observe(canvas);
+  resizeCanvas();
 })();
 </script>
 
@@ -437,6 +457,7 @@
         class="omega-slider"
         type="range"
         min="0.3"
+        aria-label="나선의 각주파수 ω"
         max="6"
         step="0.1"
         value="2"
@@ -454,6 +475,7 @@
       <input
         class="time-slider"
         type="range"
+        aria-label="나선의 표시 시간"
         min="4"
         max="20"
         step="0.5"
@@ -466,8 +488,8 @@
   </div>
 
   <div class="laplace-canvas-toolbar">
-    <button type="button" class="laplace-btn reset-view-btn">Reset View</button>
-    <button type="button" class="laplace-btn auto-rotate-btn">Auto Rotate: Off</button>
+    <button type="button" class="laplace-btn reset-view-btn">시점 초기화</button>
+    <button type="button" class="laplace-btn auto-rotate-btn" aria-pressed="false">자동 회전: 꺼짐</button>
   </div>
 
   <div class="laplace-canvas-shell">
@@ -567,7 +589,8 @@
     const cameraDistance = 8;
     const depth = cameraDistance + p.z;
     const perspective = cameraDistance / depth;
-    const scale = Math.min(width, height) * 0.16;
+    // Keep the full rotated axes and helix inside narrow canvases.
+    const scale = Math.max(1, Math.min(width, height) - 48) / 12;
 
     return {
       x: width / 2 + p.x * scale * perspective,
@@ -753,10 +776,14 @@
 
   autoRotateBtn.addEventListener("click", () => {
     autoRotate = !autoRotate;
-    autoRotateBtn.textContent = `Auto Rotate: ${autoRotate ? "On" : "Off"}`;
+    autoRotateBtn.textContent = `자동 회전: ${autoRotate ? "켜짐" : "꺼짐"}`;
+    autoRotateBtn.setAttribute("aria-pressed", String(autoRotate));
   });
 
-  window.addEventListener("resize", resizeCanvas);
+  new ResizeObserver(resizeCanvas).observe(canvas);
+  new MutationObserver(draw).observe(document.documentElement, {
+    attributes: true, attributeFilter: ["data-theme"]
+  });
 
   requestAnimationFrame(() => {
     resizeCanvas();
@@ -806,10 +833,44 @@
   flex-direction: column;
   gap: 7px;
   font-size: .92rem;
+  color: inherit;
+  min-width: 0;
+  margin: 0;
 }
 
-.laplace-controls input[type="range"] {
+.laplace-widget input[type="range"] {
   width: 100%;
+  min-width: 0;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  accent-color: #2679d8;
+  cursor: pointer;
+}
+
+.laplace-widget input[type="range"]:focus-visible,
+.laplace-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
+}
+
+.laplace-inline-formula {
+  white-space: nowrap;
+  font-family: Georgia, serif;
+  font-style: italic;
+}
+
+.laplace-controls .laplace-control-top {
+  margin-bottom: 0;
+  gap: 10px;
+}
+
+.laplace-control-top strong {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .laplace-widget canvas {
@@ -817,6 +878,11 @@
   height: auto;
   border-radius: 8px;
   display: block;
+}
+
+.laplace-widget .mode-canvas,
+.laplace-widget .integral-canvas {
+  height: clamp(240px, 40vw, 360px);
 }
 
 .laplace-widget-desc {
@@ -858,7 +924,8 @@
 }
 
 .laplace-helix-formula {
-  white-space: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
   font-size: 1rem;
   opacity: .88;
   padding-top: 2px;
@@ -920,6 +987,7 @@
 
 .laplace-canvas-toolbar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
   margin-bottom: 12px;
@@ -955,6 +1023,8 @@
   width: 100%;
   height: 500px;
   display: block;
+  touch-action: none;
+  cursor: grab;
 }
 
 .laplace-canvas-hint {
@@ -967,6 +1037,8 @@
   border-radius: 999px;
   background: rgba(0,0,0,.18);
   backdrop-filter: blur(4px);
+  max-width: calc(100% - 28px);
+  pointer-events: none;
 }
 
 .laplace-helix-bottom {

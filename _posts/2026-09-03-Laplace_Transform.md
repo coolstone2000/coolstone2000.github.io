@@ -5095,7 +5095,7 @@ $$
 
 즉 시스템은
 
-- 진폭을 $|H(j\omega)|$배
+- 진폭을 $\vert H(j\omega) \vert$배
 - 위상을 $\angle H(j\omega)$만큼
 
 변화시킨다.
