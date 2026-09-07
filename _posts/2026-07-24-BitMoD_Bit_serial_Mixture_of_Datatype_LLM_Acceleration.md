@@ -9017,8 +9017,6 @@ BitMoD PE
 
 구조임.
 
----
-
 ### Step 1. Exponent Alignment
 
 Figure 5의 첫 번째 단계에서는 각 Weight Term과 Activation을 곱했을 때 발생하는 **Product Exponent와 Sign을 먼저 계산함.**
@@ -9048,8 +9046,6 @@ $$
 $$
 e_{product}=a_e+w_e
 $$
-
-로 계산할 수 있음.
 
 Figure 5에서는 4개의 Weight-Activation Pair에 대해 이 연산을 동시에 수행함.
 
@@ -9083,8 +9079,6 @@ $$
 e_{max}=5
 $$
 
-임.
-
 따라서 각 Product가 최대 Exponent와 얼마나 차이가 나는지 계산함.
 
 $$
@@ -9096,8 +9090,6 @@ $$
 $$
 \delta e=[0,\;2,\;1,\;0]
 $$
-
-이 됨.
 
 ```text
 Product 0
@@ -9119,8 +9111,6 @@ Exponent = 5
 
 이 $\delta e$는 다음 Step의 Right Shifter가 각 Mantissa를 얼마나 Shift해야 하는지 결정함.
 
-즉,
-
 ```text
 ae + we
    ↓
@@ -9132,10 +9122,6 @@ Product Exponent
    ↓
 Step 2의 Right Shift Amount
 ```
-
-가 됨.
-
----
 
 #### Product Sign 계산
 
@@ -9178,8 +9164,6 @@ ys
 
 두 가지 정보를 생성함.
 
----
-
 ### Step 2. Bit-serial Multiplication
 
 Step 2에서는 실제 Mantissa Multiplication을 수행함.
@@ -9196,8 +9180,6 @@ $$
 11\text{-bit }a_m
 $$
 
-이 됨.
-
 #### Weight Mantissa가 1-bit인 이유
 
 Bit-serial Term의 Mantissa는 사실상
@@ -9205,8 +9187,6 @@ Bit-serial Term의 Mantissa는 사실상
 $$
 w_m\in\{0,1\}
 $$
-
-임.
 
 따라서
 
@@ -9232,8 +9212,6 @@ $$
 w_m\times a_m=a_m
 $$
 
-임.
-
 즉 일반적인 복잡한 Multiplier 대신 개념적으로
 
 ```text
@@ -9245,10 +9223,6 @@ wm = 1
 ```
 
 처럼 처리할 수 있음.
-
-이것이 Bit-serial Representation을 사용하는 Hardware상의 중요한 장점임.
-
----
 
 ### Right Shift를 통한 Exponent Alignment
 
@@ -9262,7 +9236,7 @@ $$
 
 이었음.
 
-Activation Mantissa를 설명 편의를 위해 각각
+Activation Mantissa를
 
 $$
 [1.5,\;1.25,\;1.0,\;1.5]
@@ -9318,8 +9292,6 @@ $$
 1.5
 $$
 
-그 결과
-
 ```text
 Before Alignment
 
@@ -9334,10 +9306,6 @@ shift 0  shift 2  shift 1  shift 0
 같은 Exponent 기준으로 정렬
 ```
 
-하게 됨.
-
----
-
 ### Rounding을 위한 3 Extra Bits
 
 Right Shift를 수행하면 낮은 Bit가 잘려 나가면서 Rounding Error가 발생할 수 있음.
@@ -9347,8 +9315,6 @@ Right Shift를 수행하면 낮은 Bit가 잘려 나가면서 Rounding Error가 
 이 Extra Bit는 **Round-to-Nearest-Even**을 지원하기 위한 것임.
 
 즉 Mantissa를 Shift하면서 발생하는 Precision Loss를 줄이기 위한 Hardware임.
-
----
 
 ### 4-way Adder Tree
 
@@ -9373,8 +9339,6 @@ P_0+P_1+P_2+P_3
 $$
 
 형태의 **4-way Bit-serial Dot Product**를 계산함.
-
----
 
 ### Step 3. Group Accumulation
 
@@ -9418,8 +9382,6 @@ Dot Product
 하는 과정이 필요함.
 
 이 역할을 Step 3의 **Group Accumulation**이 수행함.
-
----
 
 ### Bit-significance 적용
 
@@ -9471,8 +9433,6 @@ Dot Product
     12
 ```
 
----
-
 ### 기존 Accumulator와 합산
 
 현재 결과는 기존 Accumulator Mantissa $m_{ACC}$와 더해짐.
@@ -9511,8 +9471,6 @@ mACC=20 │
 
 이 과정을 여러 Bit-serial Term에 대해 반복함으로써 원래 Weight를 사용한 전체 Dot Product가 복원됨.
 
----
-
 ### Normalize와 Accumulator Exponent
 
 Mantissa를 계속 더하면 Mantissa의 범위가 정규화 범위를 벗어날 수 있음.
@@ -9542,8 +9500,6 @@ mACC / eACC 갱신
 
 이 결과가 해당 Weight Group의 **Group Partial Sum**이 됨.
 
----
-
 ### Step 4. Bit-serial Dequantization
 
 BitMoD는 **Per-Group Quantization**을 사용하기 때문에 각 Group의 Dot Product가 끝난 뒤에는 해당 Group의 Scaling Factor를 적용해야 함.
@@ -9565,8 +9521,6 @@ $$
 가 서로 다르기 때문에 전체 Channel 연산이 끝날 때까지 Scaling을 미룰 수 없다는 것임.
 
 따라서 Group 단위로 Dequantization을 수행해야 함.
-
----
 
 ### Section III-C와 연결
 
@@ -9595,8 +9549,6 @@ INT8 Scaling Factor
 형태로 사용함.
 
 그러면 Scaling Factor를 한 번에 곱하지 않고 **한 Bit씩 Bit-serial 방식으로 처리할 수 있음.**
-
----
 
 ### INT8 Scaling Factor를 Bit-serial로 처리하는 예시
 
@@ -9685,10 +9637,6 @@ Dequantized Partial Sum
 
 방식을 사용함.
 
-> 위의 $\Delta_q=13$은 Bit-serial Dequantization 동작을 이해하기 위한 예시이며 논문에서 사용한 실제 Scaling Factor 값은 아님.
-
----
-
 ### 8-cycle Dequantization이 Bottleneck이 되지 않는 이유
 
 Per-Group Scaling Factor는 INT8이므로 Bit를 하나씩 처리하면
@@ -9746,8 +9694,6 @@ INT8 Scaling Factor Dequantization
 
 = 8 cycles
 ```
-
-임.
 
 따라서
 
@@ -9818,8 +9764,6 @@ $$
 
 즉 BitMoD에서 Low-Precision은 단순히 Weight Memory만 줄이는 것이 아니라 **실제 PE의 연산 Cycle까지 감소시킴.**
 
----
-
 ### PE Area 측면의 장점
 
 논문에서는 이후 Hardware Evaluation을 통해 BitMoD PE가 일반 FP16 PE보다 **24% 적은 Area**를 사용한다고 설명함.
@@ -9843,8 +9787,6 @@ FP16 PE보다 작은 Area 사용
 ```
 
 이라는 추가적인 장점이 있음.
-
----
 
 ### Self-Attention 연산 지원
 
@@ -9918,8 +9860,6 @@ Value
 형태로 처리할 수 있음.
 
 이렇게 하면 기존 BitMoD Bit-serial PE를 Self-Attention 연산에도 활용할 수 있음.
-
----
 
 ### Figure 4와 Figure 5의 관계
 
@@ -10024,12 +9964,6 @@ $$
 $$
 
 까지 Hardware 내부에서 효율적으로 수행함.
-
-특히 **Section III-C에서 Scaling Factor를 INT8로 Quantization한 이유가 Figure 5의 Step 4에서 실제 Hardware 이점으로 연결됨.**
-
-FP16 Scaling Factor를 그대로 사용했다면 Group마다 FP Multiplication이 필요하지만, INT8 Scaling Factor를 사용하면 이를 **Bit-serial Shift-and-Add**로 처리할 수 있음.
-
-또한 FP3/FP4처럼 낮은 Precision에서는 처리할 Bit-serial Term 자체가 줄어들기 때문에 **Weight Precision 감소 → Memory 감소 → 연산 Cycle 감소 → Throughput 증가**로 직접 연결되는 것이 BitMoD PE의 핵심임.
 
 
 ## C. BitMoD Accelerator
