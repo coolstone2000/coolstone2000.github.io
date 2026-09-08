@@ -13,56 +13,5 @@
   </div>
 </div>
 
+<script src="{{ '/assets/js/custom/comments.js' | relative_url }}" data-stylesheet="{{ '/assets/css/comments.css' | relative_url }}"></script>
 <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-<script>
-  (function () {
-    var MIN_HEIGHT = 500;
-
-    function applyHeight(h) {
-      var iframe = document.querySelector('#cusdis_thread iframe');
-      if (!iframe) return;
-      var target = Math.max(h || 0, MIN_HEIGHT);
-      iframe.style.setProperty('height', target + 'px', 'important');
-      iframe.style.setProperty('min-height', MIN_HEIGHT + 'px', 'important');
-    }
-
-    // Cusdis가 postMessage로 높이를 보내면 수신
-    window.addEventListener('message', function (e) {
-      if (e.origin !== 'https://cusdis.com') return;
-      try {
-        var data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-        if (data && data.from === 'cusdis' && data.height) {
-          applyHeight(parseInt(data.height) + 40);
-        }
-      } catch (err) {}
-    });
-
-    // iframe이 생성된 뒤 MutationObserver로 감지해서 강제 높이 적용
-    var threadEl = document.getElementById('cusdis_thread');
-    if (threadEl) {
-      var mo = new MutationObserver(function () {
-        var iframe = threadEl.querySelector('iframe');
-        if (iframe) {
-          applyHeight(MIN_HEIGHT);
-          mo.disconnect();
-        }
-      });
-      mo.observe(threadEl, { childList: true, subtree: true });
-    }
-
-    // 테마 연동
-    function setCusdisTheme() {
-      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      if (window.CUSDIS) {
-        window.CUSDIS.setTheme(isDark ? 'dark' : 'light');
-      }
-    }
-
-    var themeObs = new MutationObserver(setCusdisTheme);
-    themeObs.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-    document.addEventListener('cusdis.initial', function () {
-      setCusdisTheme();
-      applyHeight(MIN_HEIGHT);
-    });
-  })();
-</script>

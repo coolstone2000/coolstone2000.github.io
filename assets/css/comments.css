@@ -1,0 +1,79 @@
+@font-face {
+  font-family: Pretendard;
+  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Light.woff') format('woff');
+  font-weight: 200 500;
+  font-display: swap;
+}
+
+html:root {
+  color-scheme: light;
+  --background: #eeeeee;
+  --text: #222831;
+  --muted: #626870;
+  --field: #f7f7f7;
+  --border: #cdd0d3;
+  --accent: #007eae;
+  --button-text: #fff;
+}
+html:root[data-theme='dark'] {
+  color-scheme: dark;
+  --background: #252a34;
+  --text: #eaeaea;
+  --muted: #a6abb4;
+  --field: #20242c;
+  --border: #454a53;
+  --accent: #8cced2;
+  --button-text: #20242c;
+}
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--background) !important;
+  color: var(--text) !important;
+  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+}
+#root { padding: 4px 2px 8px; }
+#root *, #root *::before, #root *::after { box-sizing: border-box; }
+#root .px-1 { padding-left: 0; padding-right: 0; }
+#root .gap-4 { gap: 16px; }
+#root label { color: var(--muted) !important; font-size: 13px; margin-bottom: 6px; }
+#root input, #root textarea {
+  color: var(--text) !important;
+  background: var(--field) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 7px;
+  padding: 10px 12px;
+  font: inherit;
+  transition: border-color .15s;
+}
+#root textarea { min-height: 112px; height: 112px; resize: vertical; }
+#root input:focus-visible, #root textarea:focus-visible, #root button:focus-visible, #root a:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 2px;
+}
+#root button {
+  border: 1px solid var(--accent) !important;
+  border-radius: 7px;
+  background: var(--accent) !important;
+  color: var(--button-text) !important;
+  padding: 8px 18px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#root button:hover { filter: brightness(.93); }
+#root button:disabled, #root .cusdis-disabled { opacity: .55; cursor: wait; }
+#root a { color: var(--muted); text-underline-offset: 3px; }
+#root a:hover { color: var(--accent); }
+#root [class*='text-gray-'] { color: var(--muted) !important; }
+#root [class*='border-gray-'] { border-color: var(--border) !important; }
+#root .prose { color: var(--text) !important; overflow-wrap: anywhere; }
+#root .prose a { color: var(--accent); }
+#root .prose pre { white-space: pre-wrap; }
+#root a[href*='cusdis.com'] { font-size: 12px; }
+@media (max-width: 480px) {
+  #root .grid-cols-2 { grid-template-columns: minmax(0, 1fr); }
+}

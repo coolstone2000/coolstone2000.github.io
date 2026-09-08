@@ -277,27 +277,18 @@ nav.toc .toc__menu ul a {
 }
 
 #cusdis_thread iframe {
+  display: block;
   width: 100% !important;
-  min-width: 100% !important;
-  min-height: 400px !important;
-  border: none !important;
-  border-radius: 10px;
-  background: mix(#000, #fff, 3%);
-  transition: background 0.2s;
+  border: 0;
+  background: transparent;
 }
 
-/* 다크모드 */
 html[data-theme='dark'] .cusdis-wrapper {
   border-top-color: rgba(255, 255, 255, 0.12);
 }
 
 html[data-theme='dark'] .cusdis-wrapper__title {
-  color: rgba(255, 255, 255, 0.45);
-}
-
-html[data-theme='dark'] #cusdis_thread iframe {
-  color-scheme: dark;
-  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 
