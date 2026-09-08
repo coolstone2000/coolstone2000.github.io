@@ -1,0 +1,12 @@
+<section class="ee-math-visual" data-ee-visual="{{ include.kind | escape }}" aria-label="{{ include.title | escape }}">
+  <div class="ee-visual-heading"><strong>{{ include.title }}</strong><span>직접 조절하며 확인하기</span></div>
+  <div class="ee-visual-controls"></div>
+  <div class="ee-visual-panels"></div>
+  <p class="ee-visual-readout" role="status" aria-live="polite"></p>
+  <noscript>이 그래프는 JavaScript를 켜면 표시됩니다. 그래프에 사용한 수식과 해설은 바로 앞뒤 본문에 있습니다.</noscript>
+</section>
+{% unless ee_math_visual_assets_loaded %}
+<link rel="stylesheet" href="{{ '/assets/css/ee-math-visual.css' | relative_url }}">
+<script defer src="{{ '/assets/js/custom/ee-math-visual.js' | relative_url }}"></script>
+{% assign ee_math_visual_assets_loaded = true %}
+{% endunless %}

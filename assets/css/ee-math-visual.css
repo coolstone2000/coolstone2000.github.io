@@ -1,0 +1,28 @@
+.ee-math-visual {
+  margin: 2rem 0;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid rgba(127,127,127,.35);
+  border-radius: 14px;
+  background: rgba(127,127,127,.06);
+  color: inherit;
+  min-width: 0;
+}
+.ee-visual-heading { display: flex; flex-wrap: wrap; gap: 8px 18px; justify-content: space-between; align-items: baseline; }
+.ee-visual-heading > span { font-size: .75em; opacity: .8; }
+.ee-visual-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 16px; margin: 20px 0; }
+.ee-visual-controls label { color: inherit; min-width: 0; margin: 0; font-size: .85em; }
+.ee-visual-control-caption { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-bottom: 8px; }
+.ee-visual-controls output { color: inherit; font-weight: bold; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ee-math-visual input[type=range] { width: 100%; height: 30px; padding: 0; margin: 0; background: transparent; box-shadow: none; border: 0; accent-color: #2581cb; cursor: pointer; }
+.ee-math-visual select { width: 100%; padding: 8px; border: 1px solid #818994; background: #f3f5f7; color: #202936; border-radius: 6px; }
+html[data-theme=dark] .ee-math-visual select { background: #252a34; color: #eaeaea; }
+.ee-math-visual input:focus-visible, .ee-math-visual select:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.ee-visual-panels { display: grid; gap: 20px; }
+.ee-visual-panel { min-width: 0; margin: 0; }
+.ee-visual-panel figcaption { color: inherit; font-size: .82em; font-weight: 700; margin: 0 0 8px; text-align: left; }
+.ee-visual-panel canvas { width: 100%; height: 270px; display: block; }
+.ee-visual-panel[data-square] canvas { height: auto; aspect-ratio: 1; max-height: 460px; }
+.ee-visual-legend { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .73em; margin-top: 4px; }
+.ee-visual-legend span::before { content: ''; display: inline-block; width: 18px; height: 3px; margin-right: 6px; vertical-align: middle; background: var(--line-color); }
+.ee-math-visual .ee-visual-readout { border-top: 1px solid rgba(127,127,127,.3); padding-top: 14px; margin: 18px 0 0; font-size: .83em; line-height: 1.7; overflow-wrap: anywhere; }
+@media (max-width: 480px) { .ee-visual-panel canvas { height: 245px; } }
