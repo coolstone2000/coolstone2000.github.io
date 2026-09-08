@@ -2,7 +2,7 @@
 layout: single
 title: "Higher-Order ODE"
 categories: Math
-tags: [Math, ODE, Circuit, Signals]
+tags: Math
 toc: true
 author_profile: false
 comments: true
@@ -10,7 +10,7 @@ comments: true
 
 ## 고계 미분방정식을 배우는 이유
 
-[ODE]({% post_url 2026-09-01-ODE %})에서는 미지함수와 그 1차 도함수의 관계를 다루었다. 이번에는 $y^{\prime\prime}$, $y^{\prime\prime\prime}$처럼 더 높은 차수의 도함수가 포함된 **고계 미분방정식(Higher-Order ODE)**을 배운다.
+[ODE]({% post_url 2026-08-29-ODE %})에서는 미지함수와 그 1차 도함수의 관계를 다루었다. 이번에는 $y^{\prime\prime}$, $y^{\prime\prime\prime}$처럼 더 높은 차수의 도함수가 포함된 **고계 미분방정식(Higher-Order ODE)**을 배운다.
 
 전기전자공학에서는 커패시터와 인덕터의 에너지 저장 때문에 미분방정식이 등장한다. 예를 들어 직렬 RLC 회로에서 커패시터 전압을 출력으로 잡으면
 

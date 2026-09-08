@@ -2,14 +2,14 @@
 layout: single
 title: "Power Series Solution"
 categories: Math
-tags: [Math, ODE, Power Series, Frobenius, Legendre, Bessel, Electromagnetics]
+tags: Math
 toc: true
 author_profile: false
 comments: true
 ---
 
-[고계 미분방정식]({% post_url 2026-09-02-Higher_Order_ODE %})에서는 상수계수 미분방정식의 해를 지수함수로 찾았다.  
-[라플라스 변환]({% post_url 2026-09-03-Laplace_Transform %})에서는 시간 미분을 $s$에 대한 곱셈으로 바꾸어 초기값 문제를 대수적으로 풀었다.
+[고계 미분방정식]({% post_url 2026-08-30-Higher_Order_ODE %})에서는 상수계수 미분방정식의 해를 지수함수로 찾았다.  
+[라플라스 변환]({% post_url 2026-09-01-Laplace_Transform %})에서는 시간 미분을 $s$에 대한 곱셈으로 바꾸어 초기값 문제를 대수적으로 풀었다.
 
 그런데 미분방정식의 계수가 상수가 아니라 위치나 시간에 따라 변하면 어떻게 해야 할까?
 
@@ -3094,8 +3094,6 @@ P_4(x)&=\frac18(35x^4-30x^2+3).
 \end{aligned}
 $$
 
-![르장드르 다항식 P0부터 P4까지의 그래프]({{ '/assets/images/math/power-series/legendre.svg' | relative_url }})
-
 또한
 
 $$
@@ -3277,9 +3275,6 @@ P_2(x)
 $$
 
 이 된다.
-
-표준 정의와 성질은 [NIST DLMF §14.2](https://dlmf.nist.gov/14.2), [§14.7](https://dlmf.nist.gov/14.7)에서 확인할 수 있다.
-
 ---
 
 ### 3.8 직교성은 무슨 뜻인가?
@@ -4214,8 +4209,6 @@ $$
 
 이 함수가 **제1종 베셀 함수(Bessel function of the first kind)**이다.
 
-표준 정의는 [NIST DLMF §10.2](https://dlmf.nist.gov/10.2)에서 확인할 수 있다.
-
 ---
 
 ### 4.6 자주 쓰는 $J_0$와 $J_1$
@@ -4285,8 +4278,6 @@ J_0^\prime(x)=-J_1(x)
 $$
 
 이다.
-
-![제1종 베셀 함수 J0와 J1의 그래프]({{ '/assets/images/math/power-series/bessel.svg' | relative_url }})
 
 베셀 함수도 진동하지만 사인과 코사인처럼 진폭이 일정하지 않다.
 
@@ -4812,9 +4803,6 @@ $$
 즉 경계조건이 아무 $k_c$나 허용하지 않고 **베셀 함수의 영점에 해당하는 특정 값들만 선택한다.**
 
 이것이 모드가 이산적으로 존재하는 이유이다.
-
-베셀 함수 영점은 [NIST DLMF §10.21](https://dlmf.nist.gov/10.21)을 참고할 수 있다.
-
 ---
 
 ### 4.13 TM$_{01}$ 모드
@@ -4859,8 +4847,6 @@ J_0(2.40482556)=0
 $$
 
 이다.
-
-![원형 도파관 TM01 모드의 정규화된 축방향 전기장 분포]({{ '/assets/images/math/power-series/tm01.svg' | relative_url }})
 
 이 그림은 **축방향 전기장 진폭의 공간 분포**이다.
 

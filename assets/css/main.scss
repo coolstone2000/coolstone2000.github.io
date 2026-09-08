@@ -318,4 +318,54 @@ html[data-theme='dark'] .page__share .btn .svg-inline--fa {
 /* 혹시 모를 SVG 내부 쏠림 방지 */
 .language-mermaid svg {
   margin: 0 auto !important;
-} 
+}
+
+// Keep wide vector/matrix equations inside the article on small screens.
+.vector-calculus-post .page__content mjx-container[display="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.3em 0;
+}
+
+// Inline vector-calculus diagrams share the article's light/dark theme.
+.vc-diagram {
+  --vc-bg: #f7f8fa;
+  --vc-text: #222831;
+  --vc-muted: #52606d;
+  --vc-axis: #8997a5;
+  --vc-border: #d5dce3;
+  --vc-accent: #007e8a;
+  --vc-secondary: #a96512;
+  --vc-surface: #e3eef0;
+  --vc-highlight: #b3dce0;
+  margin: 1.5em 0;
+  border: 1px solid var(--vc-border);
+  border-radius: 12px;
+  background: var(--vc-bg);
+  color: var(--vc-text);
+  overflow: hidden;
+}
+html[data-theme='dark'] .vc-diagram {
+  --vc-bg: #252a34;
+  --vc-text: #eaeaea;
+  --vc-muted: #b6c1cd;
+  --vc-axis: #748191;
+  --vc-border: #394454;
+  --vc-accent: #8cced2;
+  --vc-secondary: #f2bb72;
+  --vc-surface: #31434c;
+  --vc-highlight: #497079;
+}
+.vc-diagram__scroll { overflow-x: auto; }
+.vc-diagram__scroll:focus-visible { outline: 2px solid var(--vc-accent); outline-offset: -3px; }
+.vc-diagram svg { display: block; width: 100%; min-width: 640px; height: auto; }
+.vc-diagram svg text { font-family: Pretendard, sans-serif; fill: var(--vc-text); font-size: 17px; }
+.vc-diagram svg .small { font-size: 14px; fill: var(--vc-muted); }
+.vc-diagram svg .title { font-size: 21px; font-weight: 700; }
+.vc-diagram svg .line { fill: none; stroke: var(--vc-accent); stroke-width: 3; }
+.vc-diagram__controls { padding: 16px 20px; border-top: 1px solid var(--vc-border); }
+.vc-diagram__controls label { display: block; font-size: 14px; }
+.vc-diagram__controls input { width: 100%; accent-color: var(--vc-accent); }
+.vc-diagram__controls output { font-variant-numeric: tabular-nums; }
+.vc-diagram__controls p { font-size: 14px; margin: 8px 0 0; }

@@ -1,0 +1,1431 @@
+<div id="linear-system-explorer" class="lse">
+  <style>
+    #linear-system-explorer {
+      /* Default: dark. JavaScript below syncs this component with the site's theme. */
+      --lse-bg: #111827;
+      --lse-bg-2: #0f172a;
+      --lse-panel: rgba(255,255,255,.045);
+      --lse-panel-2: rgba(255,255,255,.028);
+      --lse-border: rgba(148,163,184,.20);
+      --lse-border-strong: rgba(148,163,184,.34);
+      --lse-text: #e5e7eb;
+      --lse-muted: #9ca3af;
+      --lse-heading-soft: #cbd5e1;
+      --lse-strong: #f8fafc;
+      --lse-control-bg: rgba(2,6,23,.30);
+      --lse-box-bg: rgba(2,6,23,.22);
+      --lse-button-bg: rgba(255,255,255,.035);
+      --lse-soft-bg: rgba(255,255,255,.018);
+      --lse-rule-bg: rgba(255,255,255,.025);
+      --lse-blue: #60a5fa;
+      --lse-cyan: #22d3ee;
+      --lse-amber: #f59e0b;
+      --lse-orange: #f97316;
+      --lse-green: #34d399;
+      --lse-red: #fb7185;
+      --lse-purple: #c084fc;
+      --lse-chip: rgba(96,165,250,.11);
+
+      /* Canvas palette */
+      --lse-canvas-bg: #0b1220;
+      --lse-canvas-grid: rgba(148,163,184,.09);
+      --lse-canvas-axis: rgba(226,232,240,.35);
+      --lse-canvas-text: rgba(226,232,240,.75);
+      --lse-canvas-helper: rgba(226,232,240,.16);
+      --lse-vector-field: rgba(96,165,250,.48);
+      --lse-eigen-line-1: rgba(34,211,238,.55);
+      --lse-eigen-line-2: rgba(192,132,252,.55);
+      --lse-canvas-dot-stroke: rgba(255,255,255,.55);
+      --lse-eig-axis: rgba(226,232,240,.25);
+      --lse-eig-text: rgba(226,232,240,.60);
+      --lse-stable-zone: rgba(52,211,153,.10);
+      --lse-unstable-zone: rgba(251,113,133,.07);
+
+      margin: 2rem 0;
+      padding: 18px;
+      border: 1px solid var(--lse-border);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(59,130,246,.10), transparent 30%),
+        linear-gradient(180deg, var(--lse-bg), var(--lse-bg-2));
+      color: var(--lse-text);
+      box-shadow: 0 16px 50px rgba(0,0,0,.16);
+      overflow: hidden;
+      max-width: 100%;
+      min-width: 0;
+      container-type: inline-size;
+      color-scheme: dark;
+    }
+
+    /* Light palette. The script toggles data-lse-theme, so this also works
+       with Minimal Mistakes theme switching that swaps stylesheet links. */
+    #linear-system-explorer[data-lse-theme="light"] {
+      --lse-bg: #ffffff;
+      --lse-bg-2: #f8fafc;
+      --lse-panel: rgba(15,23,42,.030);
+      --lse-panel-2: rgba(15,23,42,.020);
+      --lse-border: rgba(51,65,85,.18);
+      --lse-border-strong: rgba(51,65,85,.30);
+      --lse-text: #172033;
+      --lse-muted: #64748b;
+      --lse-heading-soft: #334155;
+      --lse-strong: #0f172a;
+      --lse-control-bg: rgba(255,255,255,.92);
+      --lse-box-bg: rgba(248,250,252,.92);
+      --lse-button-bg: rgba(255,255,255,.82);
+      --lse-soft-bg: rgba(255,255,255,.70);
+      --lse-rule-bg: rgba(248,250,252,.94);
+      --lse-blue: #2563eb;
+      --lse-cyan: #0891b2;
+      --lse-amber: #d97706;
+      --lse-orange: #ea580c;
+      --lse-green: #059669;
+      --lse-red: #e11d48;
+      --lse-purple: #7c3aed;
+      --lse-chip: rgba(37,99,235,.09);
+
+      --lse-canvas-bg: #f8fafc;
+      --lse-canvas-grid: rgba(51,65,85,.10);
+      --lse-canvas-axis: rgba(51,65,85,.34);
+      --lse-canvas-text: rgba(30,41,59,.72);
+      --lse-canvas-helper: rgba(51,65,85,.18);
+      --lse-vector-field: rgba(37,99,235,.46);
+      --lse-eigen-line-1: rgba(8,145,178,.55);
+      --lse-eigen-line-2: rgba(124,58,237,.50);
+      --lse-canvas-dot-stroke: rgba(255,255,255,.92);
+      --lse-eig-axis: rgba(51,65,85,.28);
+      --lse-eig-text: rgba(30,41,59,.62);
+      --lse-stable-zone: rgba(5,150,105,.08);
+      --lse-unstable-zone: rgba(225,29,72,.06);
+
+      box-shadow: 0 12px 36px rgba(15,23,42,.08);
+      color-scheme: light;
+    }
+
+    #linear-system-explorer * { box-sizing: border-box; }
+    #linear-system-explorer mjx-container { color: var(--lse-text) !important; }
+    #linear-system-explorer mjx-container svg {
+      color: var(--lse-text) !important;
+      fill: currentColor !important;
+    }
+    #linear-system-explorer mjx-container[display="true"] {
+      margin: .5rem 0 !important;
+      max-width: 100%;
+    }
+
+    #linear-system-explorer .lse-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 2px 2px 14px;
+    }
+
+    #linear-system-explorer .lse-eyebrow {
+      font-size: .76rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--lse-blue);
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    #linear-system-explorer .lse-title {
+      margin: 0;
+      font-size: 1.12rem;
+      line-height: 1.35;
+      font-weight: 800;
+      color: var(--lse-text);
+    }
+
+    #linear-system-explorer .lse-subtitle {
+      margin: 7px 0 0;
+      max-width: 720px;
+      color: var(--lse-muted);
+      font-size: .88rem;
+      line-height: 1.65;
+    }
+
+    #linear-system-explorer .lse-main-eq {
+      flex: 0 0 auto;
+      min-width: 180px;
+      padding: 9px 13px;
+      border: 1px solid color-mix(in srgb, var(--lse-blue) 28%, transparent);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--lse-blue) 8%, transparent);
+      text-align: center;
+      font-weight: 700;
+    }
+
+    #linear-system-explorer .lse-preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 10px;
+      margin-bottom: 14px;
+      border: 1px solid var(--lse-border);
+      border-radius: 13px;
+      background: var(--lse-panel-2);
+    }
+
+    #linear-system-explorer button {
+      appearance: none;
+      border: 1px solid var(--lse-border);
+      border-radius: 9px;
+      padding: 7px 10px;
+      background: var(--lse-button-bg);
+      color: var(--lse-text);
+      font: inherit;
+      font-size: .80rem;
+      font-weight: 750;
+      cursor: pointer;
+      transition: background .16s ease, border-color .16s ease, transform .16s ease;
+    }
+
+    #linear-system-explorer button:hover {
+      background: color-mix(in srgb, var(--lse-blue) 12%, transparent);
+      border-color: color-mix(in srgb, var(--lse-blue) 45%, transparent);
+      transform: translateY(-1px);
+    }
+
+    #linear-system-explorer button.is-active {
+      background: color-mix(in srgb, var(--lse-blue) 18%, transparent);
+      border-color: color-mix(in srgb, var(--lse-blue) 64%, transparent);
+      color: var(--lse-strong);
+    }
+
+    /* auto-fit uses the actual component width, not the browser viewport.
+       This avoids the narrow two-column layout seen inside a blog content column. */
+    #linear-system-explorer .lse-top-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    #linear-system-explorer .lse-panel {
+      border: 1px solid var(--lse-border);
+      border-radius: 14px;
+      padding: 14px;
+      background: var(--lse-panel);
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    #linear-system-explorer .lse-panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    #linear-system-explorer .lse-panel-title h4 {
+      margin: 0;
+      font-size: .92rem;
+      color: var(--lse-text);
+    }
+
+    #linear-system-explorer .lse-mini {
+      color: var(--lse-muted);
+      font-size: .74rem;
+    }
+
+    #linear-system-explorer .lse-editor {
+      display: grid;
+      grid-template-columns: minmax(230px, 1.05fr) minmax(210px, .95fr);
+      gap: 14px;
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-block-title {
+      margin-bottom: 8px;
+      color: var(--lse-heading-soft);
+      font-size: .78rem;
+      font-weight: 750;
+    }
+
+    #linear-system-explorer .lse-matrix-shell {
+      display: grid;
+      grid-template-columns: 8px minmax(0,1fr) minmax(0,1fr) 8px;
+      gap: 7px;
+      align-items: stretch;
+      max-width: 320px;
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-bracket {
+      position: relative;
+      min-height: 88px;
+    }
+
+    #linear-system-explorer .lse-bracket.left {
+      border-left: 2px solid var(--lse-border-strong);
+    }
+
+    #linear-system-explorer .lse-bracket.right {
+      border-right: 2px solid var(--lse-border-strong);
+    }
+
+    #linear-system-explorer .lse-bracket::before,
+    #linear-system-explorer .lse-bracket::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 2px;
+      background: var(--lse-border-strong);
+    }
+
+    #linear-system-explorer .lse-bracket.left::before,
+    #linear-system-explorer .lse-bracket.left::after { left: 0; }
+    #linear-system-explorer .lse-bracket.right::before,
+    #linear-system-explorer .lse-bracket.right::after { right: 0; }
+    #linear-system-explorer .lse-bracket::before { top: 0; }
+    #linear-system-explorer .lse-bracket::after { bottom: 0; }
+
+    #linear-system-explorer .lse-input-wrap {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-input-label {
+      color: var(--lse-muted);
+      font-size: .70rem;
+      text-align: center;
+    }
+
+    #linear-system-explorer input[type="number"] {
+      width: 100%;
+      min-width: 0;
+      height: 38px;
+      padding: 6px 8px;
+      border: 1px solid var(--lse-border-strong);
+      border-radius: 9px;
+      background: var(--lse-control-bg);
+      color: var(--lse-strong);
+      font: inherit;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      outline: none;
+    }
+
+    #linear-system-explorer input[type="number"]:focus {
+      border-color: color-mix(in srgb, var(--lse-blue) 75%, transparent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--lse-blue) 11%, transparent);
+    }
+
+    #linear-system-explorer .lse-small-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    #linear-system-explorer .lse-control-card {
+      padding: 8px;
+      border: 1px solid var(--lse-border);
+      border-radius: 10px;
+      background: var(--lse-soft-bg);
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-control-card label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--lse-muted);
+      font-size: .72rem;
+      font-weight: 700;
+    }
+
+    #linear-system-explorer .lse-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 9px;
+    }
+
+    #linear-system-explorer .lse-actions .primary {
+      background: color-mix(in srgb, var(--lse-blue) 18%, transparent);
+      border-color: color-mix(in srgb, var(--lse-blue) 52%, transparent);
+    }
+
+    #linear-system-explorer .lse-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    #linear-system-explorer .lse-metric {
+      padding: 9px 10px;
+      border: 1px solid var(--lse-border);
+      border-radius: 10px;
+      background: var(--lse-soft-bg);
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-metric-label {
+      color: var(--lse-muted);
+      font-size: .67rem;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    #linear-system-explorer .lse-metric-value {
+      color: var(--lse-strong);
+      font-size: .86rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: anywhere;
+    }
+
+    #linear-system-explorer .lse-analysis-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(220px, .75fr);
+      gap: 10px;
+      align-items: stretch;
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-analysis-grid > * {
+      min-width: 0;
+    }
+
+    #linear-system-explorer .lse-equation-box,
+    #linear-system-explorer .lse-eig-box,
+    #linear-system-explorer .lse-comment-box {
+      border: 1px solid var(--lse-border);
+      border-radius: 11px;
+      background: var(--lse-box-bg);
+    }
+
+    #linear-system-explorer .lse-equation-box {
+      padding: 9px 11px;
+      min-height: 104px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      min-width: 0;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-inline: contain;
+    }
+
+    /* MathJax SVG can keep an intrinsic width wider than its grid cell.
+       Keep it inside the formula card instead of painting over the eigenvalue panel. */
+    #linear-system-explorer .lse-equation-box mjx-container {
+      max-width: 100% !important;
+      font-size: .88em !important;
+    }
+
+    #linear-system-explorer .lse-equation-box mjx-container > svg {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+
+    #linear-system-explorer .lse-eig-box {
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      min-height: 104px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    #linear-system-explorer .lse-eig-title {
+      color: var(--lse-muted);
+      font-size: .68rem;
+      font-weight: 750;
+      margin-bottom: 5px;
+    }
+
+    #linear-system-explorer #lse-eig-plane {
+      width: 100%;
+      height: 100px;
+      display: block;
+      border-radius: 8px;
+      background: var(--lse-canvas-bg);
+    }
+
+    #linear-system-explorer #lse-eigs {
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    #linear-system-explorer #lse-eigs mjx-container {
+      max-width: 100% !important;
+      font-size: .90em !important;
+    }
+
+    #linear-system-explorer .lse-comment-box {
+      margin-top: 10px;
+      padding: 10px 11px;
+      color: var(--lse-heading-soft);
+      line-height: 1.62;
+      font-size: .82rem;
+    }
+
+    #linear-system-explorer .lse-comment-box strong { color: var(--lse-strong); }
+
+    #linear-system-explorer .lse-stability {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 8px;
+    }
+
+    #linear-system-explorer .lse-rule {
+      padding: 5px 8px;
+      border-radius: 8px;
+      background: var(--lse-rule-bg);
+      border: 1px solid var(--lse-border);
+      color: var(--lse-muted);
+      font-size: .70rem;
+    }
+
+    #linear-system-explorer .lse-rule b { color: var(--lse-text); }
+
+    #linear-system-explorer .lse-graph-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+      gap: 14px;
+      margin-top: 14px;
+    }
+
+    #linear-system-explorer .lse-graph-panel {
+      border: 1px solid var(--lse-border);
+      border-radius: 14px;
+      background: var(--lse-panel-2);
+      padding: 12px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    #linear-system-explorer .lse-graph-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    #linear-system-explorer .lse-graph-head h4 {
+      margin: 0;
+      font-size: .88rem;
+      color: var(--lse-text);
+    }
+
+    #linear-system-explorer .lse-legend {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 9px;
+      color: var(--lse-muted);
+      font-size: .68rem;
+    }
+
+    #linear-system-explorer .lse-legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #linear-system-explorer .lse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    #linear-system-explorer canvas.lse-canvas {
+      width: 100%;
+      display: block;
+      border: 1px solid var(--lse-border);
+      border-radius: 10px;
+      background: var(--lse-canvas-bg);
+    }
+
+    #linear-system-explorer .lse-caption {
+      margin: 8px 2px 0;
+      color: var(--lse-muted);
+      font-size: .72rem;
+      line-height: 1.55;
+    }
+
+    #linear-system-explorer .lse-footnote {
+      margin-top: 12px;
+      padding: 9px 11px;
+      border-left: 3px solid color-mix(in srgb, var(--lse-blue) 68%, transparent);
+      background: color-mix(in srgb, var(--lse-blue) 6%, transparent);
+      color: var(--lse-heading-soft);
+      font-size: .78rem;
+      line-height: 1.6;
+      border-radius: 0 9px 9px 0;
+    }
+
+    /* Component-width responsive rules. */
+    @container (max-width: 720px) {
+      #linear-system-explorer .lse-analysis-grid,
+      #linear-system-explorer .lse-editor {
+        grid-template-columns: 1fr;
+      }
+
+      #linear-system-explorer .lse-matrix-shell {
+        max-width: none;
+      }
+    }
+
+    @container (max-width: 560px) {
+      #linear-system-explorer .lse-header {
+        flex-direction: column;
+      }
+
+      #linear-system-explorer .lse-main-eq {
+        min-width: 0;
+        width: 100%;
+      }
+
+      #linear-system-explorer .lse-metrics {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      #linear-system-explorer .lse-graph-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      #linear-system-explorer { padding: 13px; }
+    }
+  </style>
+
+  <div class="lse-header">
+    <div>
+      <div class="lse-eyebrow">Interactive Linear System</div>
+      <h3 class="lse-title">연립선형계 위상평면 · 시간응답 탐색기</h3>
+      <p class="lse-subtitle">
+        행렬 \(A\)와 초기조건을 바꿔 보면서
+        고유값 → 위상평면 → 시간응답이 어떻게 연결되는지 확인한다.
+      </p>
+    </div>
+    <div class="lse-main-eq">
+      \(\dot{\mathbf{x}}=A\mathbf{x}\)
+    </div>
+  </div>
+
+  <div class="lse-preset-row" aria-label="시스템 프리셋">
+    <button type="button" data-preset="stableNode">감쇠 마디</button>
+    <button type="button" data-preset="saddle">안장점</button>
+    <button type="button" data-preset="spiralSink">나선형 감쇠</button>
+    <button type="button" data-preset="center">중심</button>
+    <button type="button" data-preset="circuit">결합 회로형</button>
+    <button type="button" id="lse-random">랜덤</button>
+  </div>
+
+  <div class="lse-top-grid">
+    <section class="lse-panel">
+      <div class="lse-panel-title">
+        <h4>시스템 설정</h4>
+        <span class="lse-mini">숫자를 바꾼 뒤 업데이트</span>
+      </div>
+
+      <div class="lse-editor">
+        <div>
+          <div class="lse-block-title">시스템 행렬 \(A\)</div>
+          <div class="lse-matrix-shell">
+            <div class="lse-bracket left"></div>
+
+            <div class="lse-input-wrap">
+              <span class="lse-input-label">\(a_{11}\)</span>
+              <input type="number" id="lse-a" step="0.1" value="0">
+              <span class="lse-input-label">\(a_{21}\)</span>
+              <input type="number" id="lse-c" step="0.1" value="-4">
+            </div>
+
+            <div class="lse-input-wrap">
+              <span class="lse-input-label">\(a_{12}\)</span>
+              <input type="number" id="lse-b" step="0.1" value="1">
+              <span class="lse-input-label">\(a_{22}\)</span>
+              <input type="number" id="lse-d" step="0.1" value="-1">
+            </div>
+
+            <div class="lse-bracket right"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="lse-block-title">초기조건 · 표시 범위</div>
+          <div class="lse-small-grid">
+            <div class="lse-control-card">
+              <label for="lse-x0">\(x_1(0)\)</label>
+              <input type="number" id="lse-x0" step="0.1" value="1.4">
+            </div>
+            <div class="lse-control-card">
+              <label for="lse-y0">\(x_2(0)\)</label>
+              <input type="number" id="lse-y0" step="0.1" value="0">
+            </div>
+            <div class="lse-control-card">
+              <label for="lse-tmax">표시 시간 \(T\)</label>
+              <input type="number" id="lse-tmax" step="0.5" value="12" min="1" max="20">
+            </div>
+            <div class="lse-control-card">
+              <label for="lse-traj">보조 흐름선</label>
+              <input type="number" id="lse-traj" step="1" value="14" min="4" max="30">
+            </div>
+          </div>
+
+          <div class="lse-actions">
+            <button type="button" class="primary" id="lse-update">업데이트</button>
+            <button type="button" id="lse-play">궤적 재생</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lse-panel">
+      <div class="lse-panel-title">
+        <h4>고유값으로 시스템 읽기</h4>
+        <span class="lse-mini" id="lse-class-mini"></span>
+      </div>
+
+      <div class="lse-metrics">
+        <div class="lse-metric">
+          <div class="lse-metric-label">\(\operatorname{tr}(A)\)</div>
+          <div class="lse-metric-value" id="lse-trace">-</div>
+        </div>
+        <div class="lse-metric">
+          <div class="lse-metric-label">\(\det(A)\)</div>
+          <div class="lse-metric-value" id="lse-det">-</div>
+        </div>
+        <div class="lse-metric">
+          <div class="lse-metric-label">분류</div>
+          <div class="lse-metric-value" id="lse-class">-</div>
+        </div>
+        <div class="lse-metric">
+          <div class="lse-metric-label">안정성</div>
+          <div class="lse-metric-value" id="lse-stability">-</div>
+        </div>
+      </div>
+
+      <div class="lse-analysis-grid">
+        <div>
+          <div class="lse-equation-box" id="lse-formula"></div>
+          <div class="lse-comment-box" id="lse-comment"></div>
+        </div>
+
+        <div class="lse-eig-box">
+          <div class="lse-eig-title">고유값 평면 · \(\operatorname{Re}\lambda\)-\(\operatorname{Im}\lambda\)</div>
+          <canvas id="lse-eig-plane" width="260" height="120"></canvas>
+          <div id="lse-eigs" style="text-align:center; font-size:.78rem; margin-top:4px;"></div>
+        </div>
+      </div>
+
+      <div class="lse-stability">
+        <span class="lse-rule"><b>\(\operatorname{Re}\lambda<0\)</b> → 감쇠</span>
+        <span class="lse-rule"><b>\(\operatorname{Re}\lambda>0\)</b> → 발산</span>
+        <span class="lse-rule"><b>\(\operatorname{Im}\lambda\ne0\)</b> → 진동·회전</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="lse-graph-grid">
+    <section class="lse-graph-panel">
+      <div class="lse-graph-head">
+        <h4>위상평면 \(x_1\)-\(x_2\)</h4>
+        <div class="lse-legend">
+          <span><i class="lse-dot" style="background:#60a5fa;"></i>방향장</span>
+          <span><i class="lse-dot" style="background:#f97316;"></i>선택 궤적</span>
+          <span><i class="lse-dot" style="background:#34d399;"></i>초기점</span>
+        </div>
+      </div>
+      <canvas class="lse-canvas" id="lse-phase" width="640" height="430"></canvas>
+      <p class="lse-caption">
+        화살표는 각 점에서의 \(\dot{\mathbf{x}}=A\mathbf{x}\) 방향이다.
+        실수 고유벡터가 존재하면 그 방향을 점선으로 함께 표시한다.
+      </p>
+    </section>
+
+    <section class="lse-graph-panel">
+      <div class="lse-graph-head">
+        <h4>시간응답 \(x_1(t),\,x_2(t)\)</h4>
+        <div class="lse-legend">
+          <span><i class="lse-dot" style="background:#60a5fa;"></i>\(x_1(t)\)</span>
+          <span><i class="lse-dot" style="background:#f59e0b;"></i>\(x_2(t)\)</span>
+        </div>
+      </div>
+      <canvas class="lse-canvas" id="lse-time" width="640" height="430"></canvas>
+      <p class="lse-caption">
+        위상평면의 수렴·발산·회전이 시간축에서는 감쇠, 성장, 진동으로 나타난다.
+      </p>
+    </section>
+  </div>
+
+  <div class="lse-footnote">
+    <strong>추천 관찰 순서:</strong>
+    감쇠 마디 → 안장점 → 중심 → 나선형 감쇠 순으로 눌러 보면서,
+    고유값의 실수부와 허수부가 그래프를 어떻게 바꾸는지 비교하면 된다.
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById("linear-system-explorer");
+      if (!root || root.dataset.ready === "1") return;
+      root.dataset.ready = "1";
+
+      function detectSiteTheme() {
+        let stored = null;
+        try { stored = sessionStorage.getItem("theme"); } catch (_) {}
+        if (stored === "light" || stored === "dark") return stored;
+
+        const html = document.documentElement;
+        const body = document.body;
+        const attrs = [
+          html && html.getAttribute("data-theme"),
+          body && body.getAttribute("data-theme"),
+          html && html.getAttribute("data-mode"),
+          body && body.getAttribute("data-mode")
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        if (attrs.includes("light")) return "light";
+        if (attrs.includes("dark")) return "dark";
+
+        const classes = `${html ? html.className : ""} ${body ? body.className : ""}`.toLowerCase();
+        if (/(^|\s)(dark|dark-theme|theme-dark)(\s|$)/.test(classes)) return "dark";
+        if (/(^|\s)(light|light-theme|theme-light)(\s|$)/.test(classes)) return "light";
+
+        /* Common Minimal Mistakes two-stylesheet switch:
+           theme_source = light stylesheet, theme_source_2 = dark stylesheet. */
+        const lightSheet = document.getElementById("theme_source");
+        const darkSheet = document.getElementById("theme_source_2");
+        if (lightSheet && darkSheet) {
+          const rel1 = (lightSheet.getAttribute("rel") || "").toLowerCase();
+          const rel2 = (darkSheet.getAttribute("rel") || "").toLowerCase();
+          const lightActive = !lightSheet.disabled && !rel1.includes("alternate");
+          const darkActive = !darkSheet.disabled && !rel2.includes("alternate");
+
+          if (lightActive && !darkActive) return "light";
+          if (darkActive && !lightActive) return "dark";
+        }
+
+        return window.matchMedia &&
+               window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light";
+      }
+
+      function syncTheme(redraw = false) {
+        const next = detectSiteTheme();
+        const changed = root.dataset.lseTheme !== next;
+        root.dataset.lseTheme = next;
+
+        if (changed && redraw && typeof render === "function") {
+          requestAnimationFrame(() => render());
+        }
+        return changed;
+      }
+
+      function cssVar(name, fallback = "") {
+        const value = getComputedStyle(root).getPropertyValue(name).trim();
+        return value || fallback;
+      }
+
+      /* Set the correct palette before the first draw. */
+      syncTheme(false);
+
+      const $ = (id) => root.querySelector("#" + id);
+      const phase = $("lse-phase");
+      const pctx = phase.getContext("2d");
+      const time = $("lse-time");
+      const tctx = time.getContext("2d");
+      const eigCanvas = $("lse-eig-plane");
+      const ectx = eigCanvas.getContext("2d");
+
+      const inputs = {
+        a: $("lse-a"),
+        b: $("lse-b"),
+        c: $("lse-c"),
+        d: $("lse-d"),
+        x0: $("lse-x0"),
+        y0: $("lse-y0"),
+        tmax: $("lse-tmax"),
+        traj: $("lse-traj")
+      };
+
+      const presets = {
+        stableNode: {a:-1.2,b:0,c:0,d:-0.4,x0:2,y0:1.4,tmax:8,label:"감쇠 마디"},
+        saddle: {a:2,b:0,c:0,d:-1,x0:1.5,y0:1.5,tmax:5,label:"안장점"},
+        spiralSink: {a:-0.3,b:-2,c:2,d:-0.3,x0:2,y0:0,tmax:15,label:"나선형 감쇠"},
+        center: {a:0,b:-1,c:1,d:0,x0:2,y0:0,tmax:12,label:"중심"},
+        circuit: {a:0,b:1,c:-4,d:-1,x0:1.4,y0:0,tmax:12,label:"결합 회로형"}
+      };
+
+      let currentPreset = "circuit";
+      let animating = false;
+      let rafId = null;
+
+      function n(v) {
+        const x = Number(v);
+        return Number.isFinite(x) ? x : 0;
+      }
+
+      function formatNum(v, digits=2) {
+        if (Math.abs(v) < 1e-12) v = 0;
+        return Number(v).toFixed(digits);
+      }
+
+      function signedTerm(v, symbol) {
+        const sign = v >= 0 ? "+" : "-";
+        return `${sign} ${formatNum(Math.abs(v))}${symbol}`;
+      }
+
+      function eig2(a,b,c,d) {
+        const tr = a + d;
+        const det = a*d - b*c;
+        const disc = tr*tr - 4*det;
+
+        if (disc >= -1e-12) {
+          const s = Math.sqrt(Math.max(0, disc));
+          return {
+            tr, det, disc,
+            l1:{re:(tr+s)/2, im:0},
+            l2:{re:(tr-s)/2, im:0}
+          };
+        }
+
+        const s = Math.sqrt(-disc);
+        return {
+          tr, det, disc,
+          l1:{re:tr/2, im:s/2},
+          l2:{re:tr/2, im:-s/2}
+        };
+      }
+
+      function eigenvector(A, lambda) {
+        if (Math.abs(A.b) > 1e-9) {
+          const v = {x:A.b, y:lambda - A.a};
+          const m = Math.hypot(v.x, v.y) || 1;
+          return {x:v.x/m, y:v.y/m};
+        }
+
+        if (Math.abs(A.c) > 1e-9) {
+          const v = {x:lambda - A.d, y:A.c};
+          const m = Math.hypot(v.x, v.y) || 1;
+          return {x:v.x/m, y:v.y/m};
+        }
+
+        if (Math.abs(lambda - A.a) < Math.abs(lambda - A.d)) {
+          return {x:1,y:0};
+        }
+        return {x:0,y:1};
+      }
+
+      function classify(e) {
+        const eps = 1e-9;
+        const complex = Math.abs(e.l1.im) > eps;
+
+        if (complex) {
+          if (Math.abs(e.l1.re) < eps) return "중심";
+          return e.l1.re < 0 ? "안정 나선" : "불안정 나선";
+        }
+
+        const r1 = e.l1.re;
+        const r2 = e.l2.re;
+
+        if (r1*r2 < -eps) return "안장점";
+        if (r1 < -eps && r2 < -eps) return "감쇠 마디";
+        if (r1 > eps && r2 > eps) return "불안정 마디";
+        if (Math.abs(r1) < eps && Math.abs(r2) < eps) return "영고유값";
+        return "경계형";
+      }
+
+      function stability(e) {
+        const maxReal = Math.max(e.l1.re, e.l2.re);
+        const minReal = Math.min(e.l1.re, e.l2.re);
+        const eps = 1e-9;
+
+        if (maxReal < -eps) return "점근 안정";
+        if (minReal > eps || (maxReal > eps && minReal <= eps)) return "불안정";
+        if (Math.abs(maxReal) <= eps && Math.abs(minReal) <= eps && Math.abs(e.l1.im) > eps) return "중립";
+        return "경계";
+      }
+
+      function eigTex(l) {
+        if (Math.abs(l.im) < 1e-9) return formatNum(l.re, 3);
+        const sign = l.im >= 0 ? "+" : "-";
+        return `${formatNum(l.re,3)} ${sign} ${formatNum(Math.abs(l.im),3)}j`;
+      }
+
+      function commentFor(e) {
+        const cl = classify(e);
+        const st = stability(e);
+        let s = `<strong>${cl}</strong> · ${st}. `;
+
+        if (Math.abs(e.l1.im) > 1e-9) {
+          s += "고유값에 허수부가 있으므로 회전·진동 성분이 나타난다. ";
+          if (e.l1.re < 0) s += "실수부가 음수라 진폭은 시간이 갈수록 줄어든다.";
+          else if (e.l1.re > 0) s += "실수부가 양수라 진폭은 시간이 갈수록 커진다.";
+          else s += "실수부가 0이라 이상적인 선형계에서는 진폭이 유지된다.";
+        } else {
+          if (e.l1.re * e.l2.re < 0) {
+            s += "한 고유모드는 커지고 다른 고유모드는 줄어들므로 안장점이 된다.";
+          } else if (e.l1.re < 0 && e.l2.re < 0) {
+            s += "두 고유모드가 모두 감쇠하므로 모든 궤적이 원점으로 들어간다.";
+          } else if (e.l1.re > 0 && e.l2.re > 0) {
+            s += "두 고유모드가 모두 성장하므로 대부분의 궤적이 원점에서 멀어진다.";
+          }
+        }
+        return s;
+      }
+
+      function clearTypeset(nodes) {
+        try {
+          if (window.MathJax && window.MathJax.typesetClear) {
+            window.MathJax.typesetClear(nodes);
+          }
+        } catch (_) {}
+      }
+
+      async function typeset(nodes, attempt=0) {
+        if (!window.MathJax || !window.MathJax.typesetPromise) {
+          if (attempt < 24) {
+            setTimeout(() => typeset(nodes, attempt + 1), 150);
+          }
+          return;
+        }
+
+        try {
+          await window.MathJax.typesetPromise(nodes);
+        } catch (_) {}
+      }
+
+      function setPreset(name) {
+        const p = presets[name];
+        if (!p) return;
+
+        currentPreset = name;
+        inputs.a.value = p.a;
+        inputs.b.value = p.b;
+        inputs.c.value = p.c;
+        inputs.d.value = p.d;
+        inputs.x0.value = p.x0;
+        inputs.y0.value = p.y0;
+        inputs.tmax.value = p.tmax;
+
+        root.querySelectorAll("[data-preset]").forEach(btn => {
+          btn.classList.toggle("is-active", btn.dataset.preset === name);
+        });
+
+        render();
+      }
+
+      root.querySelectorAll("[data-preset]").forEach(btn => {
+        btn.addEventListener("click", () => setPreset(btn.dataset.preset));
+      });
+
+      $("lse-random").addEventListener("click", () => {
+        currentPreset = "";
+        root.querySelectorAll("[data-preset]").forEach(btn => btn.classList.remove("is-active"));
+
+        ["a","b","c","d"].forEach(k => {
+          inputs[k].value = (Math.random()*4 - 2).toFixed(1);
+        });
+
+        inputs.x0.value = (Math.random()*4 - 2).toFixed(1);
+        inputs.y0.value = (Math.random()*4 - 2).toFixed(1);
+        render();
+      });
+
+      $("lse-update").addEventListener("click", render);
+
+      function rk4(A, x0, tmax, steps) {
+        const dt = tmax / steps;
+        let x = {x:x0.x, y:x0.y};
+        const out = [{t:0, x:x.x, y:x.y}];
+
+        function f(v) {
+          return {
+            x: A.a*v.x + A.b*v.y,
+            y: A.c*v.x + A.d*v.y
+          };
+        }
+
+        for (let i=0; i<steps; i++) {
+          const k1 = f(x);
+          const k2 = f({x:x.x+dt*k1.x/2, y:x.y+dt*k1.y/2});
+          const k3 = f({x:x.x+dt*k2.x/2, y:x.y+dt*k2.y/2});
+          const k4 = f({x:x.x+dt*k3.x, y:x.y+dt*k3.y});
+
+          x = {
+            x: x.x + dt*(k1.x + 2*k2.x + 2*k3.x + k4.x)/6,
+            y: x.y + dt*(k1.y + 2*k2.y + 2*k3.y + k4.y)/6
+          };
+
+          out.push({t:(i+1)*dt, x:x.x, y:x.y});
+
+          if (!Number.isFinite(x.x) || !Number.isFinite(x.y) || Math.abs(x.x)>1e5 || Math.abs(x.y)>1e5) break;
+        }
+
+        return out;
+      }
+
+      function clear(ctx, canvas) {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = cssVar("--lse-canvas-bg", "#0b1220");
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+
+      function drawEigenPlane(e) {
+        clear(ectx, eigCanvas);
+
+        const w = eigCanvas.width;
+        const h = eigCanvas.height;
+        const cx = w/2;
+        const cy = h/2;
+        const reMax = Math.max(2, Math.abs(e.l1.re), Math.abs(e.l2.re)) * 1.35;
+        const imMax = Math.max(2, Math.abs(e.l1.im), Math.abs(e.l2.im)) * 1.35;
+
+        const X = x => cx + (x/reMax)*(w*.40);
+        const Y = y => cy - (y/imMax)*(h*.36);
+
+        ectx.strokeStyle = cssVar("--lse-eig-axis", "rgba(226,232,240,.25)");
+        ectx.lineWidth = 1;
+        ectx.beginPath(); ectx.moveTo(12,cy); ectx.lineTo(w-12,cy); ectx.stroke();
+        ectx.beginPath(); ectx.moveTo(cx,10); ectx.lineTo(cx,h-10); ectx.stroke();
+
+        ectx.font = "11px sans-serif";
+        ectx.fillStyle = cssVar("--lse-eig-text", "rgba(226,232,240,.60)");
+        ectx.fillText("Re", w-26, cy-5);
+        ectx.fillText("Im", cx+5, 14);
+
+        [e.l1,e.l2].forEach((l,idx) => {
+          ectx.beginPath();
+          ectx.arc(X(l.re), Y(l.im), 5, 0, Math.PI*2);
+          ectx.fillStyle = idx===0 ? cssVar("--lse-blue", "#60a5fa") : cssVar("--lse-purple", "#c084fc");
+          ectx.fill();
+          ectx.strokeStyle = cssVar("--lse-canvas-dot-stroke", "rgba(255,255,255,.55)");
+          ectx.stroke();
+        });
+
+        // stable/unstable side hints
+        ectx.fillStyle = cssVar("--lse-stable-zone", "rgba(52,211,153,.10)");
+        ectx.fillRect(0, 0, cx, h);
+        ectx.fillStyle = cssVar("--lse-unstable-zone", "rgba(251,113,133,.07)");
+        ectx.fillRect(cx, 0, w-cx, h);
+      }
+
+      function drawPhase(A, x0, tmax, ntraj, frac=1) {
+        clear(pctx, phase);
+
+        const w = phase.width;
+        const h = phase.height;
+        const pad = 38;
+        const xmin = -4, xmax = 4, ymin = -4, ymax = 4;
+        const X = x => pad + (x-xmin)/(xmax-xmin)*(w-2*pad);
+        const Y = y => h-pad - (y-ymin)/(ymax-ymin)*(h-2*pad);
+
+        // grid
+        pctx.lineWidth = 1;
+        pctx.strokeStyle = cssVar("--lse-canvas-grid", "rgba(148,163,184,.09)");
+        for (let i=-3; i<=3; i++) {
+          pctx.beginPath(); pctx.moveTo(X(i),Y(ymin)); pctx.lineTo(X(i),Y(ymax)); pctx.stroke();
+          pctx.beginPath(); pctx.moveTo(X(xmin),Y(i)); pctx.lineTo(X(xmax),Y(i)); pctx.stroke();
+        }
+
+        pctx.strokeStyle = cssVar("--lse-canvas-axis", "rgba(226,232,240,.35)");
+        pctx.beginPath(); pctx.moveTo(X(0),Y(ymin)); pctx.lineTo(X(0),Y(ymax)); pctx.stroke();
+        pctx.beginPath(); pctx.moveTo(X(xmin),Y(0)); pctx.lineTo(X(xmax),Y(0)); pctx.stroke();
+
+        pctx.fillStyle = cssVar("--lse-canvas-text", "rgba(226,232,240,.75)");
+        pctx.font = "13px sans-serif";
+        pctx.fillText("x₁", w-24, Y(0)-7);
+        pctx.fillText("x₂", X(0)+7, 17);
+
+        // vector field
+        for (let gx=-3.5; gx<=3.5; gx+=1) {
+          for (let gy=-3.5; gy<=3.5; gy+=1) {
+            const dx = A.a*gx + A.b*gy;
+            const dy = A.c*gx + A.d*gy;
+            const mag = Math.hypot(dx,dy);
+            if (mag < 1e-10) continue;
+
+            const ux = dx/mag, uy = dy/mag;
+            const len = .30;
+            const x2 = gx + ux*len, y2 = gy + uy*len;
+
+            pctx.strokeStyle = cssVar("--lse-vector-field", "rgba(96,165,250,.48)");
+            pctx.lineWidth = 1;
+            pctx.beginPath();
+            pctx.moveTo(X(gx),Y(gy));
+            pctx.lineTo(X(x2),Y(y2));
+            pctx.stroke();
+
+            const ang = Math.atan2(Y(y2)-Y(gy), X(x2)-X(gx));
+            const px = X(x2), py = Y(y2), ah=4.5;
+            pctx.beginPath();
+            pctx.moveTo(px,py);
+            pctx.lineTo(px-ah*Math.cos(ang-Math.PI/6), py-ah*Math.sin(ang-Math.PI/6));
+            pctx.lineTo(px-ah*Math.cos(ang+Math.PI/6), py-ah*Math.sin(ang+Math.PI/6));
+            pctx.closePath();
+            pctx.fillStyle = cssVar("--lse-vector-field", "rgba(96,165,250,.48)");
+            pctx.fill();
+          }
+        }
+
+        // eigenvector lines for real eigenvalues
+        const e = eig2(A.a,A.b,A.c,A.d);
+        if (Math.abs(e.l1.im)<1e-9 && Math.abs(e.l2.im)<1e-9) {
+          [e.l1.re,e.l2.re].forEach((lam,idx) => {
+            const v = eigenvector(A,lam);
+            const L = 5;
+            pctx.save();
+            pctx.setLineDash([6,6]);
+            pctx.strokeStyle = idx===0 ? cssVar("--lse-eigen-line-1", "rgba(34,211,238,.55)") : cssVar("--lse-eigen-line-2", "rgba(192,132,252,.55)");
+            pctx.lineWidth = 1.4;
+            pctx.beginPath();
+            pctx.moveTo(X(-L*v.x),Y(-L*v.y));
+            pctx.lineTo(X(L*v.x),Y(L*v.y));
+            pctx.stroke();
+            pctx.restore();
+          });
+        }
+
+        // helper trajectories
+        const seeds = [];
+        for (let i=0;i<ntraj;i++) {
+          const ang = 2*Math.PI*i/ntraj;
+          seeds.push({x:2.8*Math.cos(ang), y:2.8*Math.sin(ang)});
+        }
+
+        seeds.forEach(seed => {
+          const tr = rk4(A, seed, tmax, 260);
+          pctx.strokeStyle = cssVar("--lse-canvas-helper", "rgba(226,232,240,.16)");
+          pctx.lineWidth = 1;
+          pctx.beginPath();
+          tr.forEach((p,i) => {
+            if (i===0) pctx.moveTo(X(p.x),Y(p.y));
+            else pctx.lineTo(X(p.x),Y(p.y));
+          });
+          pctx.stroke();
+        });
+
+        // selected trajectory
+        const tr = rk4(A, x0, tmax, 360);
+        const limit = Math.max(2, Math.floor(tr.length*Math.min(1,Math.max(0,frac))));
+
+        pctx.strokeStyle = cssVar("--lse-orange", "#f97316");
+        pctx.lineWidth = 2.5;
+        pctx.beginPath();
+        tr.slice(0,limit).forEach((p,i) => {
+          if (i===0) pctx.moveTo(X(p.x),Y(p.y));
+          else pctx.lineTo(X(p.x),Y(p.y));
+        });
+        pctx.stroke();
+
+        const p0 = tr[0];
+        pctx.fillStyle = cssVar("--lse-green", "#34d399");
+        pctx.beginPath(); pctx.arc(X(p0.x),Y(p0.y),5,0,Math.PI*2); pctx.fill();
+
+        const pn = tr[Math.min(limit-1,tr.length-1)];
+        pctx.fillStyle = cssVar("--lse-red", "#fb7185");
+        pctx.beginPath(); pctx.arc(X(pn.x),Y(pn.y),4,0,Math.PI*2); pctx.fill();
+      }
+
+      function drawTime(A, x0, tmax) {
+        clear(tctx, time);
+
+        const w = time.width;
+        const h = time.height;
+        const padL=46, padR=24, padT=26, padB=38;
+        const tr = rk4(A,x0,tmax,420);
+
+        const vals = [];
+        tr.forEach(p => {
+          if (Number.isFinite(p.x)) vals.push(p.x);
+          if (Number.isFinite(p.y)) vals.push(p.y);
+        });
+
+        let ymin = Math.min(...vals);
+        let ymax = Math.max(...vals);
+        if (!Number.isFinite(ymin) || !Number.isFinite(ymax)) { ymin=-1; ymax=1; }
+
+        const maxAbs = Math.max(1, Math.abs(ymin), Math.abs(ymax));
+        ymin = -maxAbs*1.12;
+        ymax = maxAbs*1.12;
+
+        const X = t => padL + (t/tmax)*(w-padL-padR);
+        const Y = y => padT + (ymax-y)/(ymax-ymin)*(h-padT-padB);
+
+        tctx.strokeStyle = cssVar("--lse-canvas-grid", "rgba(148,163,184,.09)");
+        tctx.lineWidth = 1;
+        for (let i=0;i<=4;i++) {
+          const xx = padL + i*(w-padL-padR)/4;
+          tctx.beginPath(); tctx.moveTo(xx,padT); tctx.lineTo(xx,h-padB); tctx.stroke();
+        }
+        for (let i=0;i<=4;i++) {
+          const yy = padT + i*(h-padT-padB)/4;
+          tctx.beginPath(); tctx.moveTo(padL,yy); tctx.lineTo(w-padR,yy); tctx.stroke();
+        }
+
+        tctx.strokeStyle = cssVar("--lse-canvas-axis", "rgba(226,232,240,.34)");
+        tctx.beginPath(); tctx.moveTo(padL,Y(0)); tctx.lineTo(w-padR,Y(0)); tctx.stroke();
+        tctx.beginPath(); tctx.moveTo(padL,padT); tctx.lineTo(padL,h-padB); tctx.stroke();
+
+        tctx.fillStyle = cssVar("--lse-canvas-text", "rgba(226,232,240,.72)");
+        tctx.font = "13px sans-serif";
+        tctx.fillText("t", w-18, h-padB-8);
+        tctx.fillText("x", padL+7, 16);
+
+        const drawSeries = (key,color) => {
+          tctx.strokeStyle=color;
+          tctx.lineWidth=2.3;
+          tctx.beginPath();
+          tr.forEach((p,i) => {
+            const xx=X(p.t), yy=Y(p[key]);
+            if(i===0) tctx.moveTo(xx,yy);
+            else tctx.lineTo(xx,yy);
+          });
+          tctx.stroke();
+        };
+
+        drawSeries("x", cssVar("--lse-blue", "#60a5fa"));
+        drawSeries("y", cssVar("--lse-amber", "#f59e0b"));
+      }
+
+      async function render() {
+        const A = {
+          a:n(inputs.a.value),
+          b:n(inputs.b.value),
+          c:n(inputs.c.value),
+          d:n(inputs.d.value)
+        };
+
+        const x0 = {x:n(inputs.x0.value), y:n(inputs.y0.value)};
+        const tmax = Math.max(1,n(inputs.tmax.value));
+        const ntraj = Math.max(4,Math.round(n(inputs.traj.value)));
+        const e = eig2(A.a,A.b,A.c,A.d);
+
+        $("lse-trace").textContent = formatNum(e.tr,3);
+        $("lse-det").textContent = formatNum(e.det,3);
+        $("lse-class").textContent = classify(e);
+        $("lse-class-mini").textContent = classify(e);
+        $("lse-stability").textContent = stability(e);
+
+        const formula = $("lse-formula");
+        const eigs = $("lse-eigs");
+
+        /* MathJax must forget the previous dynamic math BEFORE we replace it.
+           Clearing after innerHTML replacement can leave stale output/references. */
+        clearTypeset([formula, eigs]);
+
+        formula.innerHTML = `
+          \\[
+          \\begin{aligned}
+          \\dot{x}_1 &= ${formatNum(A.a)}x_1 ${signedTerm(A.b,"x_2")}\\\\[3pt]
+          \\dot{x}_2 &= ${formatNum(A.c)}x_1 ${signedTerm(A.d,"x_2")}
+          \\end{aligned}
+          \\]
+          \\[
+          A=
+          \\begin{bmatrix}
+          ${formatNum(A.a)} & ${formatNum(A.b)}\\\\
+          ${formatNum(A.c)} & ${formatNum(A.d)}
+          \\end{bmatrix}
+          \\]
+        `;
+
+        eigs.innerHTML = `
+          \\(
+          \\lambda_1=${eigTex(e.l1)},\\qquad
+          \\lambda_2=${eigTex(e.l2)}
+          \\)
+        `;
+
+        $("lse-comment").innerHTML = commentFor(e);
+
+        drawEigenPlane(e);
+        drawPhase(A,x0,tmax,ntraj,1);
+        drawTime(A,x0,tmax);
+
+        await typeset([formula,eigs]);
+      }
+
+      $("lse-play").addEventListener("click", () => {
+        if (animating) {
+          animating=false;
+          cancelAnimationFrame(rafId);
+          $("lse-play").textContent="궤적 재생";
+          render();
+          return;
+        }
+
+        animating=true;
+        $("lse-play").textContent="정지";
+
+        const A = {a:n(inputs.a.value),b:n(inputs.b.value),c:n(inputs.c.value),d:n(inputs.d.value)};
+        const x0 = {x:n(inputs.x0.value),y:n(inputs.y0.value)};
+        const tmax = Math.max(1,n(inputs.tmax.value));
+        const ntraj = Math.max(4,Math.round(n(inputs.traj.value)));
+
+        let start = null;
+
+        function step(ts) {
+          if (!animating) return;
+          if (start===null) start=ts;
+          const frac = Math.min(1,(ts-start)/3500);
+          drawPhase(A,x0,tmax,ntraj,frac);
+
+          if (frac<1) {
+            rafId=requestAnimationFrame(step);
+          } else {
+            animating=false;
+            $("lse-play").textContent="궤적 재생";
+          }
+        }
+
+        rafId=requestAnimationFrame(step);
+      });
+
+      /* Keep this component synchronized when the site's light/dark switch
+         changes classes, data attributes, or the Minimal Mistakes stylesheet links. */
+      const themeTargets = [
+        document.documentElement,
+        document.body,
+        document.getElementById("theme_source"),
+        document.getElementById("theme_source_2")
+      ].filter(Boolean);
+
+      let themeSyncQueued = false;
+      const queueThemeSync = () => {
+        if (themeSyncQueued) return;
+        themeSyncQueued = true;
+        requestAnimationFrame(() => {
+          themeSyncQueued = false;
+          syncTheme(true);
+        });
+      };
+
+      const themeObserver = new MutationObserver(queueThemeSync);
+      themeTargets.forEach(el => {
+        themeObserver.observe(el, {
+          attributes: true,
+          attributeFilter: ["class", "data-theme", "data-mode", "rel", "disabled"]
+        });
+      });
+
+      if (window.matchMedia) {
+        const mq = window.matchMedia("(prefers-color-scheme: dark)");
+        if (mq.addEventListener) mq.addEventListener("change", queueThemeSync);
+        else if (mq.addListener) mq.addListener(queueThemeSync);
+      }
+
+      window.addEventListener("storage", queueThemeSync);
+
+      setPreset("circuit");
+    })();
+  </script>
+</div>

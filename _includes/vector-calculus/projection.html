@@ -1,0 +1,30 @@
+<figure class="vc-diagram" aria-label="벡터를 정사영과 수직 잔차로 분리한 그림">
+<div class="vc-diagram__scroll" tabindex="0" role="region" aria-label="벡터를 정사영과 수직 잔차로 분리한 그림 — 가로 스크롤">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 380" role="img" aria-labelledby="vc-projection-title">
+<title id="vc-projection-title">벡터를 정사영과 수직 잔차로 분리한 그림</title>
+<defs>
+<marker id="vc-projection-a" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+<path d="M0,0 L6,3 L0,6" fill="var(--vc-accent)"/>
+</marker>
+<marker id="vc-projection-b" markerWidth="7" markerHeight="7" refX="6" refY="3" orient="auto">
+<path d="M0,0 L6,3 L0,6" fill="var(--vc-secondary)"/>
+</marker>
+</defs>
+<rect width="900" height="380" rx="14" fill="var(--vc-bg)"/>
+<text x="30" y="35" class="title">Projection: keep one direction, remove the overlap</text>
+<path d="M80,300 L410,300" fill="none" stroke="var(--vc-axis)" stroke-width="3"/>
+<path d="M80,300 L80,65" fill="none" stroke="var(--vc-axis)" stroke-width="3"/>
+<path d="M80,300 L320,100" fill="none" stroke="var(--vc-accent)" stroke-width="3" marker-end="url(#vc-projection-a)"/>
+<path d="M80,300 L320,300" fill="none" stroke="var(--vc-secondary)" stroke-width="3" marker-end="url(#vc-projection-b)"/>
+<path d="M320,300 L320,100" fill="none" stroke="var(--vc-accent)" stroke-width="3" marker-end="url(#vc-projection-a)"/>
+<text x="230" y="110" class="">v</text>
+<text x="130" y="330" class="">projection onto u</text>
+<text x="330" y="195" class="">residual</text>
+<text x="390" y="290" class="">u</text>
+<text x="490" y="115" class="">v = parallel part + perpendicular part</text>
+<text x="490" y="170" class="">Gram–Schmidt removes the parallel part.</text>
+<text x="490" y="215" class="">Least squares uses the same geometry.</text>
+<text x="490" y="265" class="small">The residual is perpendicular to the subspace.</text>
+</svg>
+</div>
+</figure>

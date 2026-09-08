@@ -1,0 +1,773 @@
+<div id="phase-plane-stability-explorer" class="ppse">
+  <style>
+    #phase-plane-stability-explorer{
+      --pp-bg:#ffffff;
+      --pp-panel:#f8fafc;
+      --pp-panel-2:#ffffff;
+      --pp-border:#dbe4f0;
+      --pp-border-strong:#cbd5e1;
+      --pp-text:#0f172a;
+      --pp-muted:#475569;
+      --pp-blue:#2563eb;
+      --pp-cyan:#0891b2;
+      --pp-amber:#d97706;
+      --pp-green:#059669;
+      --pp-red:#dc2626;
+      --pp-purple:#7c3aed;
+      --pp-grid:rgba(148,163,184,.18);
+      --pp-shadow:0 18px 48px rgba(15,23,42,.08);
+      margin:2rem 0;
+      padding:18px;
+      border:1px solid var(--pp-border);
+      border-radius:20px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(37,99,235,.08), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.98), rgba(248,250,252,.98));
+      color:var(--pp-text);
+      box-shadow:var(--pp-shadow);
+    }
+    #phase-plane-stability-explorer.pp-dark{
+      --pp-bg:#0f172a;
+      --pp-panel:rgba(255,255,255,.05);
+      --pp-panel-2:rgba(255,255,255,.025);
+      --pp-border:rgba(148,163,184,.22);
+      --pp-border-strong:rgba(148,163,184,.38);
+      --pp-text:#e5e7eb;
+      --pp-muted:#94a3b8;
+      --pp-blue:#60a5fa;
+      --pp-cyan:#22d3ee;
+      --pp-amber:#f59e0b;
+      --pp-green:#34d399;
+      --pp-red:#fb7185;
+      --pp-purple:#c084fc;
+      --pp-grid:rgba(148,163,184,.12);
+      --pp-shadow:0 18px 48px rgba(0,0,0,.25);
+      background:
+        radial-gradient(circle at 100% 0%, rgba(37,99,235,.14), transparent 28%),
+        linear-gradient(180deg, rgba(15,23,42,.98), rgba(2,6,23,.98));
+    }
+    #phase-plane-stability-explorer *{box-sizing:border-box}
+    #phase-plane-stability-explorer .pp-head{
+      display:flex; gap:16px; justify-content:space-between; align-items:flex-start; margin-bottom:14px;
+    }
+    #phase-plane-stability-explorer .pp-kicker{
+      color:var(--pp-blue); font-size:.77rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; margin-bottom:5px;
+    }
+    #phase-plane-stability-explorer h3{
+      margin:0; font-size:1.18rem; line-height:1.35;
+    }
+    #phase-plane-stability-explorer .pp-sub{
+      margin:8px 0 0; color:var(--pp-muted); font-size:.9rem; line-height:1.65; max-width:760px;
+    }
+    #phase-plane-stability-explorer .pp-pill{
+      flex:0 0 auto; padding:10px 14px; border:1px solid var(--pp-border-strong); border-radius:14px;
+      background:rgba(37,99,235,.08); font-weight:800; white-space:nowrap;
+    }
+    #phase-plane-stability-explorer .pp-tip-grid{
+      display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:14px;
+    }
+    #phase-plane-stability-explorer .pp-tip{
+      padding:12px; border:1px solid var(--pp-border); border-radius:14px; background:var(--pp-panel);
+    }
+    #phase-plane-stability-explorer .pp-tip b{display:block; margin-bottom:5px; font-size:.92rem}
+    #phase-plane-stability-explorer .pp-tip p{margin:0; color:var(--pp-muted); font-size:.82rem; line-height:1.6}
+    #phase-plane-stability-explorer .pp-presets{
+      display:flex; gap:8px; flex-wrap:wrap; padding:10px; border:1px solid var(--pp-border); border-radius:14px; background:var(--pp-panel); margin-bottom:14px;
+    }
+    #phase-plane-stability-explorer button{
+      appearance:none; border:1px solid var(--pp-border); border-radius:10px; background:var(--pp-panel-2);
+      color:var(--pp-text); padding:8px 11px; font:inherit; font-size:.82rem; font-weight:760; cursor:pointer;
+      transition:.15s ease;
+    }
+    #phase-plane-stability-explorer button:hover{
+      transform:translateY(-1px); border-color:rgba(37,99,235,.45); background:rgba(37,99,235,.09);
+    }
+    #phase-plane-stability-explorer button.is-active{
+      background:rgba(37,99,235,.16); border-color:rgba(37,99,235,.58);
+    }
+    #phase-plane-stability-explorer .pp-grid{
+      display:grid; grid-template-columns:minmax(300px,.94fr) minmax(340px,1.06fr); gap:14px; align-items:stretch;
+    }
+    #phase-plane-stability-explorer .pp-panel{
+      border:1px solid var(--pp-border); border-radius:16px; background:var(--pp-panel); padding:14px; min-width:0;
+    }
+    #phase-plane-stability-explorer .pp-title{
+      display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px;
+    }
+    #phase-plane-stability-explorer .pp-title h4{margin:0; font-size:.96rem}
+    #phase-plane-stability-explorer .pp-mini{font-size:.74rem; color:var(--pp-muted)}
+    #phase-plane-stability-explorer .pp-controls{
+      display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px;
+    }
+    #phase-plane-stability-explorer .pp-card{
+      padding:10px; border:1px solid var(--pp-border); border-radius:12px; background:var(--pp-panel-2);
+    }
+    #phase-plane-stability-explorer .pp-card label{
+      display:flex; justify-content:space-between; gap:8px; margin-bottom:7px; color:var(--pp-muted); font-size:.76rem; font-weight:700;
+    }
+    #phase-plane-stability-explorer .pp-card input{
+      width:100%;
+    }
+    #phase-plane-stability-explorer .pp-note{
+      margin-top:10px; padding:10px 11px; border-radius:12px; border-left:3px solid rgba(37,99,235,.65);
+      background:rgba(37,99,235,.06); color:var(--pp-muted); font-size:.81rem; line-height:1.6;
+    }
+    #phase-plane-stability-explorer .pp-metrics{
+      display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-bottom:10px;
+    }
+    #phase-plane-stability-explorer .pp-metric{
+      padding:10px; border:1px solid var(--pp-border); border-radius:12px; background:var(--pp-panel-2); min-width:0;
+    }
+    #phase-plane-stability-explorer .pp-metric .k{
+      color:var(--pp-muted); font-size:.68rem; font-weight:700; margin-bottom:4px;
+    }
+    #phase-plane-stability-explorer .pp-metric .v{
+      font-size:.87rem; font-weight:800; line-height:1.35; overflow-wrap:anywhere;
+    }
+    #phase-plane-stability-explorer .pp-explain{
+      display:grid; grid-template-columns:minmax(0,1fr) minmax(180px,.85fr); gap:10px; margin-bottom:10px;
+    }
+    #phase-plane-stability-explorer .pp-box{
+      border:1px solid var(--pp-border); border-radius:12px; background:var(--pp-panel-2); padding:11px;
+      min-height:110px;
+    }
+    #phase-plane-stability-explorer .pp-box .label{
+      color:var(--pp-muted); font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;
+    }
+    #phase-plane-stability-explorer .pp-eq{
+      font-size:1rem; line-height:1.85;
+    }
+    #phase-plane-stability-explorer .pp-eq code{
+      background:none; padding:0; border:none; color:inherit; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:.98em;
+    }
+    #phase-plane-stability-explorer .pp-comment{
+      color:var(--pp-muted); font-size:.82rem; line-height:1.65;
+    }
+    #phase-plane-stability-explorer .pp-comment b{color:var(--pp-text)}
+    #phase-plane-stability-explorer .pp-tagrow{
+      display:flex; flex-wrap:wrap; gap:7px; margin-top:8px;
+    }
+    #phase-plane-stability-explorer .pp-tag{
+      padding:5px 8px; border-radius:999px; border:1px solid var(--pp-border); background:var(--pp-panel);
+      color:var(--pp-muted); font-size:.72rem;
+    }
+    #phase-plane-stability-explorer .pp-two{
+      display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;
+    }
+    #phase-plane-stability-explorer .pp-graph{
+      border:1px solid var(--pp-border); border-radius:16px; background:var(--pp-panel-2); padding:12px;
+      min-width:0;
+    }
+    #phase-plane-stability-explorer .pp-graph-head{
+      display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:8px;
+    }
+    #phase-plane-stability-explorer .pp-graph-head h4{margin:0; font-size:.92rem}
+    #phase-plane-stability-explorer .pp-legend{
+      display:flex; flex-wrap:wrap; gap:9px; color:var(--pp-muted); font-size:.69rem;
+    }
+    #phase-plane-stability-explorer .pp-legend span{display:inline-flex; align-items:center; gap:4px}
+    #phase-plane-stability-explorer .dot{
+      width:7px; height:7px; border-radius:999px; display:inline-block;
+    }
+    #phase-plane-stability-explorer canvas{
+      width:100%; display:block; border:1px solid var(--pp-border); border-radius:10px; background:var(--pp-bg);
+    }
+    #phase-plane-stability-explorer .pp-cap{
+      margin:8px 2px 0; color:var(--pp-muted); font-size:.74rem; line-height:1.58;
+    }
+    #phase-plane-stability-explorer .pp-bottom{
+      margin-top:14px; border:1px solid var(--pp-border); border-radius:15px; padding:12px; background:var(--pp-panel);
+    }
+    #phase-plane-stability-explorer .pp-bottom b{display:block; margin-bottom:7px}
+    #phase-plane-stability-explorer .pp-bottom ul{margin:0; padding-left:1.1rem; color:var(--pp-muted); font-size:.82rem; line-height:1.65}
+    @media (max-width:980px){
+      #phase-plane-stability-explorer .pp-grid,
+      #phase-plane-stability-explorer .pp-two,
+      #phase-plane-stability-explorer .pp-tip-grid,
+      #phase-plane-stability-explorer .pp-explain{
+        grid-template-columns:1fr;
+      }
+    }
+    @media (max-width:680px){
+      #phase-plane-stability-explorer{padding:13px}
+      #phase-plane-stability-explorer .pp-head{flex-direction:column}
+      #phase-plane-stability-explorer .pp-metrics{grid-template-columns:1fr 1fr}
+      #phase-plane-stability-explorer .pp-controls{grid-template-columns:1fr}
+      #phase-plane-stability-explorer .pp-pill{width:100%; text-align:center}
+    }
+  </style>
+
+  <div class="pp-head">
+    <div>
+      <div class="pp-kicker">Phase Plane Explorer</div>
+      <h3>위상평면 · 임계점 · 안정성 시각 탐색기</h3>
+      <p class="pp-sub">
+        “시간에 따른 해”와 “평면 위에서의 움직임”을 같이 보면서,
+        마디·안장점·나선·중심이 어떻게 생기는지 바로 비교할 수 있게 만든 시각화다.
+      </p>
+    </div>
+    <div class="pp-pill">같은 해를 두 가지 방식으로 본다</div>
+  </div>
+
+  <div class="pp-tip-grid">
+    <div class="pp-tip">
+      <b>1) 시간응답</b>
+      <p><code>x<sub>1</sub>(t), x<sub>2</sub>(t)</code>를 시간축에 따라 그린 그래프다. 감쇠, 성장, 진동을 읽기 좋다.</p>
+    </div>
+    <div class="pp-tip">
+      <b>2) 위상평면</b>
+      <p><code>(x<sub>1</sub>(t), x<sub>2</sub>(t))</code>를 하나의 움직이는 점으로 본다. 해가 어디로 가는지 한눈에 보인다.</p>
+    </div>
+    <div class="pp-tip">
+      <b>3) 임계점과 안정성</b>
+      <p>임계점 근처에서 해가 모여드는지, 멀어지는지, 회전하는지 보면 안정성을 이해하기 쉽다.</p>
+    </div>
+  </div>
+
+  <div class="pp-presets" aria-label="프리셋">
+    <button type="button" data-key="stableNode">안정 마디</button>
+    <button type="button" data-key="unstableNode">불안정 마디</button>
+    <button type="button" data-key="saddle">안장점</button>
+    <button type="button" data-key="center">중심</button>
+    <button type="button" data-key="spiralSink">안정 나선</button>
+    <button type="button" data-key="nonlinear">비선형 예시</button>
+  </div>
+
+  <div class="pp-grid">
+    <section class="pp-panel">
+      <div class="pp-title">
+        <h4>초기조건 · 관찰 범위</h4>
+        <span class="pp-mini">슬라이더를 움직이면 바로 다시 그림</span>
+      </div>
+
+      <div class="pp-controls">
+        <div class="pp-card">
+          <label for="pp-x0"><span>초기값 x<sub>1</sub>(0)</span><span id="pp-x0v"></span></label>
+          <input id="pp-x0" type="range" min="-3" max="3" step="0.1" value="1.6">
+        </div>
+        <div class="pp-card">
+          <label for="pp-y0"><span>초기값 x<sub>2</sub>(0)</span><span id="pp-y0v"></span></label>
+          <input id="pp-y0" type="range" min="-3" max="3" step="0.1" value="1.0">
+        </div>
+        <div class="pp-card">
+          <label for="pp-tmax"><span>표시 시간 T</span><span id="pp-tmaxv"></span></label>
+          <input id="pp-tmax" type="range" min="4" max="20" step="1" value="10">
+        </div>
+        <div class="pp-card">
+          <label for="pp-seeds"><span>보조 궤적 개수</span><span id="pp-seedsv"></span></label>
+          <input id="pp-seeds" type="range" min="6" max="24" step="1" value="12">
+        </div>
+      </div>
+
+      <div class="pp-note" id="pp-note"></div>
+    </section>
+
+    <section class="pp-panel">
+      <div class="pp-title">
+        <h4>현재 시스템 해석</h4>
+        <span class="pp-mini" id="pp-mini-type"></span>
+      </div>
+
+      <div class="pp-metrics">
+        <div class="pp-metric"><div class="k">임계점</div><div class="v" id="pp-critical">-</div></div>
+        <div class="pp-metric"><div class="k">분류</div><div class="v" id="pp-class">-</div></div>
+        <div class="pp-metric"><div class="k">안정성</div><div class="v" id="pp-stab">-</div></div>
+        <div class="pp-metric"><div class="k">고유값 / 선형화</div><div class="v" id="pp-eigs">-</div></div>
+      </div>
+
+      <div class="pp-explain">
+        <div class="pp-box">
+          <div class="label">System</div>
+          <div class="pp-eq" id="pp-eq"></div>
+        </div>
+        <div class="pp-box">
+          <div class="label">Reading Guide</div>
+          <div class="pp-comment" id="pp-comment"></div>
+          <div class="pp-tagrow">
+            <span class="pp-tag">Re(λ) &lt; 0 → 감쇠</span>
+            <span class="pp-tag">Re(λ) &gt; 0 → 성장</span>
+            <span class="pp-tag">Im(λ) ≠ 0 → 회전/진동</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="pp-two">
+    <section class="pp-graph">
+      <div class="pp-graph-head">
+        <h4>위상평면 (x<sub>1</sub>, x<sub>2</sub>)</h4>
+        <div class="pp-legend">
+          <span><i class="dot" style="background:#2563eb"></i>방향장</span>
+          <span><i class="dot" style="background:#d97706"></i>선택 궤적</span>
+          <span><i class="dot" style="background:#059669"></i>초기점</span>
+        </div>
+      </div>
+      <canvas id="pp-phase" width="640" height="430"></canvas>
+      <p class="pp-cap">평면의 각 점에서 화살표는 그 자리에서 상태가 어느 방향으로 움직이는지 뜻한다. 선형계는 원점 중심의 형태를, 비선형계는 여러 임계점 주변의 서로 다른 거동을 보여 준다.</p>
+    </section>
+
+    <section class="pp-graph">
+      <div class="pp-graph-head">
+        <h4>시간응답 x<sub>1</sub>(t), x<sub>2</sub>(t)</h4>
+        <div class="pp-legend">
+          <span><i class="dot" style="background:#2563eb"></i>x<sub>1</sub>(t)</span>
+          <span><i class="dot" style="background:#d97706"></i>x<sub>2</sub>(t)</span>
+        </div>
+      </div>
+      <canvas id="pp-time" width="640" height="430"></canvas>
+      <p class="pp-cap">위상평면에서 원점으로 감기면 시간응답에서는 감쇠 진동이 나타난다. 바깥으로 벌어지면 성장, 닫힌 곡선이면 주기적인 응답으로 읽으면 된다.</p>
+    </section>
+  </div>
+
+  <div class="pp-bottom">
+    <b>추천 관찰 순서</b>
+    <ul>
+      <li><b>안정 마디</b>를 먼저 보고 “모든 궤적이 원점으로 들어간다”는 감각을 잡기</li>
+      <li><b>안장점</b>으로 바꿔서 한 방향은 들어가고 다른 방향은 나가는 걸 확인하기</li>
+      <li><b>중심</b>과 <b>안정 나선</b>을 비교해서 “허수부가 있으면 회전이 생긴다”는 점 이해하기</li>
+      <li><b>비선형 예시</b>에서 임계점이 여러 개 생기고, 각 점 근처 안정성이 다를 수 있다는 점 보기</li>
+    </ul>
+  </div>
+
+  <script>
+    (() => {
+      const root = document.getElementById("phase-plane-stability-explorer");
+      if (!root || root.dataset.ready === "1") return;
+      root.dataset.ready = "1";
+
+      const $ = (sel) => root.querySelector(sel);
+      const phase = $("#pp-phase"), pctx = phase.getContext("2d");
+      const time = $("#pp-time"), tctx = time.getContext("2d");
+      const inputs = {
+        x0: $("#pp-x0"), y0: $("#pp-y0"), tmax: $("#pp-tmax"), seeds: $("#pp-seeds")
+      };
+      const outputs = {
+        x0v: $("#pp-x0v"), y0v: $("#pp-y0v"), tmaxv: $("#pp-tmaxv"), seedsv: $("#pp-seedsv"),
+        note: $("#pp-note"), mini: $("#pp-mini-type"), critical: $("#pp-critical"),
+        cls: $("#pp-class"), stab: $("#pp-stab"), eigs: $("#pp-eigs"),
+        eq: $("#pp-eq"), comment: $("#pp-comment")
+      };
+
+      const presets = {
+        stableNode: {
+          label: "안정 마디", type: "linear", A: {a:-1.2,b:0,c:0,d:-0.5},
+          x0:1.6, y0:1.0, tmax:10,
+          eqHTML: "ẋ<sub>1</sub> = -1.2x<sub>1</sub><br>ẋ<sub>2</sub> = -0.5x<sub>2</sub>",
+          note: "두 고유값이 모두 음수다. 따라서 모든 해가 원점으로 수렴한다."
+        },
+        unstableNode: {
+          label: "불안정 마디", type: "linear", A: {a:0.9,b:0,c:0,d:1.6},
+          x0:0.8, y0:1.2, tmax:8,
+          eqHTML: "ẋ<sub>1</sub> = 0.9x<sub>1</sub><br>ẋ<sub>2</sub> = 1.6x<sub>2</sub>",
+          note: "두 고유값이 모두 양수다. 대부분의 궤적이 원점에서 멀어진다."
+        },
+        saddle: {
+          label: "안장점", type: "linear", A: {a:2,b:0,c:0,d:-1},
+          x0:1.2, y0:1.2, tmax:6,
+          eqHTML: "ẋ<sub>1</sub> = 2x<sub>1</sub><br>ẋ<sub>2</sub> = -x<sub>2</sub>",
+          note: "한 고유값은 양수, 다른 하나는 음수다. 그래서 한 축은 들어가고 다른 축은 나간다."
+        },
+        center: {
+          label: "중심", type: "linear", A: {a:0,b:-1,c:1,d:0},
+          x0:2.0, y0:0.0, tmax:14,
+          eqHTML: "ẋ<sub>1</sub> = -x<sub>2</sub><br>ẋ<sub>2</sub> = x<sub>1</sub>",
+          note: "고유값이 순허수다. 진폭은 유지되고 궤적은 원점 주위를 계속 회전한다."
+        },
+        spiralSink: {
+          label: "안정 나선", type: "linear", A: {a:-0.6,b:-2,c:2,d:-0.6},
+          x0:2.0, y0:0.0, tmax:16,
+          eqHTML: "ẋ<sub>1</sub> = -0.6x<sub>1</sub> - 2x<sub>2</sub><br>ẋ<sub>2</sub> = 2x<sub>1</sub> - 0.6x<sub>2</sub>",
+          note: "허수부 때문에 회전하고, 실수부가 음수라 점점 원점으로 감겨 들어간다."
+        },
+        nonlinear: {
+          label: "비선형 예시", type: "nonlinear",
+          x0:1.7, y0:1.2, tmax:12,
+          eqHTML: "ẋ = x - x<sup>3</sup><br>ẏ = -y",
+          note: "비선형계는 임계점이 여러 개 생길 수 있다. 여기서는 (-1,0), (0,0), (1,0)이 임계점이다."
+        }
+      };
+
+      let currentKey = "stableNode";
+
+      function isDarkTheme(){
+        const html = document.documentElement;
+        const body = document.body;
+        const probes = [
+          html.getAttribute("data-theme"),
+          body && body.getAttribute("data-theme"),
+          html.getAttribute("data-color-mode"),
+          body && body.getAttribute("data-color-mode"),
+          html.getAttribute("data-mode"),
+          body && body.getAttribute("data-mode"),
+          sessionStorage.getItem("theme"),
+          localStorage.getItem("theme"),
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        const cls = ((html.className || "") + " " + ((body && body.className) || "")).toLowerCase();
+        if (probes.includes("dark") || cls.includes("dark")) return true;
+        if (probes.includes("light") || cls.includes("light")) return false;
+        return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      }
+
+      function applyTheme(){
+        root.classList.toggle("pp-dark", isDarkTheme());
+        render();
+      }
+
+      const themeObserver = new MutationObserver(() => applyTheme());
+      themeObserver.observe(document.documentElement, {attributes:true, attributeFilter:["class","data-theme","data-color-mode","data-mode"]});
+      if (document.body) themeObserver.observe(document.body, {attributes:true, attributeFilter:["class","data-theme","data-color-mode","data-mode"]});
+      if (window.matchMedia) {
+        const mq = window.matchMedia("(prefers-color-scheme: dark)");
+        if (mq.addEventListener) mq.addEventListener("change", applyTheme);
+      }
+
+      function fmt(v, d=2){
+        if (Math.abs(v) < 1e-12) v = 0;
+        return Number(v).toFixed(d);
+      }
+
+      function eig2(A){
+        const {a,b,c,d} = A;
+        const tr = a + d;
+        const det = a*d - b*c;
+        const disc = tr*tr - 4*det;
+        if (disc >= -1e-12){
+          const s = Math.sqrt(Math.max(0, disc));
+          return {tr, det, disc, l1:{re:(tr+s)/2, im:0}, l2:{re:(tr-s)/2, im:0}};
+        }
+        const s = Math.sqrt(-disc);
+        return {tr, det, disc, l1:{re:tr/2, im:s/2}, l2:{re:tr/2, im:-s/2}};
+      }
+
+      function classifyLinear(e){
+        const eps = 1e-9;
+        if (Math.abs(e.l1.im) > eps){
+          if (Math.abs(e.l1.re) < eps) return "중심";
+          return e.l1.re < 0 ? "안정 나선" : "불안정 나선";
+        }
+        const r1 = e.l1.re, r2 = e.l2.re;
+        if (r1*r2 < -eps) return "안장점";
+        if (r1 < -eps && r2 < -eps) return "안정 마디";
+        if (r1 > eps && r2 > eps) return "불안정 마디";
+        return "경계형";
+      }
+
+      function stabilityLinear(e){
+        const eps = 1e-9;
+        const maxR = Math.max(e.l1.re, e.l2.re);
+        const minR = Math.min(e.l1.re, e.l2.re);
+        if (Math.abs(e.l1.im) > eps && Math.abs(maxR) <= eps && Math.abs(minR) <= eps) return "중립 안정";
+        if (maxR < -eps) return "점근 안정";
+        if (minR > eps || (maxR > eps && minR <= eps)) return "불안정";
+        return "경계";
+      }
+
+      function eigString(e){
+        const one = (l) => Math.abs(l.im) < 1e-9 ? fmt(l.re,3) : `${fmt(l.re,3)} ${l.im >= 0 ? '+' : '-'} ${fmt(Math.abs(l.im),3)}j`;
+        return `λ₁=${one(e.l1)}, λ₂=${one(e.l2)}`;
+      }
+
+      function nonlinearField(x,y){
+        return {x: x - x*x*x, y: -y};
+      }
+
+      function nonlinearJacobianAt(x,y){
+        return {a:1-3*x*x, b:0, c:0, d:-1};
+      }
+
+      function nonlinearCriticalInfo(){
+        const pts = [
+          {x:-1,y:0,name:"(-1,0)"},
+          {x:0,y:0,name:"(0,0)"},
+          {x:1,y:0,name:"(1,0)"},
+        ];
+        pts.forEach(p => {
+          const e = eig2(nonlinearJacobianAt(p.x,p.y));
+          p.cls = classifyLinear(e);
+          p.stab = stabilityLinear(e);
+          p.eigs = eigString(e);
+        });
+        return pts;
+      }
+
+      function currentSystem(){
+        const p = presets[currentKey];
+        if (p.type === "linear") return {type:"linear", ...p};
+        return {type:"nonlinear", ...p};
+      }
+
+      function field(sys, x, y){
+        if (sys.type === "linear"){
+          const A = sys.A;
+          return {x:A.a*x + A.b*y, y:A.c*x + A.d*y};
+        }
+        return nonlinearField(x,y);
+      }
+
+      function rk4(sys, x0, tmax, steps){
+        const dt = tmax/steps;
+        let x = {x:x0.x, y:x0.y};
+        const out = [{t:0,x:x.x,y:x.y}];
+        for (let i=0;i<steps;i++){
+          const f1 = field(sys, x.x, x.y);
+          const f2 = field(sys, x.x + dt*f1.x/2, x.y + dt*f1.y/2);
+          const f3 = field(sys, x.x + dt*f2.x/2, x.y + dt*f2.y/2);
+          const f4 = field(sys, x.x + dt*f3.x, x.y + dt*f3.y);
+
+          x = {
+            x: x.x + dt*(f1.x + 2*f2.x + 2*f3.x + f4.x)/6,
+            y: x.y + dt*(f1.y + 2*f2.y + 2*f3.y + f4.y)/6
+          };
+          out.push({t:(i+1)*dt, x:x.x, y:x.y});
+          if (!Number.isFinite(x.x) || !Number.isFinite(x.y) || Math.abs(x.x) > 8 || Math.abs(x.y) > 8) break;
+        }
+        return out;
+      }
+
+      function palette(){
+        const cs = getComputedStyle(root);
+        return {
+          bg: cs.getPropertyValue("--pp-bg").trim() || "#fff",
+          text: cs.getPropertyValue("--pp-text").trim() || "#111827",
+          muted: cs.getPropertyValue("--pp-muted").trim() || "#64748b",
+          grid: cs.getPropertyValue("--pp-grid").trim() || "rgba(148,163,184,.18)",
+          axis: root.classList.contains("pp-dark") ? "rgba(226,232,240,.36)" : "rgba(51,65,85,.42)",
+          blue: cs.getPropertyValue("--pp-blue").trim() || "#2563eb",
+          amber: cs.getPropertyValue("--pp-amber").trim() || "#d97706",
+          green: cs.getPropertyValue("--pp-green").trim() || "#059669",
+          red: cs.getPropertyValue("--pp-red").trim() || "#dc2626",
+          purple: cs.getPropertyValue("--pp-purple").trim() || "#7c3aed",
+          ghost: root.classList.contains("pp-dark") ? "rgba(226,232,240,.15)" : "rgba(71,85,105,.17)"
+        };
+      }
+
+      function clear(ctx, canvas, colors){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = colors.bg;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+
+      function drawPhase(sys, x0, tmax, nSeeds){
+        const colors = palette();
+        clear(pctx, phase, colors);
+        const w=phase.width, h=phase.height, pad=38;
+        const xmin=-3.5, xmax=3.5, ymin=-3.5, ymax=3.5;
+        const X = x => pad + (x-xmin)/(xmax-xmin)*(w-2*pad);
+        const Y = y => h-pad - (y-ymin)/(ymax-ymin)*(h-2*pad);
+
+        pctx.strokeStyle = colors.grid;
+        pctx.lineWidth = 1;
+        for (let i=-3;i<=3;i++){
+          pctx.beginPath(); pctx.moveTo(X(i), Y(ymin)); pctx.lineTo(X(i), Y(ymax)); pctx.stroke();
+          pctx.beginPath(); pctx.moveTo(X(xmin), Y(i)); pctx.lineTo(X(xmax), Y(i)); pctx.stroke();
+        }
+
+        pctx.strokeStyle = colors.axis;
+        pctx.beginPath(); pctx.moveTo(X(0),Y(ymin)); pctx.lineTo(X(0),Y(ymax)); pctx.stroke();
+        pctx.beginPath(); pctx.moveTo(X(xmin),Y(0)); pctx.lineTo(X(xmax),Y(0)); pctx.stroke();
+
+        pctx.fillStyle = colors.muted;
+        pctx.font = "13px sans-serif";
+        pctx.fillText("x₁", w-22, Y(0)-8);
+        pctx.fillText("x₂", X(0)+7, 16);
+
+        // vector field
+        for (let gx=-3; gx<=3; gx+=0.75){
+          for (let gy=-3; gy<=3; gy+=0.75){
+            const v = field(sys, gx, gy);
+            const mag = Math.hypot(v.x, v.y);
+            if (mag < 1e-9) continue;
+            const ux=v.x/mag, uy=v.y/mag, len=.23;
+            const x2=gx+ux*len, y2=gy+uy*len;
+            pctx.strokeStyle = root.classList.contains("pp-dark") ? "rgba(96,165,250,.46)" : "rgba(37,99,235,.44)";
+            pctx.lineWidth = 1;
+            pctx.beginPath(); pctx.moveTo(X(gx),Y(gy)); pctx.lineTo(X(x2),Y(y2)); pctx.stroke();
+            const px=X(x2), py=Y(y2), ang=Math.atan2(Y(y2)-Y(gy), X(x2)-X(gx)), ah=4.3;
+            pctx.beginPath();
+            pctx.moveTo(px,py);
+            pctx.lineTo(px-ah*Math.cos(ang-Math.PI/6), py-ah*Math.sin(ang-Math.PI/6));
+            pctx.lineTo(px-ah*Math.cos(ang+Math.PI/6), py-ah*Math.sin(ang+Math.PI/6));
+            pctx.closePath();
+            pctx.fillStyle = root.classList.contains("pp-dark") ? "rgba(96,165,250,.46)" : "rgba(37,99,235,.44)";
+            pctx.fill();
+          }
+        }
+
+        // helper trajectories
+        const seeds = [];
+        for (let i=0;i<nSeeds;i++){
+          const ang=2*Math.PI*i/nSeeds;
+          seeds.push({x:2.6*Math.cos(ang), y:2.6*Math.sin(ang)});
+        }
+        seeds.forEach(seed => {
+          const tr = rk4(sys, seed, tmax, 320);
+          pctx.strokeStyle = colors.ghost;
+          pctx.lineWidth = 1;
+          pctx.beginPath();
+          tr.forEach((p,idx) => idx===0 ? pctx.moveTo(X(p.x),Y(p.y)) : pctx.lineTo(X(p.x),Y(p.y)));
+          pctx.stroke();
+        });
+
+        // nonlinear critical points
+        if (sys.type === "nonlinear"){
+          nonlinearCriticalInfo().forEach(pt => {
+            pctx.beginPath();
+            pctx.arc(X(pt.x), Y(pt.y), 5, 0, Math.PI*2);
+            pctx.fillStyle = pt.cls === "안정 마디" ? colors.green : colors.red;
+            pctx.fill();
+            pctx.strokeStyle = colors.bg;
+            pctx.lineWidth = 1.4;
+            pctx.stroke();
+          });
+        }
+
+        // selected trajectory
+        const tr = rk4(sys, x0, tmax, 440);
+        pctx.strokeStyle = colors.amber;
+        pctx.lineWidth = 2.6;
+        pctx.beginPath();
+        tr.forEach((p,idx) => idx===0 ? pctx.moveTo(X(p.x),Y(p.y)) : pctx.lineTo(X(p.x),Y(p.y)));
+        pctx.stroke();
+
+        if (tr.length > 4){
+          const pEnd = tr[tr.length-1], prev = tr[Math.max(0, tr.length-6)];
+          const ang = Math.atan2(Y(pEnd.y)-Y(prev.y), X(pEnd.x)-X(prev.x));
+          const px = X(pEnd.x), py = Y(pEnd.y), ah = 8;
+          pctx.beginPath();
+          pctx.moveTo(px,py);
+          pctx.lineTo(px-ah*Math.cos(ang-Math.PI/7), py-ah*Math.sin(ang-Math.PI/7));
+          pctx.lineTo(px-ah*Math.cos(ang+Math.PI/7), py-ah*Math.sin(ang+Math.PI/7));
+          pctx.closePath();
+          pctx.fillStyle = colors.amber;
+          pctx.fill();
+        }
+
+        pctx.beginPath(); pctx.arc(X(x0.x),Y(x0.y),5.2,0,Math.PI*2);
+        pctx.fillStyle = colors.green;
+        pctx.fill();
+      }
+
+      function drawTime(sys, x0, tmax){
+        const colors = palette();
+        clear(tctx, time, colors);
+        const w=time.width, h=time.height, padL=46, padR=22, padT=22, padB=38;
+        const tr = rk4(sys, x0, tmax, 420);
+        let vals = [];
+        tr.forEach(p => { vals.push(p.x, p.y); });
+        let maxAbs = Math.max(1, ...vals.map(v => Math.abs(v)).filter(Number.isFinite));
+        maxAbs = Math.min(maxAbs, 6.5);
+        const ymin=-maxAbs*1.12, ymax=maxAbs*1.12;
+        const X = t => padL + (t/tmax)*(w-padL-padR);
+        const Y = y => padT + (ymax-y)/(ymax-ymin)*(h-padT-padB);
+
+        tctx.strokeStyle = colors.grid;
+        tctx.lineWidth = 1;
+        for (let i=0;i<=4;i++){
+          const xx=padL + i*(w-padL-padR)/4;
+          tctx.beginPath(); tctx.moveTo(xx,padT); tctx.lineTo(xx,h-padB); tctx.stroke();
+        }
+        for (let i=0;i<=4;i++){
+          const yy=padT + i*(h-padT-padB)/4;
+          tctx.beginPath(); tctx.moveTo(padL,yy); tctx.lineTo(w-padR,yy); tctx.stroke();
+        }
+
+        tctx.strokeStyle = colors.axis;
+        tctx.beginPath(); tctx.moveTo(padL, Y(0)); tctx.lineTo(w-padR, Y(0)); tctx.stroke();
+        tctx.beginPath(); tctx.moveTo(padL, padT); tctx.lineTo(padL, h-padB); tctx.stroke();
+
+        tctx.fillStyle = colors.muted;
+        tctx.font = "13px sans-serif";
+        tctx.fillText("t", w-18, h-padB-8);
+        tctx.fillText("x", padL+7, 16);
+
+        const drawSeries = (key, color) => {
+          tctx.strokeStyle = color;
+          tctx.lineWidth = 2.35;
+          tctx.beginPath();
+          tr.forEach((p,idx) => {
+            const xx=X(p.t), yy=Y(Math.max(Math.min(p[key], ymax), ymin));
+            idx===0 ? tctx.moveTo(xx,yy) : tctx.lineTo(xx,yy);
+          });
+          tctx.stroke();
+        };
+        drawSeries("x", colors.blue);
+        drawSeries("y", colors.amber);
+      }
+
+      function describe(sys){
+        if (sys.type === "linear"){
+          const e = eig2(sys.A);
+          outputs.mini.textContent = "선형계";
+          outputs.critical.textContent = "(0,0)";
+          outputs.cls.textContent = classifyLinear(e);
+          outputs.stab.textContent = stabilityLinear(e);
+          outputs.eigs.textContent = eigString(e);
+          outputs.eq.innerHTML = sys.eqHTML;
+          let msg = `<b>${classifyLinear(e)}</b> · ${stabilityLinear(e)}. `;
+          if (Math.abs(e.l1.im) > 1e-9){
+            msg += "허수부가 있어서 궤적이 회전한다. ";
+            msg += e.l1.re < 0 ? "실수부가 음수라 점점 안쪽으로 감긴다." :
+                   e.l1.re > 0 ? "실수부가 양수라 점점 바깥으로 벌어진다." :
+                                 "실수부가 0이라 반지름이 유지된다.";
+          } else {
+            const r1=e.l1.re, r2=e.l2.re;
+            if (r1*r2 < 0) msg += "한 방향은 원점으로 들어가고 다른 방향은 밖으로 나가므로 안장점이 된다.";
+            else if (r1 < 0 && r2 < 0) msg += "모든 자연모드가 감쇠하므로 모든 궤적이 원점으로 모인다.";
+            else if (r1 > 0 && r2 > 0) msg += "모든 자연모드가 성장하므로 대부분의 궤적이 원점에서 멀어진다.";
+            else msg += "경계형이어서 추가 분석이 필요하다.";
+          }
+          outputs.comment.innerHTML = msg;
+          outputs.note.textContent = sys.note;
+          return;
+        }
+
+        const pts = nonlinearCriticalInfo();
+        outputs.mini.textContent = "비선형계";
+        outputs.critical.textContent = "(-1,0), (0,0), (1,0)";
+        outputs.cls.textContent = "점별로 다름";
+        outputs.stab.textContent = "±1에서 안정, 0에서 불안정";
+        outputs.eigs.textContent = "선형화(Jacobian) 사용";
+        outputs.eq.innerHTML = sys.eqHTML + '<div style="margin-top:8px;color:var(--pp-muted);font-size:.78rem">J(x,y) = [[1-3x², 0], [0, -1]]</div>';
+        outputs.comment.innerHTML = `<b>비선형계</b>에서는 먼저 임계점을 찾고, 각 점에서 Jacobian으로 선형화한다.
+        이 예시에서는 <b>(-1,0)</b>과 <b>(1,0)</b> 근처는 안정 마디, <b>(0,0)</b> 근처는 안장점이다. 즉 하나의 시스템 안에서도 임계점마다 성질이 달라질 수 있다.`;
+        outputs.note.textContent = sys.note;
+      }
+
+      function render(){
+        const sys = currentSystem();
+        const x0 = {x:Number(inputs.x0.value), y:Number(inputs.y0.value)};
+        const tmax = Number(inputs.tmax.value);
+        const nSeeds = Number(inputs.seeds.value);
+
+        outputs.x0v.textContent = fmt(x0.x,1);
+        outputs.y0v.textContent = fmt(x0.y,1);
+        outputs.tmaxv.textContent = fmt(tmax,0);
+        outputs.seedsv.textContent = fmt(nSeeds,0);
+
+        describe(sys);
+        drawPhase(sys, x0, tmax, nSeeds);
+        drawTime(sys, x0, tmax);
+      }
+
+      Object.values(inputs).forEach(el => el.addEventListener("input", render));
+      root.querySelectorAll("[data-key]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          currentKey = btn.dataset.key;
+          root.querySelectorAll("[data-key]").forEach(b => b.classList.toggle("is-active", b === btn));
+          const p = presets[currentKey];
+          inputs.x0.value = p.x0;
+          inputs.y0.value = p.y0;
+          inputs.tmax.value = p.tmax;
+          render();
+        });
+      });
+
+      // default
+      root.querySelector('[data-key="stableNode"]').classList.add("is-active");
+      applyTheme();
+    })();
+  </script>
+</div>

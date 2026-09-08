@@ -2,7 +2,7 @@
 layout: single
 title: "Laplace Transform"
 categories: Math
-tags: [Math, Laplace, Circuit, Signals]
+tags: Math
 toc: true
 author_profile: false
 comments: true
