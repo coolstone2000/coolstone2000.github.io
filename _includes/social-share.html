@@ -34,20 +34,20 @@
         Kakao.Share.sendDefault({
           objectType: 'feed',
           content: {
-            title: '{{ page.title | escape }}',
-            description: '{{ page.excerpt | strip_html | truncate: 100 | escape }}',
-            imageUrl: '{{ page.header.og_image | default: site.og_image | absolute_url }}',
+            title: {{ page.title | jsonify | replace: '<', '\u003c' }},
+            description: {{ page.excerpt | strip_html | strip_newlines | truncate: 100 | jsonify | replace: '<', '\u003c' }},
+            imageUrl: {{ page.header.og_image | default: site.og_image | absolute_url | jsonify | replace: '<', '\u003c' }},
             link: {
-              mobileWebUrl: '{{ page.url | absolute_url }}',
-              webUrl: '{{ page.url | absolute_url }}',
+              mobileWebUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
+              webUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
             },
           },
           buttons: [
             {
               title: '웹으로 보기',
               link: {
-                mobileWebUrl: '{{ page.url | absolute_url }}',
-                webUrl: '{{ page.url | absolute_url }}',
+                mobileWebUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
+                webUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
               },
             },
           ],
@@ -55,7 +55,7 @@
       });
 
       document.getElementById('instagram-share-btn').addEventListener('click', function() {
-        var url = '{{ page.url | absolute_url }}';
+        var url = {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }};
         if (navigator.clipboard && navigator.clipboard.writeText) {
           navigator.clipboard.writeText(url).then(function() {
             alert('링크가 클립보드에 복사되었습니다!\nInstagram 앱에서 붙여넣기 해주세요.');

@@ -78,6 +78,7 @@
     {% assign firstHeader = true %}
     {% assign currLevel = 0 %}
     {% assign lastLevel = 0 %}
+    {% assign levelStack = '' | split: ',' %}
 
     {% capture listModifier %}{% if orderedList %}ol{% else %}ul{% endif %}{% endcapture %}
 
@@ -138,16 +139,24 @@
             {% capture listItem %}{{ anchorBody }}{% endcapture %}
         {% endif %}
 
+        {% comment %}Track lists actually opened: heading jumps do not create every intermediate level.{% endcomment %}
         {% if currLevel > lastLevel %}
             {% capture jekyll_toc %}{{ jekyll_toc }}<{{ listModifier }}{{ subMenuClass }}>{% endcapture %}
+            {% assign levelStack = levelStack | push: currLevel %}
         {% elsif currLevel < lastLevel %}
-            {% assign repeatCount = lastLevel | minus: currLevel %}
-
-            {% for i in (1..repeatCount) %}
-                {% capture jekyll_toc %}{{ jekyll_toc }}</li></{{ listModifier }}>{% endcapture %}
+            {% for openLevel in levelStack reversed %}
+                {% if openLevel > currLevel %}
+                    {% capture jekyll_toc %}{{ jekyll_toc }}</li></{{ listModifier }}>{% endcapture %}
+                    {% assign levelStack = levelStack | pop %}
+                {% endif %}
             {% endfor %}
-
-            {% capture jekyll_toc %}{{ jekyll_toc }}</li>{% endcapture %}
+            {% assign parentLevel = levelStack | last %}
+            {% if parentLevel == currLevel %}
+                {% capture jekyll_toc %}{{ jekyll_toc }}</li>{% endcapture %}
+            {% else %}
+                {% capture jekyll_toc %}{{ jekyll_toc }}<{{ listModifier }}{{ subMenuClass }}>{% endcapture %}
+                {% assign levelStack = levelStack | push: currLevel %}
+            {% endif %}
         {% else %}
             {% capture jekyll_toc %}{{ jekyll_toc }}</li>{% endcapture %}
         {% endif %}
@@ -158,8 +167,7 @@
         {% assign firstHeader = false %}
     {% endfor %}
 
-    {% assign repeatCount = minHeader | minus: 1 %}
-    {% assign repeatCount = lastLevel | minus: repeatCount %}
+    {% assign repeatCount = levelStack | size %}
     {% for i in (1..repeatCount) %}
         {% capture jekyll_toc %}{{ jekyll_toc }}</li></{{ listModifier }}>{% endcapture %}
     {% endfor %}
