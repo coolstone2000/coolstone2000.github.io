@@ -107,10 +107,6 @@
             {% continue %}
         {% endif %}
 
-        {% if firstHeader %}
-            {% assign minHeader = currLevel %}
-        {% endif %}
-
         {% capture _hAttrToStrip %}{{ _workspace[0] | split: '>' | first }}>{% endcapture %}
         {% assign header = _workspace[0] | replace: _hAttrToStrip, '' %}
 
@@ -137,6 +133,10 @@
             {% continue %}
         {% else %}
             {% capture listItem %}{{ anchorBody }}{% endcapture %}
+        {% endif %}
+
+        {% if firstHeader %}
+            {% assign minHeader = currLevel %}
         {% endif %}
 
         {% comment %}Track lists actually opened: heading jumps do not create every intermediate level.{% endcomment %}

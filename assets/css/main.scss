@@ -325,6 +325,8 @@ html[data-theme='dark'] .page__share .btn .svg-inline--fa {
   max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+}
+.ml-math-post .page__content mjx-container[display="true"] {
   padding: 0.3em 0;
 }
 
@@ -369,3 +371,13 @@ html[data-theme='dark'] .vc-diagram {
 .vc-diagram__controls input { width: 100%; accent-color: var(--vc-accent); }
 .vc-diagram__controls output { font-variant-numeric: tabular-nums; }
 .vc-diagram__controls p { font-size: 14px; margin: 8px 0 0; }
+
+/* Keep wide, selectable ML equations inside the article on small screens. */
+.ml-math-post .page__content mjx-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.ml-math-post .page__content mjx-container[display="true"] {
+  padding: 0.3em 0;
+}
