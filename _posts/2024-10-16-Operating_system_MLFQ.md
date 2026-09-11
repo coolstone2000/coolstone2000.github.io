@@ -2,7 +2,7 @@
 layout: single
 title: Operating sysetem - MLFQ
 categories: Operating_system
-tags: OS
+tags: ["OS", "CPU Scheduling", "MLFQ", "Lottery Scheduling"]
 toc: true
 author_profile: false
 ---

@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - Thread API
 categories: Operating_system
-tags: OS
+tags: ["OS", "Concurrency", "Thread", "Pthreads", "Synchronization", "Lock", "Condition Variable"]
 toc: true
 author_profile: false
 ---

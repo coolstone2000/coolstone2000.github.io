@@ -2,7 +2,7 @@
 layout: single
 title: "Operating sysetem - Direct execution"
 categories: Operating_system
-tags: OS
+tags: ["OS", "Process", "System Call", "Context Switch", "Interrupt"]
 toc: true
 author_profile: false
 ---

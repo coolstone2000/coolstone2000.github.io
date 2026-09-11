@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - FlashSSD
 categories: Operating_system
-tags: OS
+tags: ["OS", "Storage", "SSD", "Flash Memory", "FTL", "Garbage Collection"]
 toc: true
 author_profile: false
 ---

@@ -2,7 +2,7 @@
 layout: single
 title: "Phase Plane, Critical Points and Stability"
 categories: Math
-tags: Math
+tags: ["Math", "ODE", "Phase Plane", "Stability", "Nonlinear Systems", "Linearization", "Eigenvalues"]
 toc: true
 author_profile: false
 comments: true

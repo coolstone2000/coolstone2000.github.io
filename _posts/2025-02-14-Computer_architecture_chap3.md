@@ -2,7 +2,7 @@
 layout: single
 title: "CA - chapter 3 Arithmetic for Computers"
 categories: Computer_architecture
-tags: CA
+tags: ["CA", "Computer Arithmetic", "ALU", "Binary Arithmetic", "Multiplier"]
 toc: true
 author_profile: false
 ---

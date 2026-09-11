@@ -2,7 +2,7 @@
 layout: single
 title: "Sanger: A Co-Design Framework for Enabling Sparse Attention using Reconfigurable Architecture, MICRO 2021"
 categories: Paper_review
-tags: PR
+tags: ["PR", "CA", "AI Accelerator", "Sparse Attention", "Hardware-Software Co-Design", "Sanger", "TPU"]
 toc: true
 author_profile: false
 comments: true

@@ -2,7 +2,7 @@
 layout: single
 title: Operating sysetem - Address translation
 categories: Operating_system
-tags: OS
+tags: ["OS", "Virtual Memory", "Address Translation", "Memory Protection"]
 toc: true
 author_profile: false
 ---

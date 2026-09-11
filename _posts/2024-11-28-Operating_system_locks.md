@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - Locks
 categories: Operating_system
-tags: OS
+tags: ["OS", "Concurrency", "Synchronization", "Lock", "Spinlock", "Atomic Operation"]
 toc: true
 author_profile: false
 ---

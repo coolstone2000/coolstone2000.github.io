@@ -2,7 +2,7 @@
 layout: single
 title: "TensorDIMM_A Practical Near-Memory Processing Architecture for Embeddings and Tensor Operations in Deep, MICRO 2019"
 categories: Paper_review
-tags: PR
+tags: ["PR", "CA", "AI Accelerator", "Near-Memory Processing", "Memory Bandwidth", "Embedding", "Recommender Systems", "TensorDIMM"]
 toc: true
 author_profile: false
 comments: true

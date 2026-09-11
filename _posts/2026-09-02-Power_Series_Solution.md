@@ -2,7 +2,7 @@
 layout: single
 title: "Power Series Solution"
 categories: Math
-tags: Math
+tags: ["Math", "ODE", "Power Series", "Frobenius Method", "Legendre Polynomials", "Bessel Functions", "Electromagnetics", "Waveguide"]
 toc: true
 author_profile: false
 comments: true

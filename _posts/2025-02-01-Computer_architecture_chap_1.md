@@ -2,7 +2,7 @@
 layout: single
 title: "CA - chapter 1 Computer Abstraction and Technology"
 categories: Computer_architecture
-tags: CA
+tags: ["CA", "CPU Performance", "Parallelism", "Power Efficiency"]
 toc: true
 author_profile: false
 ---

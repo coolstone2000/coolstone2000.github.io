@@ -2,7 +2,7 @@
 layout: single
 title: "Laplace Transform"
 categories: Math
-tags: Math
+tags: ["Math", "Laplace Transform", "ODE", "Convolution", "Transfer Function", "Circuit Analysis", "Signals and Systems"]
 toc: true
 author_profile: false
 comments: true

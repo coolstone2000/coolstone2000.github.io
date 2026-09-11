@@ -2,7 +2,7 @@
 layout: single
 title: "Operating sysetem - CPU_scheduling"
 categories: Operating_system
-tags: OS
+tags: ["OS", "Process", "CPU Scheduling", "Round Robin"]
 toc: true
 author_profile: false
 ---

@@ -2,7 +2,7 @@
 layout: single
 title: "CA - chapter 2 Instructions: Language of the Computer"
 categories: Computer_architecture
-tags: CA
+tags: ["CA", "RISC-V", "ISA", "Assembly", "Addressing Mode"]
 toc: true
 author_profile: false
 ---

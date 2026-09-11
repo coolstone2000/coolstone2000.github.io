@@ -2,7 +2,7 @@
 layout: single
 title: "SpAtten: Efficient Sparse Attention Architecture with Cascade Token and Head Pruning, HPCA 2021"
 categories: Paper_review
-tags: PR
+tags: ["PR", "CA", "AI Accelerator", "Transformer", "Sparse Attention", "Pruning", "Quantization", "SpAtten"]
 toc: true
 author_profile: false
 comments: true

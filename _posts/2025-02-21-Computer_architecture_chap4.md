@@ -2,7 +2,7 @@
 layout: single
 title: "CA - chapter 4 The Processor - Datapath and Control"
 categories: Computer_architecture
-tags: CA
+tags: ["CA", "RISC-V", "Datapath", "Control Unit", "Pipelining", "Pipeline Hazard"]
 toc: true
 author_profile: false
 ---

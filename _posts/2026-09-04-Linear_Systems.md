@@ -2,7 +2,7 @@
 layout: single
 title: "Linear System"
 categories: Math
-tags: Math
+tags: ["Math", "ODE", "Linear Algebra", "Eigenvalues", "Matrix Exponential", "State Space", "Circuit Analysis"]
 toc: true
 author_profile: false
 comments: true

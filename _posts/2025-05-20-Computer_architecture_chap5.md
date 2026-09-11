@@ -2,7 +2,7 @@
 layout: single
 title: "CA - chapter 5 Large and Fast: Exploiting Memory Hierarchy"
 categories: Computer_architecture
-tags: CA
+tags: ["CA", "Memory Hierarchy", "Cache", "Locality", "Virtual Memory"]
 toc: true
 author_profile: false
 ---

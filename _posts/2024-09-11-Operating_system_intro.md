@@ -2,7 +2,7 @@
 layout: single
 title: "Operating sysetem - Introduction"
 categories: Operating_system
-tags: OS
+tags: ["OS", "Virtualization", "System Call", "Concurrency", "Persistence"]
 toc: true
 author_profile: false
 ---

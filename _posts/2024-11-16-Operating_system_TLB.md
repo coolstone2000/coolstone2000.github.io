@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - Translation Lookaside Buffer
 categories: Operating_system
-tags: OS
+tags: ["OS", "Virtual Memory", "Paging", "TLB", "Cache", "Address Translation"]
 toc: true
 author_profile: false
 ---

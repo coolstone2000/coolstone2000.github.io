@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - Concurrency
 categories: Operating_system
-tags: OS
+tags: ["OS", "Concurrency", "Thread", "Race Condition", "Synchronization"]
 toc: true
 author_profile: false
 ---

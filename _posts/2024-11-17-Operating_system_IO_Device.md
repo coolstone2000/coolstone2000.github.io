@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - I/O Devices
 categories: Operating_system
-tags: OS
+tags: ["OS", "I/O", "Interrupt", "DMA", "Device Driver"]
 toc: true
 author_profile: false
 ---

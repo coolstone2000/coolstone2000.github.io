@@ -2,7 +2,7 @@
 layout: single
 title: "Ten Lessons From Three Generations Shaped Googles TPUv4i Industrial Product, ISCA 2021"
 categories: Paper_review
-tags: PR
+tags: ["PR", "CA", "AI Accelerator", "TPU", "Memory Hierarchy", "Hardware-Software Co-Design", "Power Efficiency"]
 toc: true
 author_profile: false
 comments: true

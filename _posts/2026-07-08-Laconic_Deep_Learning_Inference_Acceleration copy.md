@@ -2,7 +2,7 @@
 layout: single
 title: "Laconic Deep Learning Inference Acceleration, ISCA 2019"
 categories: Paper_review
-tags: PR
+tags: ["PR", "CA", "Deep Learning", "AI Accelerator", "Sparsity", "Bit-Serial", "Laconic"]
 toc: true
 author_profile: false
 paper_venue: "ISCA 2019"

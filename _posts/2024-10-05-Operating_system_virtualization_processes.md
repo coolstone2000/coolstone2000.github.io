@@ -2,7 +2,7 @@
 layout: single
 title: "Operating sysetem - Virtualization_processes"
 categories: Operating_system
-tags: OS
+tags: ["OS", "Process", "Virtualization", "System Call", "Process API"]
 toc: true
 author_profile: false
 ---

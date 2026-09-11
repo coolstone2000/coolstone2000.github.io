@@ -2,7 +2,7 @@
 layout: single
 title: "BitMoD Bit-serial Mixture-of-Datatype LLM Acceleration, HPCA 2025"
 categories: Paper_review
-tags: PR
+tags: ["PR", "CA", "AI Accelerator", "LLM", "Quantization", "Bit-Serial", "Hardware-Software Co-Design", "BitMoD"]
 toc: true
 author_profile: false
 comments: true

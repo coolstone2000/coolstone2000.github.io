@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - File system
 categories: Operating_system
-tags: OS
+tags: ["OS", "File System", "Storage", "Inode"]
 toc: true
 author_profile: false
 ---

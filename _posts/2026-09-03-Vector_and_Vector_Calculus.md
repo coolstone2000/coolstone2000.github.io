@@ -3,7 +3,7 @@ layout: single
 classes: vector-calculus-post
 title: "Vector and Vector Calculus"
 categories: Math
-tags: [Math, Linear Algebra, Vector Calculus, Electromagnetics]
+tags: ["Math", "Linear Algebra", "Vector Calculus", "Least Squares", "Eigenvalues", "Electromagnetics", "Maxwell Equations"]
 toc: true
 author_profile: false
 comments: true

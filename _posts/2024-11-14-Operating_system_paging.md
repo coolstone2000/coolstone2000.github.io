@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - Paging
 categories: Operating_system
-tags: OS
+tags: ["OS", "Virtual Memory", "Paging", "Page Table", "Address Translation"]
 toc: true
 author_profile: false
 ---

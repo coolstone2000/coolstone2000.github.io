@@ -2,7 +2,7 @@
 layout: single
 title: Operating sysetem - Address space
 categories: Operating_system
-tags: OS
+tags: ["OS", "Virtual Memory", "Address Space", "Memory Allocation"]
 toc: true
 author_profile: false
 ---

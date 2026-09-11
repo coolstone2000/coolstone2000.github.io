@@ -3,7 +3,7 @@ layout: single
 classes: signals-systems-post
 title: "Signals and Systems & Digital Signal Processing"
 categories: Math
-tags: [Math, Signals and Systems, DSP, Fourier, Sampling]
+tags: ["Math", "Signals and Systems", "DSP", "Fourier", "Sampling", "Convolution", "Z Transform", "FFT", "Digital Filter", "Quantization"]
 toc: true
 author_profile: false
 comments: true

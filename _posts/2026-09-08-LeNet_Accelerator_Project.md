@@ -2,7 +2,7 @@
 layout: single
 title: "2026 여름방학 프로젝트: LeNet FPGA 가속기 — Baseline에서 BitMoD v3까지"
 categories: Project
-tags: FPGA
+tags: ["FPGA", "AI Accelerator", "LeNet", "CNN", "Verilog", "Zynq", "Quantization", "BitMoD", "Hardware-Software Co-Design"]
 toc: true
 toc_sticky: true
 author_profile: false

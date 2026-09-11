@@ -2,7 +2,7 @@
 layout: single
 title: "Orthogonal Functions, Fourier Analysis and Communication"
 categories: Math
-tags: [Math, Fourier, Signals, Communication, DSP, Electromagnetics, Complex Analysis]
+tags: ["Math", "Fourier", "Orthogonal Functions", "Signals and Systems", "Communication", "DSP", "OFDM", "Electromagnetics", "Complex Analysis"]
 toc: true
 author_profile: false
 comments: true

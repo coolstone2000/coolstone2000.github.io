@@ -2,7 +2,7 @@
 layout: single
 title: "Higher-Order ODE"
 categories: Math
-tags: Math
+tags: ["Math", "ODE", "RLC Circuit", "Resonance", "Damping", "Signals and Systems"]
 toc: true
 author_profile: false
 comments: true

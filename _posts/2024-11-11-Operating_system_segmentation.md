@@ -2,7 +2,7 @@
 layout: single
 title: Operating system - Segmentation
 categories: Operating_system
-tags: OS
+tags: ["OS", "Virtual Memory", "Segmentation", "Memory Allocation", "Fragmentation"]
 toc: true
 author_profile: false
 ---
