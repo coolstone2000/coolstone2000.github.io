@@ -14,7 +14,7 @@ layout: default
   {% endunless %}
 {% endif %}
 
-<div id="main" role="main">
+<div id="main" role="main"{% if page.path == 'index.html' %} class="home-page"{% endif %}>
   {% include sidebar.html %}
 
   <div class="archive">

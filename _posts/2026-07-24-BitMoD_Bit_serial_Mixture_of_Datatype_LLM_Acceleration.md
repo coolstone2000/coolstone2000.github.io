@@ -8,6 +8,11 @@ author_profile: false
 comments: true
 ---
 
+## 발표자료
+
+{% include presentation-preview.html title="BitMoD 논문 세미나 발표자료" pages="81" pdf="/files/presentations/bitmod-seminar.pdf" pptx="/files/presentations/bitmod-seminar.pptx" %}
+
+
 
 # ◼︎ Abstract
 

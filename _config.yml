@@ -14,8 +14,6 @@
 remote_theme             : "mmistakes/minimal-mistakes"
 minimal_mistakes_skin    : "air" # "air", "aqua", "contrast", "dark", "dirt", "neon", "mint", "plum", "sunrise"
 dark_theme_toggle        : true
-after_footer_scripts:
-  - /assets/js/custom/dark-theme.js
   
 # Site Settings
 locale                   : "en-US"
@@ -83,6 +81,8 @@ yandex_site_verification :
 baidu_site_verification  :
 
 # Social Sharing
+kakao:
+  javascript_key: "91465fcb20c1e3420262c7fd9d8b236b"
 twitter:
   username               :
 facebook:

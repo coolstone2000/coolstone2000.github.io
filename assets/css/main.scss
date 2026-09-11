@@ -12,14 +12,16 @@ search: false
 
 @font-face {
     font-family: 'Pretendard';
-    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Light.woff') format('woff');
-    font-weight: 200;
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Regular.woff') format('woff');
+    font-weight: 400;
+    font-display: swap;
     font-style: normal;
 }
 @font-face {
     font-family: 'Pretendard';
-    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-ExtraBold.woff') format('woff');
-    font-weight: 900;
+    src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Bold.woff') format('woff');
+    font-weight: 700;
+    font-display: swap;
     font-style: normal;
 }
 
@@ -291,6 +293,36 @@ html[data-theme='dark'] .cusdis-wrapper__title {
   color: rgba(255, 255, 255, 0.55);
 }
 
+/* ==========================================
+   📌 댓글 서비스 연결 상태
+   ========================================== */
+.comments-provider__status {
+  margin: 0;
+  padding: 1rem;
+  border: 1px solid mix(#000, #fff, 12%);
+  border-radius: 8px;
+  color: mix(#000, #fff, 48%);
+  text-align: center;
+}
+
+.comments-provider__status.is-error {
+  color: #b45309;
+}
+
+.comments-provider__status a {
+  color: $link-color;
+  font-weight: 700;
+}
+
+html[data-theme='dark'] .comments-provider__status {
+  border-color: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.66);
+}
+
+html[data-theme='dark'] .comments-provider__status.is-error {
+  color: #f2bb72;
+}
+
 
 /* ==========================================
    📌 다크모드 하단 공유(Share) 버튼 글씨 흰색 변경
@@ -354,7 +386,7 @@ html[data-theme='dark'] .vc-diagram {
   --vc-muted: #b6c1cd;
   --vc-axis: #748191;
   --vc-border: #394454;
-  --vc-accent: #8cced2;
+  --vc-accent: #8fa8d8;
   --vc-secondary: #f2bb72;
   --vc-surface: #31434c;
   --vc-highlight: #497079;
@@ -381,3 +413,5 @@ html[data-theme='dark'] .vc-diagram {
 .ml-math-post .page__content mjx-container[display="true"] {
   padding: 0.3em 0;
 }
+
+@import "minimal-mistakes/custom/readability";

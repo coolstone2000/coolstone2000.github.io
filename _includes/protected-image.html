@@ -1,0 +1,21 @@
+{% assign protected_id = include.id | default: 'protected-image-' | append: forloop.index0 %}
+{% assign protected_question = include.question | default: '내 생년월일' %}
+<figure class="protected-image" data-protected-image data-protected-id="{{ protected_id | slugify }}" data-password="{{ include.password | default: '' | escape }}">
+  <div class="protected-image__locked">
+    <div class="protected-image__icon" aria-hidden="true">🔒</div>
+    <p class="protected-image__title">잠긴 사진입니다</p>
+    <p class="protected-image__hint">{{ include.hint | default: protected_question | append: '을 입력하면 사진을 볼 수 있습니다.' }}</p>
+    <form class="protected-image__form">
+      <label>
+        <span class="visually-hidden">{{ protected_question }}</span>
+        <input class="protected-image__input" type="password" inputmode="numeric" autocomplete="off" placeholder="{{ protected_question }}" required>
+      </label>
+      <button class="btn btn--primary protected-image__submit" type="submit">확인</button>
+    </form>
+    <p class="protected-image__error" role="alert" aria-live="polite"></p>
+  </div>
+  <div class="protected-image__content" hidden>
+    <img data-protected-src="{{ include.src | relative_url }}" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="{{ include.alt | default: '잠금 해제된 사진' | escape }}"{% if include.width %} style="width: min(100%, {{ include.width }}px); border: 10px solid white;"{% else %} style="border: 10px solid white;"{% endif %} loading="lazy">
+    {% if include.caption %}<figcaption>{{ include.caption }}</figcaption>{% endif %}
+  </div>
+</figure>

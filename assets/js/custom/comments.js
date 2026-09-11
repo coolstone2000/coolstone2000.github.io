@@ -2,8 +2,19 @@
   var container = document.getElementById('cusdis_thread');
   if (!container) return;
   var stylesheet = new URL(document.currentScript.dataset.stylesheet, location.href).href;
+  var status = container.parentElement && container.parentElement.querySelector('[data-cusdis-status]');
   var frame;
   var resizeObserver;
+  var fallbackTimer;
+
+  function showUnavailable() {
+    if (!status || frame) return;
+    status.hidden = false;
+    status.classList.add('is-error');
+    status.textContent = '댓글 창을 불러오지 못했습니다. Cusdis 서버가 일시적으로 다운됐을 수 있습니다. 잠시 후 다시 시도해 주세요.';
+  }
+
+  window.__showCusdisUnavailable = showUnavailable;
 
   function syncTheme() {
     var theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
@@ -40,6 +51,8 @@
     var next = container.querySelector('iframe');
     if (!next || next === frame) return;
     frame = next;
+    if (fallbackTimer) window.clearTimeout(fallbackTimer);
+    if (status) status.hidden = true;
     frame.addEventListener('load', styleFrame);
     styleFrame();
   }
@@ -50,4 +63,5 @@
   });
   new MutationObserver(connectFrame).observe(container, { childList: true });
   connectFrame();
+  fallbackTimer = window.setTimeout(showUnavailable, 8000);
 })();

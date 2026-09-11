@@ -1,4 +1,4 @@
-console.log("Code header script loaded");
+
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("div.highlight").forEach((block) => {
@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <span class="dot red"></span>
       <span class="dot yellow"></span>
       <span class="dot green"></span>
-      <button class="copy-btn" onclick="copyCode(this)">
+      <button class="copy-btn" type="button" aria-label="코드 복사" title="코드 복사" onclick="copyCode(this)">
         <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
              viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round">
@@ -54,47 +54,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-function copyCode(button) {
-    const block = button.closest('.highlight');
-    const codeElement = block.querySelector('pre code');
-    let copiedText = '';
-  
-    // 📦 줄 번호 테이블 구조일 경우
-    const table = codeElement.querySelector('table');
-    if (table) {
-      const rows = table.querySelectorAll('tr');
-      rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        if (cells.length === 2) {
-          // 📌 줄 번호(td[0]) + 코드 본문(td[1])
-          copiedText += cells[1].innerText + '\n';
-        } else if (cells.length === 1) {
-          // 혹시 줄 번호 없는 구조면 그냥 그거 복사
-          copiedText += cells[0].innerText + '\n';
-        }
-      });
-    } else {
-      // 👌 줄 번호 테이블 없으면 전체 복사
-      copiedText = codeElement.innerText;
-    }
-  
-    navigator.clipboard.writeText(copiedText.trim()).then(() => {
-      // ✅ 체크 아이콘 전환
-      button.innerHTML = `
-        <svg class="check-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-             viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M20 6L9 17l-5-5" />
-        </svg>`;
-      setTimeout(() => {
-        button.innerHTML = `
-          <svg class="copy-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-               viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>`;
-      }, 1500);
-    });
+async function copyCode(button) {
+  const block = button.closest('.highlight');
+  const codeElement = block.querySelector('pre code');
+  if (!codeElement) return;
+  const codeCells = codeElement.querySelectorAll('td.rouge-code');
+  const text = codeCells.length
+    ? Array.from(codeCells, cell => cell.textContent).join('')
+    : codeElement.textContent;
+  const originalIcon = button.innerHTML;
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = '복사됨';
+    button.setAttribute('aria-label', '코드 복사 완료');
+    button.title = '코드 복사 완료';
+  } catch (_) {
+    button.textContent = '실패';
+    button.setAttribute('aria-label', '복사 실패. 코드를 선택해서 직접 복사해 주세요.');
+    button.title = '코드를 선택해서 직접 복사해 주세요.';
   }
-  
+  window.setTimeout(() => {
+    button.innerHTML = originalIcon;
+    button.setAttribute('aria-label', '코드 복사');
+    button.title = '코드 복사';
+  }, 1800);
+}

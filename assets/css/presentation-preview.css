@@ -1,0 +1,58 @@
+.presentation-preview {
+  margin: 1em 0 2em;
+}
+.presentation-preview__description {
+  font-weight: 700;
+}
+.presentation-preview__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.presentation-preview__actions .btn {
+  margin: 0;
+}
+.presentation-preview__help {
+  margin: 1rem 0;
+  font-size: 0.8em;
+}
+.presentation-preview__frame {
+  display: block;
+  width: 100%;
+  height: 650px;
+  height: clamp(360px, 75vh, 800px);
+  border: 1px solid #888;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.presentation-preview__actions .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.presentation-preview__actions .btn:not(.btn--primary),
+.presentation-preview__actions .btn:not(.btn--primary):visited {
+  color: var(--reading-accent, #006c88) !important;
+  border: 1px solid var(--reading-border, #cbd2d9);
+  background: transparent;
+}
+.presentation-preview__actions .btn:not(.btn--primary):hover,
+.presentation-preview__actions .btn:not(.btn--primary):focus-visible {
+  color: var(--reading-accent-hover, #0085a5) !important;
+  border-color: var(--reading-accent, #006c88);
+  background: var(--reading-accent-soft, rgba(0, 108, 136, .08));
+}
+.presentation-preview__actions .btn--primary,
+.presentation-preview__actions .btn--primary:visited {
+  color: #fff !important;
+}
+@media (max-width: 600px) {
+  .presentation-preview__actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .presentation-preview__actions .btn:first-child { grid-column: 1 / -1; }
+  .presentation-preview__help { font-size: 14px; }
+  .presentation-preview__frame { height: 60vh; min-height: 340px; }
+}

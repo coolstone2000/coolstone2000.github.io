@@ -1,21 +1,96 @@
 <script>
   'use strict';
 
-  (function() {
+  (function () {
     var commentContainer = document.querySelector('#utterances-comments');
 
     if (!commentContainer) {
       return;
     }
 
+    var status = commentContainer.querySelector('[data-comments-status]');
+    var lightTheme = '{{ site.comments.utterances.theme | default: "github-light" }}';
+    var darkTheme = '{{ site.comments.utterances.dark_theme | default: "github-dark" }}';
+    var repo = '{{ site.comments.utterances.repo }}';
+    var issueTerm = '{{ site.comments.utterances.issue_term | default: "pathname" }}';
+    var issueUrl = 'https://github.com/' + repo + '/issues';
+
+    function getTheme() {
+      return document.documentElement.getAttribute('data-theme') === 'dark' ? darkTheme : lightTheme;
+    }
+
+    function setStatus(message, isError) {
+      if (!status) return;
+      status.textContent = message;
+      status.classList.toggle('is-error', Boolean(isError));
+    }
+
+    function syncTheme(theme) {
+      var frame = commentContainer.querySelector('.utterances-frame');
+
+      if (frame && frame.contentWindow) {
+        frame.contentWindow.postMessage({
+          type: 'set-theme',
+          theme: theme || getTheme()
+        }, 'https://utteranc.es');
+      }
+    }
+
+    function markLoaded() {
+      var frame = commentContainer.querySelector('.utterances-frame');
+      if (!frame) return false;
+      if (status) status.hidden = true;
+      syncTheme();
+      return true;
+    }
+
+    window.customUtterances = {
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      onChange: syncTheme
+    };
+
+    if (!repo) {
+      setStatus('댓글 저장소가 설정되지 않았습니다.', true);
+      return;
+    }
+
     var script = document.createElement('script');
-    script.setAttribute('src', 'https://utteranc.es/client.js');
-    script.setAttribute('repo', '{{ site.repository }}');
-    script.setAttribute('issue-term', '{{ site.comments.utterances.issue_term | default: "pathname" }}');
+    script.src = 'https://utteranc.es/client.js';
+    script.async = true;
+    script.setAttribute('repo', repo);
+    script.setAttribute('issue-term', issueTerm);
     {% if site.comments.utterances.label %}script.setAttribute('label', '{{ site.comments.utterances.label }}');{% endif %}
-    script.setAttribute('theme', '{{ site.comments.utterances.theme | default: "github-light" }}');
+    script.setAttribute('theme', getTheme());
     script.setAttribute('crossorigin', 'anonymous');
+    script.onload = function () {
+      setTimeout(function () {
+        if (!markLoaded()) {
+          setStatus('댓글 창을 불러오지 못했습니다. GitHub에서 댓글을 확인할 수 있습니다.', true);
+          if (status && !status.querySelector('a')) {
+            var link = document.createElement('a');
+            link.href = issueUrl;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            link.textContent = ' 댓글 저장소 열기';
+            status.appendChild(link);
+          }
+        }
+      }, 2500);
+    };
 
     commentContainer.appendChild(script);
+
+    var observer = new MutationObserver(function () {
+      if (markLoaded()) observer.disconnect();
+    });
+    observer.observe(commentContainer, { childList: true, subtree: true });
+
+    new MutationObserver(function () {
+      syncTheme();
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
   })();
 </script>

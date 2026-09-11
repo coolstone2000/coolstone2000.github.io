@@ -1,4 +1,13 @@
-<section class="page__share">
+{% assign share_url = page.url | absolute_url %}
+{% assign share_image = page.header.overlay_image | default: page.header.image | default: page.header.teaser | default: site.og_image | default: site.author.avatar %}
+{% assign share_description = page.description | default: page.excerpt | strip_html | strip_newlines | truncate: 100 %}
+<section class="page__share" data-social-share
+  data-share-url="{{ share_url | escape }}"
+  data-share-title="{{ page.title | default: site.title | escape }}"
+  data-share-description="{{ share_description | escape }}"
+  data-share-image="{{ share_image | absolute_url | escape }}"
+  data-production-origin="{{ site.url | escape }}"
+  data-kakao-key="{{ site.kakao.javascript_key | default: '91465fcb20c1e3420262c7fd9d8b236b' | escape }}">
   {% if site.data.ui-text[site.locale].share_on_label %}
     <h4 class="page__share-title">{{ site.data.ui-text[site.locale].share_on_label | default: "Share on" }}</h4>
   {% endif %}
@@ -9,65 +18,14 @@
 
   <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ page.url | absolute_url | url_encode }}" class="btn btn--linkedin" onclick="window.open(this.href, 'window', 'left=20,top=20,width=500,height=500,toolbar=1,resizable=0'); return false;" title="{{ site.data.ui-text[site.locale].share_on_label | default: 'Share on' }} LinkedIn"><i class="fab fa-fw fa-linkedin" aria-hidden="true"></i><span> LinkedIn</span></a>
 
-  <button type="button" id="kakao-share-btn" class="btn" style="background-color:#C8A800;color:#fff;border-color:#C8A800;cursor:pointer;">
+  <button type="button" class="btn btn--kakao" data-share-kind="kakao" aria-label="카카오톡으로 공유">
     <i class="fas fa-comment" aria-hidden="true"></i><span> 카카오톡 공유</span>
   </button>
 
-  <button type="button" id="instagram-share-btn" class="btn" style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;border:none;cursor:pointer;">
-    <i class="fab fa-instagram" aria-hidden="true"></i><span> Instagram</span>
+  <button type="button" class="btn btn--share" data-share-kind="native" aria-label="공유">
+    <i class="fas fa-share-alt" aria-hidden="true"></i><span> 공유</span>
   </button>
-
-  <!-- Kakao SDK -->
-  <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
-  <script>
-    (function() {
-      // Kakao SDK 초기화 (중복 방지)
-      if (typeof Kakao !== 'undefined' && !Kakao.isInitialized()) {
-        Kakao.init('91465fcb20c1e3420262c7fd9d8b236b');
-      }
-
-      document.getElementById('kakao-share-btn').addEventListener('click', function() {
-        if (typeof Kakao === 'undefined' || !Kakao.isInitialized()) {
-          alert('카카오 SDK 로딩 중입니다. 잠시 후 다시 시도해주세요.');
-          return;
-        }
-        Kakao.Share.sendDefault({
-          objectType: 'feed',
-          content: {
-            title: {{ page.title | jsonify | replace: '<', '\u003c' }},
-            description: {{ page.excerpt | strip_html | strip_newlines | truncate: 100 | jsonify | replace: '<', '\u003c' }},
-            imageUrl: {{ page.header.og_image | default: site.og_image | absolute_url | jsonify | replace: '<', '\u003c' }},
-            link: {
-              mobileWebUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
-              webUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
-            },
-          },
-          buttons: [
-            {
-              title: '웹으로 보기',
-              link: {
-                mobileWebUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
-                webUrl: {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }},
-              },
-            },
-          ],
-        });
-      });
-
-      document.getElementById('instagram-share-btn').addEventListener('click', function() {
-        var url = {{ page.url | absolute_url | jsonify | replace: '<', '\u003c' }};
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(url).then(function() {
-            alert('링크가 클립보드에 복사되었습니다!\nInstagram 앱에서 붙여넣기 해주세요.');
-          }).catch(function() {
-            prompt('아래 링크를 복사해서 Instagram에 공유하세요:', url);
-          });
-        } else {
-          prompt('아래 링크를 복사해서 Instagram에 공유하세요:', url);
-        }
-      });
-    })();
-  </script>
+  <p class="page__share-status" data-share-status role="status" aria-live="polite"></p>
 </section>
 
 

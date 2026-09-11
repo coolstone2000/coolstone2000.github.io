@@ -4,6 +4,7 @@
     <span>Comments</span>
   </h4>
 
+  <p class="comments-provider__status" data-cusdis-status role="status" aria-live="polite">댓글 창을 불러오는 중입니다…</p>
   <div id="cusdis_thread"
     data-host="https://cusdis.com"
     data-app-id="db03d51a-2972-422f-ad0a-e9c1760dc064"
@@ -14,4 +15,4 @@
 </div>
 
 <script src="{{ '/assets/js/custom/comments.js' | relative_url }}" data-stylesheet="{{ '/assets/css/comments.css' | relative_url }}"></script>
-<script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
+<script async defer src="https://cusdis.com/js/cusdis.es.js" onerror="window.__showCusdisUnavailable && window.__showCusdisUnavailable();"></script>

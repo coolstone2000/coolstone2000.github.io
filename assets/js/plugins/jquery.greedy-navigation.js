@@ -70,6 +70,7 @@ $(function() {
     availableSpace = /* nav */ $nav.innerWidth()
                    - /* logo */ ($logo.length !== 0 ? $logo.outerWidth(true) : 0)
                    - /* title */ $title.outerWidth(true)
+                   - /* theme switch */ ($nav.find(".tgl-btn").outerWidth(true) || 0)
                    - /* search */ ($search.length !== 0 ? $search.outerWidth(true) : 0)
                    - /* toggle */ (numOfVisibleItems !== breakWidths.length ? $btn.outerWidth(true) : 0);
     requiredSpace = breakWidths[numOfVisibleItems - 1];
@@ -92,6 +93,8 @@ $(function() {
     } else $btn.removeClass('hidden');
   }
 
+  if (document.fonts) document.fonts.ready.then(function() { measureLinks(); check(); });
+
   // Window listeners
   $(window).resize(function() {
     check();
@@ -100,6 +103,7 @@ $(function() {
   $btn.on('click', function() {
     $hlinks.toggleClass('hidden');
     $(this).toggleClass('close');
+    $btn.attr("aria-expanded", !$hlinks.hasClass("hidden"));
     clearTimeout(timer);
   });
 

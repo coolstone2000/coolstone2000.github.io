@@ -1,0 +1,11 @@
+<link rel="stylesheet" href="{{ '/assets/css/presentation-preview.css' | relative_url }}?v={{ site.time | date: '%s' }}">
+<section class="presentation-preview" aria-label="{{ include.title | escape }}">
+  <p class="presentation-preview__description">{{ include.title }} · {{ include.pages }}장</p>
+  <div class="presentation-preview__actions">
+    <a class="btn btn--primary" href="{{ include.pdf | relative_url }}" target="_blank" rel="noopener">PDF 새 창에서 보기</a>
+    <a class="btn" href="{{ include.pdf | relative_url }}" download>PDF 다운로드</a>
+    <a class="btn" href="{{ include.pptx | relative_url }}" download>PPTX 원본 다운로드</a>
+  </div>
+  <p class="presentation-preview__help">아래에서 발표자료를 읽을 수 있습니다. 미리보기가 표시되지 않으면 PDF를 새 창에서 열거나 다운로드해 주세요.</p>
+  <iframe class="presentation-preview__frame" src="{{ include.pdf | relative_url }}#view=FitH" title="{{ include.title | escape }} PDF 미리보기" loading="lazy"></iframe>
+</section>

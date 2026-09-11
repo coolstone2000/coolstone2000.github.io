@@ -13,15 +13,21 @@
   document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/g, '') + ' js ';
 </script>
 
+<script>
+  try {
+    const savedTheme = localStorage.getItem('theme');
+    const dark = savedTheme ? savedTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+  } catch (_) {}
+</script>
 <!-- For all browsers -->
 <link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
+{% if page.share %}
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
+{% endif %}
 <link rel="preload" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css"></noscript>
-<!-- darkmode css -->
-<!-- main.scss → main.css 로 컴파일된 단 하나의 CSS만 불러오기 -->
-<link rel="stylesheet" href="{{ '/assets/css/main.css' | relative_url }}">
-<!-- dark-mode toggle -->
-<script src="/assets/js/custom/dark-theme.js" defer></script>
+
 
 
 {% if site.head_scripts %}
@@ -44,4 +50,4 @@
 <!-- end custom head snippets -->
 
 <!-- _includes/head-custom.html -->
-<script src="/assets/js/custom/inject-code-header.js"></script>
+

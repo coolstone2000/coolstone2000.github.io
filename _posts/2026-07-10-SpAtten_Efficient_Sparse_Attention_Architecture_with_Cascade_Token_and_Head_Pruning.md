@@ -8,6 +8,11 @@ author_profile: false
 comments: true
 ---
 
+## 발표자료
+
+{% include presentation-preview.html title="SpAtten 논문 세미나 발표자료" pages="52" pdf="/files/presentations/spatten-seminar.pdf" pptx="/files/presentations/spatten-seminar.pptx" %}
+
+
 
 # ◼︎ Abstract
 

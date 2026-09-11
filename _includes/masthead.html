@@ -27,8 +27,8 @@
         </button>
         {% endif %}
         {% if site.dark_theme_toggle == true %}
-        <input id="toggle_dark_theme" class="tgl tgl-ios" type="checkbox">
-        <label for="toggle_dark_theme" class="tgl-btn"></label>
+        <input id="toggle_dark_theme" class="tgl tgl-ios" type="checkbox" aria-label="다크 모드">
+        <label for="toggle_dark_theme" class="tgl-btn" title="다크 모드 전환"></label>
         {% endif %}
         <button class="greedy-nav__toggle hidden" type="button">
           <span class="visually-hidden">{{ site.data.ui-text[site.locale].menu_label | default: "Toggle menu" }}</span>

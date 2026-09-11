@@ -196,6 +196,181 @@
       #phase-plane-stability-explorer .pp-controls{grid-template-columns:1fr}
       #phase-plane-stability-explorer .pp-pill{width:100%; text-align:center}
     }
+
+    /* Keep this explorer in the same visual language as the signal/Fourier
+       widgets: quiet surfaces, compact cards, and the site's dark palette. */
+    #phase-plane-stability-explorer {
+      --pp-bg: #f7f8fa;
+      --pp-panel: #ffffff;
+      --pp-panel-2: #ffffff;
+      --pp-border: #ccd6df;
+      --pp-border-strong: #b8c5d0;
+      --pp-text: #222831;
+      --pp-muted: #52606d;
+      --pp-blue: #2563eb;
+      --pp-cyan: #0891b2;
+      --pp-amber: #a95a08;
+      --pp-green: #16724b;
+      --pp-red: #b93443;
+      --pp-purple: #7050a0;
+      --pp-grid: rgba(82, 96, 109, .14);
+      --pp-accent-rgb: 37, 99, 235;
+      margin: 1.35rem 0;
+      padding: 14px;
+      border-radius: 10px;
+      background: var(--pp-bg);
+      box-shadow: none;
+      clear: both;
+      max-width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      container-type: inline-size;
+      color-scheme: light;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+    #phase-plane-stability-explorer.pp-dark {
+      --pp-bg: #252a34;
+      --pp-panel: #20242c;
+      --pp-panel-2: #252a34;
+      --pp-border: #454e5a;
+      --pp-border-strong: #5b6876;
+      --pp-text: #eaeaea;
+      --pp-muted: #b0bdc9;
+      --pp-blue: #8fa8d8;
+      --pp-cyan: #8fa8d8;
+      --pp-amber: #f2bb72;
+      --pp-green: #8bd0ac;
+      --pp-red: #ef929b;
+      --pp-purple: #c2a9e8;
+      --pp-grid: rgba(176, 189, 201, .16);
+      --pp-accent-rgb: 143, 168, 216;
+      background: var(--pp-bg);
+      box-shadow: none;
+      color-scheme: dark;
+    }
+    #phase-plane-stability-explorer .pp-head {
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px 16px;
+      margin-bottom: 10px;
+      padding: 2px 2px 0;
+    }
+    #phase-plane-stability-explorer .pp-kicker {
+      font-size: .76rem;
+      margin-bottom: 4px;
+    }
+    #phase-plane-stability-explorer h3 {
+      font-size: 1.12rem;
+      font-weight: 800;
+      color: var(--pp-text);
+    }
+    #phase-plane-stability-explorer .pp-sub {
+      margin: 7px 0 0;
+      max-width: 720px;
+      font-size: .88rem;
+      line-height: 1.65;
+    }
+    #phase-plane-stability-explorer .pp-pill {
+      min-width: 180px;
+      padding: 9px 13px;
+      border-radius: 12px;
+      border-color: var(--pp-border-strong);
+      background: rgba(var(--pp-accent-rgb), .08);
+      text-align: center;
+      font-weight: 700;
+    }
+    #phase-plane-stability-explorer .pp-tip-grid {
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    #phase-plane-stability-explorer .pp-tip {
+      padding: 9px;
+      border-radius: 8px;
+      background: var(--pp-panel);
+    }
+    #phase-plane-stability-explorer .pp-tip b { font-size: .86rem; }
+    #phase-plane-stability-explorer .pp-tip p { font-size: .80rem; }
+    #phase-plane-stability-explorer .pp-presets {
+      gap: 7px;
+      padding: 8px;
+      border-radius: 13px;
+      background: var(--pp-panel-2);
+    }
+    #phase-plane-stability-explorer button {
+      border-radius: 9px;
+      padding: 7px 10px;
+      background: var(--pp-panel-2);
+      font-size: .80rem;
+      font-weight: 750;
+    }
+    #phase-plane-stability-explorer button:hover {
+      border-color: rgba(var(--pp-accent-rgb), .45);
+      background: rgba(var(--pp-accent-rgb), .12);
+    }
+    #phase-plane-stability-explorer button.is-active {
+      background: rgba(var(--pp-accent-rgb), .18);
+      border-color: rgba(var(--pp-accent-rgb), .64);
+    }
+    #phase-plane-stability-explorer .pp-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #phase-plane-stability-explorer .pp-panel {
+      padding: 11px;
+      border-radius: 14px;
+      background: var(--pp-panel);
+    }
+    #phase-plane-stability-explorer .pp-title { margin-bottom: 9px; }
+    #phase-plane-stability-explorer .pp-title h4,
+    #phase-plane-stability-explorer .pp-graph-head h4 {
+      color: var(--pp-text);
+      font-size: .92rem;
+    }
+    #phase-plane-stability-explorer .pp-card,
+    #phase-plane-stability-explorer .pp-metric,
+    #phase-plane-stability-explorer .pp-box {
+      border-radius: 10px;
+      background: var(--pp-panel-2);
+    }
+    #phase-plane-stability-explorer .pp-card { padding: 7px; }
+    #phase-plane-stability-explorer .pp-metric { padding: 8px 9px; }
+    #phase-plane-stability-explorer .pp-box { border-radius: 11px; }
+    #phase-plane-stability-explorer .pp-note {
+      border-left-color: rgba(var(--pp-accent-rgb), .65);
+      background: rgba(var(--pp-accent-rgb), .09);
+    }
+    #phase-plane-stability-explorer .pp-two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    #phase-plane-stability-explorer .pp-graph {
+      padding: 9px;
+      border-radius: 12px;
+      background: var(--pp-panel);
+    }
+    #phase-plane-stability-explorer canvas { border-radius: 8px; }
+    #phase-plane-stability-explorer .dot-blue { background: var(--pp-blue) !important; }
+    #phase-plane-stability-explorer .dot-amber { background: var(--pp-amber) !important; }
+    #phase-plane-stability-explorer .dot-green { background: var(--pp-green) !important; }
+    #phase-plane-stability-explorer .pp-bottom {
+      border-radius: 13px;
+      background: var(--pp-panel);
+    }
+    @media (max-width: 900px) {
+      #phase-plane-stability-explorer .pp-grid,
+      #phase-plane-stability-explorer .pp-two {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 680px) {
+      #phase-plane-stability-explorer { padding: 13px; }
+      #phase-plane-stability-explorer .pp-head { flex-direction: column; }
+      #phase-plane-stability-explorer .pp-metrics { grid-template-columns: 1fr 1fr; }
+      #phase-plane-stability-explorer .pp-controls { grid-template-columns: 1fr; }
+      #phase-plane-stability-explorer .pp-pill { width: 100%; }
+    }
   </style>
 
   <div class="pp-head">
@@ -299,12 +474,12 @@
       <div class="pp-graph-head">
         <h4>위상평면 (x<sub>1</sub>, x<sub>2</sub>)</h4>
         <div class="pp-legend">
-          <span><i class="dot" style="background:#2563eb"></i>방향장</span>
-          <span><i class="dot" style="background:#d97706"></i>선택 궤적</span>
-          <span><i class="dot" style="background:#059669"></i>초기점</span>
+          <span><i class="dot dot-blue"></i>방향장</span>
+          <span><i class="dot dot-amber"></i>선택 궤적</span>
+          <span><i class="dot dot-green"></i>초기점</span>
         </div>
       </div>
-      <canvas id="pp-phase" width="640" height="430"></canvas>
+      <canvas id="pp-phase" width="640" height="360"></canvas>
       <p class="pp-cap">평면의 각 점에서 화살표는 그 자리에서 상태가 어느 방향으로 움직이는지 뜻한다. 선형계는 원점 중심의 형태를, 비선형계는 여러 임계점 주변의 서로 다른 거동을 보여 준다.</p>
     </section>
 
@@ -312,11 +487,11 @@
       <div class="pp-graph-head">
         <h4>시간응답 x<sub>1</sub>(t), x<sub>2</sub>(t)</h4>
         <div class="pp-legend">
-          <span><i class="dot" style="background:#2563eb"></i>x<sub>1</sub>(t)</span>
-          <span><i class="dot" style="background:#d97706"></i>x<sub>2</sub>(t)</span>
+          <span><i class="dot dot-blue"></i>x<sub>1</sub>(t)</span>
+          <span><i class="dot dot-amber"></i>x<sub>2</sub>(t)</span>
         </div>
       </div>
-      <canvas id="pp-time" width="640" height="430"></canvas>
+      <canvas id="pp-time" width="640" height="360"></canvas>
       <p class="pp-cap">위상평면에서 원점으로 감기면 시간응답에서는 감쇠 진동이 나타난다. 바깥으로 벌어지면 성장, 닫힌 곡선이면 주기적인 응답으로 읽으면 된다.</p>
     </section>
   </div>
@@ -575,6 +750,7 @@
         pctx.fillText("x₂", X(0)+7, 16);
 
         // vector field
+        pctx.globalAlpha = .46;
         for (let gx=-3; gx<=3; gx+=0.75){
           for (let gy=-3; gy<=3; gy+=0.75){
             const v = field(sys, gx, gy);
@@ -582,7 +758,7 @@
             if (mag < 1e-9) continue;
             const ux=v.x/mag, uy=v.y/mag, len=.23;
             const x2=gx+ux*len, y2=gy+uy*len;
-            pctx.strokeStyle = root.classList.contains("pp-dark") ? "rgba(96,165,250,.46)" : "rgba(37,99,235,.44)";
+            pctx.strokeStyle = colors.blue;
             pctx.lineWidth = 1;
             pctx.beginPath(); pctx.moveTo(X(gx),Y(gy)); pctx.lineTo(X(x2),Y(y2)); pctx.stroke();
             const px=X(x2), py=Y(y2), ang=Math.atan2(Y(y2)-Y(gy), X(x2)-X(gx)), ah=4.3;
@@ -591,10 +767,11 @@
             pctx.lineTo(px-ah*Math.cos(ang-Math.PI/6), py-ah*Math.sin(ang-Math.PI/6));
             pctx.lineTo(px-ah*Math.cos(ang+Math.PI/6), py-ah*Math.sin(ang+Math.PI/6));
             pctx.closePath();
-            pctx.fillStyle = root.classList.contains("pp-dark") ? "rgba(96,165,250,.46)" : "rgba(37,99,235,.44)";
+            pctx.fillStyle = colors.blue;
             pctx.fill();
           }
         }
+        pctx.globalAlpha = 1;
 
         // helper trajectories
         const seeds = [];

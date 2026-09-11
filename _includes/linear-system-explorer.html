@@ -602,6 +602,77 @@
     @media (max-width: 700px) {
       #linear-system-explorer { padding: 13px; }
     }
+
+    /* Match the compact Signals/Fourier widgets and the site's dark surface.
+       Keep all interaction and the light palette intact while reducing the
+       amount of vertical scrolling on the article page. */
+    #linear-system-explorer {
+      margin: 1.35rem 0;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+    #linear-system-explorer[data-lse-theme="dark"] {
+      --lse-bg: #252a34;
+      --lse-bg-2: #252a34;
+      --lse-panel: #20242c;
+      --lse-panel-2: #20242c;
+      --lse-border: #454e5a;
+      --lse-border-strong: #5b6876;
+      --lse-text: #eaeaea;
+      --lse-muted: #b0bdc9;
+      --lse-heading-soft: #c3cfdb;
+      --lse-strong: #f4f6fa;
+      --lse-control-bg: #1d2430;
+      --lse-box-bg: #1d2430;
+      --lse-button-bg: #20242c;
+      --lse-soft-bg: #20242c;
+      --lse-rule-bg: #252a34;
+      --lse-blue: #8fa8d8;
+      --lse-cyan: #8fa8d8;
+      --lse-amber: #f2bb72;
+      --lse-orange: #f2bb72;
+      --lse-green: #8bd0ac;
+      --lse-red: #ef929b;
+      --lse-purple: #c2a9e8;
+      --lse-chip: rgba(143, 168, 216, .14);
+      --lse-canvas-bg: #1d2430;
+      --lse-canvas-grid: rgba(176, 189, 201, .16);
+      --lse-canvas-axis: rgba(234, 234, 234, .38);
+      --lse-canvas-text: rgba(234, 234, 234, .74);
+      --lse-canvas-helper: rgba(176, 189, 201, .2);
+      --lse-vector-field: rgba(143, 168, 216, .48);
+      --lse-eigen-line-1: rgba(143, 168, 216, .62);
+      --lse-eigen-line-2: rgba(194, 169, 232, .58);
+      --lse-canvas-dot-stroke: rgba(255, 255, 255, .62);
+      --lse-eig-axis: rgba(176, 189, 201, .3);
+      --lse-eig-text: rgba(234, 234, 234, .65);
+      --lse-stable-zone: rgba(139, 208, 172, .1);
+      --lse-unstable-zone: rgba(239, 146, 155, .08);
+      background: var(--lse-bg);
+      color-scheme: dark;
+    }
+    #linear-system-explorer .lse-header { gap: 14px; padding-bottom: 10px; }
+    #linear-system-explorer .lse-main-eq { min-width: 150px; padding: 7px 10px; }
+    #linear-system-explorer .lse-preset-row { gap: 6px; padding: 8px; margin-bottom: 10px; }
+    #linear-system-explorer .lse-top-grid,
+    #linear-system-explorer .lse-graph-grid { gap: 10px; }
+    #linear-system-explorer .lse-panel,
+    #linear-system-explorer .lse-graph-panel { padding: 11px; border-radius: 10px; }
+    #linear-system-explorer .lse-panel-title { margin-bottom: 8px; }
+    #linear-system-explorer .lse-editor { gap: 10px; }
+    #linear-system-explorer .lse-metrics { gap: 6px; margin-bottom: 8px; }
+    #linear-system-explorer .lse-analysis-grid { gap: 8px; }
+    #linear-system-explorer .lse-graph-grid { margin-top: 10px; }
+    #linear-system-explorer canvas.lse-canvas { aspect-ratio: 16 / 9; height: auto; }
+    #linear-system-explorer .lse-footnote { margin-top: 10px; padding: 8px 10px; }
+    #linear-system-explorer .lse-dot-blue { background: var(--lse-blue) !important; }
+    #linear-system-explorer .lse-dot-amber { background: var(--lse-amber) !important; }
+    #linear-system-explorer .lse-dot-green { background: var(--lse-green) !important; }
+    @media (max-width: 700px) {
+      #linear-system-explorer { padding: 12px; }
+      #linear-system-explorer canvas.lse-canvas { aspect-ratio: 4 / 3; }
+    }
   </style>
 
   <div class="lse-header">
@@ -738,12 +809,12 @@
       <div class="lse-graph-head">
         <h4>위상평면 \(x_1\)-\(x_2\)</h4>
         <div class="lse-legend">
-          <span><i class="lse-dot" style="background:#60a5fa;"></i>방향장</span>
-          <span><i class="lse-dot" style="background:#f97316;"></i>선택 궤적</span>
-          <span><i class="lse-dot" style="background:#34d399;"></i>초기점</span>
+          <span><i class="lse-dot lse-dot-blue"></i>방향장</span>
+          <span><i class="lse-dot lse-dot-amber"></i>선택 궤적</span>
+          <span><i class="lse-dot lse-dot-green"></i>초기점</span>
         </div>
       </div>
-      <canvas class="lse-canvas" id="lse-phase" width="640" height="430"></canvas>
+      <canvas class="lse-canvas" id="lse-phase" width="640" height="360"></canvas>
       <p class="lse-caption">
         화살표는 각 점에서의 \(\dot{\mathbf{x}}=A\mathbf{x}\) 방향이다.
         실수 고유벡터가 존재하면 그 방향을 점선으로 함께 표시한다.
@@ -754,11 +825,11 @@
       <div class="lse-graph-head">
         <h4>시간응답 \(x_1(t),\,x_2(t)\)</h4>
         <div class="lse-legend">
-          <span><i class="lse-dot" style="background:#60a5fa;"></i>\(x_1(t)\)</span>
-          <span><i class="lse-dot" style="background:#f59e0b;"></i>\(x_2(t)\)</span>
+          <span><i class="lse-dot lse-dot-blue"></i>\(x_1(t)\)</span>
+          <span><i class="lse-dot lse-dot-amber"></i>\(x_2(t)\)</span>
         </div>
       </div>
-      <canvas class="lse-canvas" id="lse-time" width="640" height="430"></canvas>
+      <canvas class="lse-canvas" id="lse-time" width="640" height="360"></canvas>
       <p class="lse-caption">
         위상평면의 수렴·발산·회전이 시간축에서는 감쇠, 성장, 진동으로 나타난다.
       </p>

@@ -9,6 +9,11 @@ author_profile: false
 comments: true
 ---
 
+## 발표자료
+
+{% include presentation-preview.html title="LeNet 가속기 프로젝트 발표자료" pages="40" pdf="/files/presentations/lenet-accelerator.pdf" pptx="/files/presentations/lenet-accelerator.pptx" %}
+
+
 <link rel="stylesheet" href="{{ "/assets/css/lenet-project.css" | relative_url }}">
 
 <div class="lenet-project" markdown="1">

@@ -7,7 +7,7 @@
 }
 html[data-theme='dark'] .ssv-root {
   --ss-bg:#252a34; --ss-panel:#20242c; --ss-border:#454e5a; --ss-text:#eaeaea;
-  --ss-muted:#b0bdc9; --ss-blue:#8cced2; --ss-amber:#f2bb72; --ss-green:#8bd0ac;
+  --ss-muted:#b0bdc9; --ss-blue:#8fa8d8; --ss-amber:#f2bb72; --ss-green:#8bd0ac;
   --ss-red:#ef929b; --ss-purple:#c2a9e8;
 }
 .ssv-root * {box-sizing:border-box;}
