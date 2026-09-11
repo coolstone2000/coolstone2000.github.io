@@ -1,0 +1,2143 @@
+{
+  "sources": [
+    {
+      "section": "overview",
+      "file": "2026년 여름방학 인턴 프로젝트 3af6df6cdff980bfab54d3c49876eae8.md",
+      "sha256": "53384fa468756fba14f4b6e3e71089baf2c788eb53b00ee45055a06f6376fb81"
+    },
+    {
+      "section": "baseline",
+      "file": "LeNet baseline 2816df6cdff98026824be64f8c6e8195.md",
+      "sha256": "3ef1475fc91e1d92ea7d17a0b57d13249f849bcd9fb25a44c0ef8b55eca0f3ee"
+    },
+    {
+      "section": "v2",
+      "file": "LeNet accelerator v2 3af6df6cdff9800b88f1eb32db8a3fe8.md",
+      "sha256": "5c58dba7ca3c954658da21534d0aade0b5ca6829366307365088fa7ab9b065c1"
+    },
+    {
+      "section": "v3",
+      "file": "LeNet BitMoD v3 3bd6df6cdff9808493fee620d71f7078.md",
+      "sha256": "ced17f73b776c2cfe60efc441ff206f110765721f695d6e2cf3748791065d0c4"
+    },
+    {
+      "section": "quantization",
+      "file": "combined_quantization_results_notion.md",
+      "sha256": "b51125b3f02892c325ced575464cf995d508fc731a70606de959798b92836412"
+    }
+  ],
+  "images": [
+    {
+      "section": "overview",
+      "source": "image.png",
+      "path": "/assets/images/lenet-project-2026/overview-01.png",
+      "width": 1147,
+      "height": 664,
+      "sha256": "56ea7bd68e7fdb52e885ea995d92894dfb0896dd9ddedb4319d7ac9000fef8ac"
+    },
+    {
+      "section": "baseline",
+      "source": "image.png",
+      "path": "/assets/images/lenet-project-2026/baseline-01.png",
+      "width": 2031,
+      "height": 1225,
+      "sha256": "3d2c187aedf405973fb4d95767986da529d6e83cbd992488620e1e2197a3c918"
+    },
+    {
+      "section": "baseline",
+      "source": "image 1.png",
+      "path": "/assets/images/lenet-project-2026/baseline-02.png",
+      "width": 1291,
+      "height": 925,
+      "sha256": "ab620795ac4f61c848028d6928e318e9188fbc6888e5cc154782e5a063edf839"
+    },
+    {
+      "section": "baseline",
+      "source": "image 2.png",
+      "path": "/assets/images/lenet-project-2026/baseline-03.png",
+      "width": 1043,
+      "height": 788,
+      "sha256": "c627aa0ed45da49bfdf7511f55f44df512c9684c6bc00a1b39672fdf7d5d61b8"
+    },
+    {
+      "section": "baseline",
+      "source": "image 3.png",
+      "path": "/assets/images/lenet-project-2026/baseline-04.png",
+      "width": 1036,
+      "height": 778,
+      "sha256": "2cb129c157a547d4d30333ef6df422a9416eb5b59f879a029d3e7153a7ea6c61"
+    },
+    {
+      "section": "baseline",
+      "source": "image 4.png",
+      "path": "/assets/images/lenet-project-2026/baseline-05.png",
+      "width": 1292,
+      "height": 924,
+      "sha256": "96fe7a69132efe4d020c18f60687029c1afdb7a7a085a1d064b86f2711ae7d6e"
+    },
+    {
+      "section": "baseline",
+      "source": "image 5.png",
+      "path": "/assets/images/lenet-project-2026/baseline-06.png",
+      "width": 1041,
+      "height": 788,
+      "sha256": "9ec1002104deb32c786a07fc6f9dacb8b69ae6efbe53e7c16d53eb2302a04a7d"
+    },
+    {
+      "section": "baseline",
+      "source": "image 6.png",
+      "path": "/assets/images/lenet-project-2026/baseline-07.png",
+      "width": 1296,
+      "height": 926,
+      "sha256": "ece138efdac69afef123ee4790ad4c39d5caddbaf574f8dc4a1b3868a3c49b5f"
+    },
+    {
+      "section": "baseline",
+      "source": "image 7.png",
+      "path": "/assets/images/lenet-project-2026/baseline-08.png",
+      "width": 1041,
+      "height": 777,
+      "sha256": "ef7adbf6f4801b9cdbc4f483cd54d77e0483538b6f66621c5f2b5978d291c29e"
+    },
+    {
+      "section": "baseline",
+      "source": "image 8.png",
+      "path": "/assets/images/lenet-project-2026/baseline-09.png",
+      "width": 1362,
+      "height": 633,
+      "sha256": "e7761452bc6ce33729c05f4d067d24b3bb1b7db15621ce6c151184c328764ae4"
+    },
+    {
+      "section": "baseline",
+      "source": "image 9.png",
+      "path": "/assets/images/lenet-project-2026/baseline-10.png",
+      "width": 842,
+      "height": 570,
+      "sha256": "7dec49cddbb8474fe3146a6e9a321b9967693d71817c5e57cf82d359ce699c07"
+    },
+    {
+      "section": "baseline",
+      "source": "image 10.png",
+      "path": "/assets/images/lenet-project-2026/baseline-11.png",
+      "width": 840,
+      "height": 571,
+      "sha256": "fcf1200adf9969e0900ac59b3e5dc9efb7329e71bf8b0b1dffb02077245a00ea"
+    },
+    {
+      "section": "baseline",
+      "source": "image 11.png",
+      "path": "/assets/images/lenet-project-2026/baseline-12.png",
+      "width": 841,
+      "height": 564,
+      "sha256": "40025a2e6a3dcf96aa31f1666fa4f8ec1d946fb5dee29af8443792b8dca5665b"
+    },
+    {
+      "section": "baseline",
+      "source": "image 12.png",
+      "path": "/assets/images/lenet-project-2026/baseline-13.png",
+      "width": 841,
+      "height": 570,
+      "sha256": "f3034497b928fd7f8404a488e94768f873159f636fe71e0273929054788a5c6d"
+    },
+    {
+      "section": "baseline",
+      "source": "image 13.png",
+      "path": "/assets/images/lenet-project-2026/baseline-14.png",
+      "width": 795,
+      "height": 655,
+      "sha256": "ce4f34c40124403e9f9522ded0934152e58ca5cc86721c1c4a3e53b352fcef40"
+    },
+    {
+      "section": "baseline",
+      "source": "image 14.png",
+      "path": "/assets/images/lenet-project-2026/baseline-15.png",
+      "width": 2548,
+      "height": 1372,
+      "sha256": "ceb298b7e075deb912397ae92d976756640e59f726ce4af288c867e834501c7b"
+    },
+    {
+      "section": "baseline",
+      "source": "image 15.png",
+      "path": "/assets/images/lenet-project-2026/baseline-16.png",
+      "width": 1710,
+      "height": 978,
+      "sha256": "9e4550db4a1947846120ac198aa72c0ebb0763deafb894125cccd5d2c42e2d14"
+    },
+    {
+      "section": "baseline",
+      "source": "image 16.png",
+      "path": "/assets/images/lenet-project-2026/baseline-17.png",
+      "width": 1503,
+      "height": 985,
+      "sha256": "23d90aafd034dc30a41857361fe67ec3d405e0a0dae6f4c13c33dff26285289f"
+    },
+    {
+      "section": "baseline",
+      "source": "image 17.png",
+      "path": "/assets/images/lenet-project-2026/baseline-18.png",
+      "width": 1717,
+      "height": 976,
+      "sha256": "fdabdcd4d9c5c34158ff1d88c7612d7fe878d30e890c01de5fa3d366e86bd1f6"
+    },
+    {
+      "section": "baseline",
+      "source": "image 18.png",
+      "path": "/assets/images/lenet-project-2026/baseline-19.png",
+      "width": 832,
+      "height": 652,
+      "sha256": "e3ec3bf1d314b603519f776d7021310f30a1b994ad4a2d156c36b2e8fd057dbd"
+    },
+    {
+      "section": "baseline",
+      "source": "image 19.png",
+      "path": "/assets/images/lenet-project-2026/baseline-20.png",
+      "width": 841,
+      "height": 572,
+      "sha256": "137c7c2efc84e3a73f0d875f68856c9ad848e469349b5f27c59ac8f22fe008e2"
+    },
+    {
+      "section": "baseline",
+      "source": "image 20.png",
+      "path": "/assets/images/lenet-project-2026/baseline-21.png",
+      "width": 840,
+      "height": 567,
+      "sha256": "88d3899586b7bb68e311a82b4a746f20f0db148877185911228bd8d490ff6869"
+    },
+    {
+      "section": "baseline",
+      "source": "image 21.png",
+      "path": "/assets/images/lenet-project-2026/baseline-22.png",
+      "width": 2559,
+      "height": 1389,
+      "sha256": "30e13cd61bac405472dec496a329fc71a19b92eda645cd223a4fc925c9a2c31a"
+    },
+    {
+      "section": "baseline",
+      "source": "image 22.png",
+      "path": "/assets/images/lenet-project-2026/baseline-23.png",
+      "width": 864,
+      "height": 761,
+      "sha256": "5548c334eddcf0f0061c31f315d335b551d62669561fd068e7f6924c9984af7f"
+    },
+    {
+      "section": "baseline",
+      "source": "image 23.png",
+      "path": "/assets/images/lenet-project-2026/baseline-24.png",
+      "width": 863,
+      "height": 771,
+      "sha256": "7093ca0531b257af927fa412a8e6f86e273c106ca02ba8a86d14023113ce3047"
+    },
+    {
+      "section": "baseline",
+      "source": "image 24.png",
+      "path": "/assets/images/lenet-project-2026/baseline-25.png",
+      "width": 1292,
+      "height": 976,
+      "sha256": "3e4fb3c6a5261b666caf5cabfa2146d2906b8aa3cc728d9e56f2a771d9f1c825"
+    },
+    {
+      "section": "baseline",
+      "source": "image 25.png",
+      "path": "/assets/images/lenet-project-2026/baseline-26.png",
+      "width": 1862,
+      "height": 923,
+      "sha256": "db9a6453adef033bded7198c292d7758ee318424e077e3265b389424bbef1670"
+    },
+    {
+      "section": "baseline",
+      "source": "image 26.png",
+      "path": "/assets/images/lenet-project-2026/baseline-27.png",
+      "width": 628,
+      "height": 262,
+      "sha256": "68d729d0cad1fac86bb574e8faa1a227323757e97b3532342087df1de1b94804"
+    },
+    {
+      "section": "baseline",
+      "source": "image 27.png",
+      "path": "/assets/images/lenet-project-2026/baseline-28.png",
+      "width": 582,
+      "height": 582,
+      "sha256": "5f3110a4d28ba8442e7e6be1bb19049845ff9b542fc9bd2b6bbc074812a5762f"
+    },
+    {
+      "section": "baseline",
+      "source": "image 28.png",
+      "path": "/assets/images/lenet-project-2026/baseline-29.png",
+      "width": 500,
+      "height": 608,
+      "sha256": "3756f8e599e2dd2fb8cad4810c926ac0c1ea2d92dc028b280db23d3db9c1ef4e"
+    },
+    {
+      "section": "baseline",
+      "source": "image 29.png",
+      "path": "/assets/images/lenet-project-2026/baseline-30.png",
+      "width": 1094,
+      "height": 474,
+      "sha256": "0537c9ecbe742aff22676b27ff1ef92613b25787b8e5ebd41a22de92e67cf81e"
+    },
+    {
+      "section": "baseline",
+      "source": "image 30.png",
+      "path": "/assets/images/lenet-project-2026/baseline-31.png",
+      "width": 329,
+      "height": 449,
+      "sha256": "07efc52aeda34390f25f05a9b18e5fbe0a2c4daf879adf231cdd02946b00d552"
+    },
+    {
+      "section": "baseline",
+      "source": "image 31.png",
+      "path": "/assets/images/lenet-project-2026/baseline-32.png",
+      "width": 1033,
+      "height": 783,
+      "sha256": "7892ea5c12044db30e7c4562624f16cb5cb3694dba2c82704d28ab6bf791fd2b"
+    },
+    {
+      "section": "baseline",
+      "source": "image 32.png",
+      "path": "/assets/images/lenet-project-2026/baseline-33.png",
+      "width": 949,
+      "height": 907,
+      "sha256": "f122b30b52ca0b999004c28f8b5e73d7c077200932a9d9425c1d099c23f4446a"
+    },
+    {
+      "section": "baseline",
+      "source": "image 33.png",
+      "path": "/assets/images/lenet-project-2026/baseline-34.png",
+      "width": 1035,
+      "height": 796,
+      "sha256": "da2e67c7f2d4c2b922fda8b4dcaa65b1b8202076eff827913f88ef1849c71f88"
+    },
+    {
+      "section": "baseline",
+      "source": "image 34.png",
+      "path": "/assets/images/lenet-project-2026/baseline-35.png",
+      "width": 376,
+      "height": 596,
+      "sha256": "b285d72804f9f990c58b34bcc0c622d9cb3958ffc10d6ab3f8c0660b7fb2675b"
+    },
+    {
+      "section": "baseline",
+      "source": "image 35.png",
+      "path": "/assets/images/lenet-project-2026/baseline-36.png",
+      "width": 1034,
+      "height": 779,
+      "sha256": "add5e23f2b16c394646bacf298887dd140de50e386eb1cb7b9a2cedd7d862b04"
+    },
+    {
+      "section": "baseline",
+      "source": "image 36.png",
+      "path": "/assets/images/lenet-project-2026/baseline-37.png",
+      "width": 1280,
+      "height": 543,
+      "sha256": "3a2bf97807b478d1e24dcfc029746eb1284bb6eed31591596bc879ee422745e2"
+    },
+    {
+      "section": "baseline",
+      "source": "image 37.png",
+      "path": "/assets/images/lenet-project-2026/baseline-38.png",
+      "width": 1153,
+      "height": 447,
+      "sha256": "6cf61be265aa72cfc67a6f62a2768cc3f84846f507bad8f167754dbe274a6df1"
+    },
+    {
+      "section": "baseline",
+      "source": "image 38.png",
+      "path": "/assets/images/lenet-project-2026/baseline-39.png",
+      "width": 1035,
+      "height": 781,
+      "sha256": "5023b572f02fb7dbeaabca4bdab3229d1ebe059b1c6cb49464f1ae2b9e098c3e"
+    },
+    {
+      "section": "baseline",
+      "source": "image 39.png",
+      "path": "/assets/images/lenet-project-2026/baseline-40.png",
+      "width": 1036,
+      "height": 786,
+      "sha256": "b28d01fb1ee1af12c2856a2df5828f5193a3f07a8fd662e9888667adf47e6ea8"
+    },
+    {
+      "section": "baseline",
+      "source": "image 40.png",
+      "path": "/assets/images/lenet-project-2026/baseline-41.png",
+      "width": 1573,
+      "height": 628,
+      "sha256": "df67c9ab486ecf07e8f84ffeec29d2962fcff18e1f6ae8a5eedde7cbb9b68fc8"
+    },
+    {
+      "section": "baseline",
+      "source": "image 41.png",
+      "path": "/assets/images/lenet-project-2026/baseline-42.png",
+      "width": 1035,
+      "height": 786,
+      "sha256": "0985d7dc050463625e2a2f0baea1620ab3dc0e5526a32e72b0c36f461148f7d9"
+    },
+    {
+      "section": "baseline",
+      "source": "image 42.png",
+      "path": "/assets/images/lenet-project-2026/baseline-43.png",
+      "width": 1361,
+      "height": 541,
+      "sha256": "fa9498e64c8c88d6477b0a7541e4fb48d0628625599f74230366b7536589a0c0"
+    },
+    {
+      "section": "baseline",
+      "source": "image 43.png",
+      "path": "/assets/images/lenet-project-2026/baseline-44.png",
+      "width": 990,
+      "height": 734,
+      "sha256": "b373cc182658d19398c843a4eb5490629fe694c784134e578c8340c635ff6e42"
+    },
+    {
+      "section": "baseline",
+      "source": "image 44.png",
+      "path": "/assets/images/lenet-project-2026/baseline-45.png",
+      "width": 1372,
+      "height": 840,
+      "sha256": "bbe450bba8120ab2c04b8a44b7321a40a79f70c8a6b8c98df67219b3183bac26"
+    },
+    {
+      "section": "baseline",
+      "source": "image 45.png",
+      "path": "/assets/images/lenet-project-2026/baseline-46.png",
+      "width": 433,
+      "height": 851,
+      "sha256": "c23daceed6f9f6d76ad97d9fc50ee2a05a59b85534cbdcfe56a89a6260c42b02"
+    },
+    {
+      "section": "baseline",
+      "source": "image 46.png",
+      "path": "/assets/images/lenet-project-2026/baseline-47.png",
+      "width": 1014,
+      "height": 145,
+      "sha256": "10e7def81a9cfa1c89ece2f8bba762d475667dc9abfea982613fb1b5408cbba3"
+    },
+    {
+      "section": "baseline",
+      "source": "image 47.png",
+      "path": "/assets/images/lenet-project-2026/baseline-48.png",
+      "width": 2306,
+      "height": 322,
+      "sha256": "4c775c34b42900882dab0a475343cca1277e0c5317f280cdb504458a15a24527"
+    },
+    {
+      "section": "baseline",
+      "source": "image 48.png",
+      "path": "/assets/images/lenet-project-2026/baseline-49.png",
+      "width": 1605,
+      "height": 213,
+      "sha256": "1852aeca51a7974533473ed11a0fc2a108c328d020a51208a92253ac57d3e42a"
+    },
+    {
+      "section": "baseline",
+      "source": "image 49.png",
+      "path": "/assets/images/lenet-project-2026/baseline-50.png",
+      "width": 640,
+      "height": 601,
+      "sha256": "484cf31856c26298b98cbe9e1649cadc661255089603da85729d37a4dba1ab06"
+    },
+    {
+      "section": "baseline",
+      "source": "image 50.png",
+      "path": "/assets/images/lenet-project-2026/baseline-51.png",
+      "width": 779,
+      "height": 664,
+      "sha256": "c081274e8c0783507d893503a7052cd77767068a080757e12271ed9e2c984b61"
+    },
+    {
+      "section": "baseline",
+      "source": "image 51.png",
+      "path": "/assets/images/lenet-project-2026/baseline-52.png",
+      "width": 618,
+      "height": 589,
+      "sha256": "51ef08d27bcc9c9bdd8bc72e2fba4a1393289e3424bcdf4501a1151a2645ce60"
+    },
+    {
+      "section": "baseline",
+      "source": "image 52.png",
+      "path": "/assets/images/lenet-project-2026/baseline-53.png",
+      "width": 1530,
+      "height": 200,
+      "sha256": "14f135f2681f229187e5d658cc3ce57f55e291b2932b3bb88469fbd4d9a87018"
+    },
+    {
+      "section": "baseline",
+      "source": "image 53.png",
+      "path": "/assets/images/lenet-project-2026/baseline-54.png",
+      "width": 1198,
+      "height": 491,
+      "sha256": "383f382bf7c497e5ebf7a3c7cbb3b607dea318beb4ea40f205b2a5aa3ebfccfe"
+    },
+    {
+      "section": "baseline",
+      "source": "image 54.png",
+      "path": "/assets/images/lenet-project-2026/baseline-55.png",
+      "width": 1968,
+      "height": 1082,
+      "sha256": "4fb7de3582a768072f0955bed67235b18927760dbf512b5d086ca2a8cf006b02"
+    },
+    {
+      "section": "baseline",
+      "source": "image 55.png",
+      "path": "/assets/images/lenet-project-2026/baseline-56.png",
+      "width": 1057,
+      "height": 708,
+      "sha256": "39051c950698cceda9b7be1ce5b939a9736a1a23e5924e169011f49454890dda"
+    },
+    {
+      "section": "baseline",
+      "source": "image 56.png",
+      "path": "/assets/images/lenet-project-2026/baseline-57.png",
+      "width": 1049,
+      "height": 707,
+      "sha256": "6563881c347d7a09049a0c25d697cdc4f9a687c77ad37c945518d61395169d3f"
+    },
+    {
+      "section": "baseline",
+      "source": "image 57.png",
+      "path": "/assets/images/lenet-project-2026/baseline-58.png",
+      "width": 450,
+      "height": 157,
+      "sha256": "f14d47b514bf778c80c31c05c6922dfb1f4fe1174246347a89fbca7a962bf0e8"
+    },
+    {
+      "section": "baseline",
+      "source": "image 58.png",
+      "path": "/assets/images/lenet-project-2026/baseline-59.png",
+      "width": 498,
+      "height": 485,
+      "sha256": "9ca2babdd01fd40f70a6edb2e21b31f9135c63420991df9a36a33ebd1c3d0501"
+    },
+    {
+      "section": "baseline",
+      "source": "image 59.png",
+      "path": "/assets/images/lenet-project-2026/baseline-60.png",
+      "width": 680,
+      "height": 552,
+      "sha256": "527937512c0fb92b7ddd87dd4ff4041e00791b3f03a912237da8b89edccf5268"
+    },
+    {
+      "section": "baseline",
+      "source": "image 60.png",
+      "path": "/assets/images/lenet-project-2026/baseline-61.png",
+      "width": 1055,
+      "height": 703,
+      "sha256": "d1ba6de19f9023b6052d572280aeaee4179af6f85f259f022a63cb28f75b9d77"
+    },
+    {
+      "section": "baseline",
+      "source": "image 61.png",
+      "path": "/assets/images/lenet-project-2026/baseline-62.png",
+      "width": 270,
+      "height": 275,
+      "sha256": "47e9921ed7b066749248076eedd99b9351a97e961f2963b1200c72c9a16d0832"
+    },
+    {
+      "section": "baseline",
+      "source": "image 62.png",
+      "path": "/assets/images/lenet-project-2026/baseline-63.png",
+      "width": 446,
+      "height": 342,
+      "sha256": "06d9350c84fe1d1296299cc057d77df2e7f0834a8c67a052bbaf1066acbbc405"
+    },
+    {
+      "section": "baseline",
+      "source": "image 63.png",
+      "path": "/assets/images/lenet-project-2026/baseline-64.png",
+      "width": 609,
+      "height": 289,
+      "sha256": "ef657b6134926aa1a8549b6fabc9c3e8d2cdf2a867469aad4d0c5f7f3757ab8f"
+    },
+    {
+      "section": "baseline",
+      "source": "image 64.png",
+      "path": "/assets/images/lenet-project-2026/baseline-65.png",
+      "width": 509,
+      "height": 80,
+      "sha256": "958536abc58df56fe6d39db83b12dfdc3d49fa44956c27a1ab88ed706d911640"
+    },
+    {
+      "section": "baseline",
+      "source": "image 65.png",
+      "path": "/assets/images/lenet-project-2026/baseline-66.png",
+      "width": 1188,
+      "height": 712,
+      "sha256": "988d82da62f84cf76827ce7164e0ce0d292a42e3fef8016f8c07659bc58026ad"
+    },
+    {
+      "section": "v2",
+      "source": "image.png",
+      "path": "/assets/images/lenet-project-2026/v2-01.png",
+      "width": 1619,
+      "height": 971,
+      "sha256": "808a54e3b66bdbc4629daf2160de724cbcac7abdeb862d212f24bb9cf0014f76"
+    },
+    {
+      "section": "v2",
+      "source": "image 1.png",
+      "path": "/assets/images/lenet-project-2026/v2-02.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "a14cb471839f159969195eac1cac89bc90c98bb6fdefffcdf6f27864c861da20"
+    },
+    {
+      "section": "v2",
+      "source": "image 2.png",
+      "path": "/assets/images/lenet-project-2026/v2-03.png",
+      "width": 2078,
+      "height": 370,
+      "sha256": "f35e796b384fc0db099b8846f209763eabb855f98b89db317faca90d8e951f9c"
+    },
+    {
+      "section": "v2",
+      "source": "image 3.png",
+      "path": "/assets/images/lenet-project-2026/v2-04.png",
+      "width": 1858,
+      "height": 722,
+      "sha256": "033949b8b52e093a86ed2388add589e4881f18754b39a60b3db15b4300e0e6d6"
+    },
+    {
+      "section": "v2",
+      "source": "image 4.png",
+      "path": "/assets/images/lenet-project-2026/v2-05.png",
+      "width": 2286,
+      "height": 489,
+      "sha256": "1ba5890c61943f17a4814dac02a0ca4a4eec88e64c9da9811f36baf7d1684002"
+    },
+    {
+      "section": "v2",
+      "source": "image 5.png",
+      "path": "/assets/images/lenet-project-2026/v2-06.png",
+      "width": 915,
+      "height": 230,
+      "sha256": "fe640f87b34b4479f348a34659362199de2cd558a9aba5e32a24f792181ffbd3"
+    },
+    {
+      "section": "v2",
+      "source": "image 6.png",
+      "path": "/assets/images/lenet-project-2026/v2-07.png",
+      "width": 658,
+      "height": 605,
+      "sha256": "c46a8afcc51aaf6923c79185801de9b4c175fe16fedb26c9125baf1526838395"
+    },
+    {
+      "section": "v2",
+      "source": "image 7.png",
+      "path": "/assets/images/lenet-project-2026/v2-08.png",
+      "width": 703,
+      "height": 436,
+      "sha256": "1808198513a9001d669c9894e0cc750160a8d74d037bd84ca848e3d4508edf5b"
+    },
+    {
+      "section": "v3",
+      "source": "image_grid_vs_bits.png",
+      "path": "/assets/images/lenet-project-2026/v3-01.png",
+      "width": 1995,
+      "height": 2614,
+      "sha256": "3f65aa04d9b68405d04ce249ef302a541fde60172344656c96b36a41363e140b"
+    },
+    {
+      "section": "v3",
+      "source": "image.png",
+      "path": "/assets/images/lenet-project-2026/v3-02.png",
+      "width": 1852,
+      "height": 412,
+      "sha256": "7a7ad6c8acd7278dc71b865e4f02d3a7e1d89eeba210b1ce94703868f1d25392"
+    },
+    {
+      "section": "v3",
+      "source": "image 1.png",
+      "path": "/assets/images/lenet-project-2026/v3-03.png",
+      "width": 1672,
+      "height": 941,
+      "sha256": "006c784046f539c280388e76f37bd1eeeb84bf4871f1b5b159385b08890e4e1f"
+    }
+  ],
+  "code_blocks": [
+    {
+      "section": "baseline",
+      "index": 1,
+      "language": "python",
+      "lines": 414,
+      "sha256": "cbd621d65ad106e86a3d533ea71c9de1bd5475163a239a27aa687f276a59d9c2"
+    },
+    {
+      "section": "baseline",
+      "index": 2,
+      "language": "bash",
+      "lines": 24,
+      "sha256": "14b6d209186e9f110c9f23a49dbc06f825168265e6b2b2972c44514145c05fcf"
+    },
+    {
+      "section": "baseline",
+      "index": 3,
+      "language": "verilog",
+      "lines": 43,
+      "sha256": "98183e617794cb1d1528dd0493ae12164b534dc51b15db9f8b618f8a40c1ddbc"
+    },
+    {
+      "section": "baseline",
+      "index": 4,
+      "language": "verilog",
+      "lines": 42,
+      "sha256": "3d43fb9c288225e5ac31e2bca3dde20ff6a24799dd8b5afbc3051dd3d115423c"
+    },
+    {
+      "section": "baseline",
+      "index": 5,
+      "language": "verilog",
+      "lines": 45,
+      "sha256": "626e99ede822a177f8c282fcbb84366e4dbf6db31d7abbcde43f2b0a282123ab"
+    },
+    {
+      "section": "baseline",
+      "index": 6,
+      "language": "verilog",
+      "lines": 35,
+      "sha256": "fca56d885941e1ccbdda2656bbc964582cc1f8a4c75ef7d453762591d965f3a9"
+    },
+    {
+      "section": "baseline",
+      "index": 7,
+      "language": "verilog",
+      "lines": 94,
+      "sha256": "a7143009ebc62a2893f34d1dbd5798f9c8ad43fa4bde70b23c1ad3350e4f85a6"
+    },
+    {
+      "section": "baseline",
+      "index": 8,
+      "language": "verilog",
+      "lines": 19,
+      "sha256": "00748886f303df91784176dbd7022d72588da4781d1f8575de76da40a2ddd273"
+    },
+    {
+      "section": "baseline",
+      "index": 9,
+      "language": "verilog",
+      "lines": 251,
+      "sha256": "b87c00516ff4977ede54600b1ae8baea1f99e7073a7f8b7289046514f9e2eba9"
+    },
+    {
+      "section": "baseline",
+      "index": 10,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "eb93c0cde960bd98558735b5d5e52224ee2633fb0bfb9fbe0eaec50e9190620a"
+    },
+    {
+      "section": "baseline",
+      "index": 11,
+      "language": "",
+      "lines": 7,
+      "sha256": "bd8781dda1e2513e8869c119ebac7ad740b0f1df06c3a47878674da1f48de832"
+    },
+    {
+      "section": "baseline",
+      "index": 12,
+      "language": "",
+      "lines": 8,
+      "sha256": "3f218bda8424c22db84b80eaaff8a95a6936c4f98effcdd0f2c112ff9bea2c73"
+    },
+    {
+      "section": "baseline",
+      "index": 13,
+      "language": "",
+      "lines": 5,
+      "sha256": "80969b254a13184e93760d1b431194d3d623a243f4db3540cc69d08731ebf29d"
+    },
+    {
+      "section": "baseline",
+      "index": 14,
+      "language": "",
+      "lines": 3,
+      "sha256": "a3c53b8d4d7e7b7599d2952cc6e4d485054ed80cbe39493d4fea2e94d91cb6cf"
+    },
+    {
+      "section": "baseline",
+      "index": 15,
+      "language": "",
+      "lines": 7,
+      "sha256": "54e25defde4eea2d9af46818c3a3ad0e374a43a6bd98ae345d03b4ad4e9138d4"
+    },
+    {
+      "section": "baseline",
+      "index": 16,
+      "language": "",
+      "lines": 15,
+      "sha256": "b36e07236aa62a9234a73ae204c6a85e635a5868536e54dfc322e09c04ed5cca"
+    },
+    {
+      "section": "baseline",
+      "index": 17,
+      "language": "",
+      "lines": 3,
+      "sha256": "326ffce24f4a77d9feb1ae10f70413f2f33ae8c579dd5baca93a4f0a53925739"
+    },
+    {
+      "section": "baseline",
+      "index": 18,
+      "language": "",
+      "lines": 3,
+      "sha256": "54d32ed9b5182a7b8555c0c40dfdda9a4a50504828c9e1c30c15f52d3a6f0e06"
+    },
+    {
+      "section": "baseline",
+      "index": 19,
+      "language": "",
+      "lines": 3,
+      "sha256": "09dbaac5dc24d21a6192676aa72485dc0f4d5ab2cedc770ae92eadf0692ffe58"
+    },
+    {
+      "section": "baseline",
+      "index": 20,
+      "language": "",
+      "lines": 3,
+      "sha256": "f6184c74568b0b9879a098a71b17816675d8db112dc0c245160392a5b0ecd15f"
+    },
+    {
+      "section": "baseline",
+      "index": 21,
+      "language": "",
+      "lines": 3,
+      "sha256": "f0591c1370cf0fc294ec662c1661071fdb8204787e926aed57a63b7d88ad2f85"
+    },
+    {
+      "section": "baseline",
+      "index": 22,
+      "language": "",
+      "lines": 3,
+      "sha256": "8568def1853412ceb7b0ed5c95fd6cf0105c4d39b0cb3987f78af2a170970d33"
+    },
+    {
+      "section": "baseline",
+      "index": 23,
+      "language": "",
+      "lines": 22,
+      "sha256": "24c6c575c30c4b68021b9b1b26fc62bec05ae72ea1c1e8fb8a993b4a9e45d7a2"
+    },
+    {
+      "section": "baseline",
+      "index": 24,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "572efc97e0c1cd36c82889d82917f52f49561c03df570d8c291bf2266af523d8"
+    },
+    {
+      "section": "baseline",
+      "index": 25,
+      "language": "verilog",
+      "lines": 3,
+      "sha256": "e2540daac4c4ccce0e3f4d6944f5746e87651ffb5537fcb14e703b5a0e5e77ad"
+    },
+    {
+      "section": "baseline",
+      "index": 26,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "e54e4c272c14f058aa10fab9e19668271b226ababc65862781d7d16b8b371a14"
+    },
+    {
+      "section": "baseline",
+      "index": 27,
+      "language": "verilog",
+      "lines": 11,
+      "sha256": "8c37e4372ef318e962b2078027c63e3532f01f6eb6eb423b8b6397a08ff2894c"
+    },
+    {
+      "section": "baseline",
+      "index": 28,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "db642e3c4db2dd3273d546af0c536398499ab20d2c228a301f17eda64791ac37"
+    },
+    {
+      "section": "baseline",
+      "index": 29,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "2694740da8158941d49b126ba0a9b73e35b6be9cd349b78d45a68c82640eb20f"
+    },
+    {
+      "section": "baseline",
+      "index": 30,
+      "language": "verilog",
+      "lines": 11,
+      "sha256": "93363ae61edd6fd5d2e9c089ec61f8a6a01cac476a7b66c5823402cf64d4b091"
+    },
+    {
+      "section": "baseline",
+      "index": 31,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "d7decc2e61c804329f861fba8e7d822727b17b1c90aa3697b974feae9cb03e33"
+    },
+    {
+      "section": "baseline",
+      "index": 32,
+      "language": "verilog",
+      "lines": 89,
+      "sha256": "652f2a13d0e19dfb33162b26d51925374d8984800ac56176632cce4fefe03fdf"
+    },
+    {
+      "section": "baseline",
+      "index": 33,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "aa17297936e141c06e97de5b351eadbdd447ef0290ba45728745da3d4bd1d6af"
+    },
+    {
+      "section": "baseline",
+      "index": 34,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "e10805361becb8f17534a92abace4a4477d225b52ae5f3009b4c12855a2fe1f9"
+    },
+    {
+      "section": "baseline",
+      "index": 35,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "18202584f79bc3b40d50ed5f692baa131a5cf65fd3b428d80f4838ba98d28e79"
+    },
+    {
+      "section": "baseline",
+      "index": 36,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "e43caa201c62b58c51e91bb07e0f099f63261bfc6ada987025481729facd2911"
+    },
+    {
+      "section": "baseline",
+      "index": 37,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "fad9d0a75ff20aecb90fd430bbac2408f9bd17ff5fda38c155b90fbb87e27456"
+    },
+    {
+      "section": "baseline",
+      "index": 38,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "7a196f4880fb0afe5cea1cdfef4485097ce23bc154249a8d0a9b4ca240d07616"
+    },
+    {
+      "section": "baseline",
+      "index": 39,
+      "language": "verilog",
+      "lines": 10,
+      "sha256": "c70d9ebebe75d3c3bd5a66b27ce6e7b635156063f36f3026c15ad5be89c0c1bf"
+    },
+    {
+      "section": "baseline",
+      "index": 40,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "b67911885354574fadab4fc5be6e8e778afa16f5fa305b9274ae6647ca48cd93"
+    },
+    {
+      "section": "baseline",
+      "index": 41,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "b8ba53f593a035d623d84484b67e59ff486226b52fcfc6237e56a850014924d9"
+    },
+    {
+      "section": "baseline",
+      "index": 42,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "a119e5b98948fc9781c50a1f8a91681a028446231a1213f6dcb02ce60c465682"
+    },
+    {
+      "section": "baseline",
+      "index": 43,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "7dd33e3df931e48836b08abf72b9945d29926b6d043744915bb4bc7810d7b9bd"
+    },
+    {
+      "section": "baseline",
+      "index": 44,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "7caf1868461fb551220fa5b20d64164723245d40c98c5c583e34ae59ed19ccee"
+    },
+    {
+      "section": "baseline",
+      "index": 45,
+      "language": "verilog",
+      "lines": 9,
+      "sha256": "6f8a0a6269310ee2150cd176b645f97a9e830ef86a7d6a30edc7547c9f2708c1"
+    },
+    {
+      "section": "baseline",
+      "index": 46,
+      "language": "verilog",
+      "lines": 153,
+      "sha256": "99b1c525680c43334c3ab902b8319e3c862c79d409e8a5f90ef273b08aba3f98"
+    },
+    {
+      "section": "baseline",
+      "index": 47,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "cf305b5a47fb22c274f96625dbde790a7b3c9068a9e809822579744172bc0b83"
+    },
+    {
+      "section": "baseline",
+      "index": 48,
+      "language": "verilog",
+      "lines": 9,
+      "sha256": "4c38f5144fd5e9c3714c1e13ca3c7787ba1d53b53612ee4f6d4bc69246ea9463"
+    },
+    {
+      "section": "baseline",
+      "index": 49,
+      "language": "verilog",
+      "lines": 14,
+      "sha256": "f52717955a52be568c5e28d5ad391e148f6040a4244cbb46b31b856fd127593f"
+    },
+    {
+      "section": "baseline",
+      "index": 50,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "e647f235379f81c35cbc7a8764365fa2960534975625121129bb7ed814c2d751"
+    },
+    {
+      "section": "baseline",
+      "index": 51,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "10dfa3747fe619bd22e793b8d9e13517c0395769d57d15116a9335371f7060b3"
+    },
+    {
+      "section": "baseline",
+      "index": 52,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "c330edaf2e65a5b53215eb69f898e043c22c753669b152cba700d2a49b5b342d"
+    },
+    {
+      "section": "baseline",
+      "index": 53,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "07c91e146f28ab42279479ddc11014a5a9c9ff0ada13eb005f067dd2d29391f5"
+    },
+    {
+      "section": "baseline",
+      "index": 54,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "b07b64d57c42018245399ea841f376b44db027988bd649c635a39a9d5460fcfc"
+    },
+    {
+      "section": "baseline",
+      "index": 55,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "08ee02bb7cf167223ceb494ee210d41db648afc15bc3e7330a50c99be915ab95"
+    },
+    {
+      "section": "baseline",
+      "index": 56,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "312fa81547cb3b5c4ac45c05fd9903ae2429742ee99c34ef58f760511eb80735"
+    },
+    {
+      "section": "baseline",
+      "index": 57,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "6e59ab53d3c4b6f2435006b373c21ef96f3e5dbf4defb65f550ea79e829ce0c1"
+    },
+    {
+      "section": "baseline",
+      "index": 58,
+      "language": "",
+      "lines": 23,
+      "sha256": "1427923eccdd78a8f23f393b61802e161605ed22466122ec0828f7ba07fe58c2"
+    },
+    {
+      "section": "baseline",
+      "index": 59,
+      "language": "verilog",
+      "lines": 13,
+      "sha256": "b0d7392de1ac2a1e4027805968b989b0794b80499cc068c17a52bb8ea860e688"
+    },
+    {
+      "section": "baseline",
+      "index": 60,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "b8ba53f593a035d623d84484b67e59ff486226b52fcfc6237e56a850014924d9"
+    },
+    {
+      "section": "baseline",
+      "index": 61,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "a119e5b98948fc9781c50a1f8a91681a028446231a1213f6dcb02ce60c465682"
+    },
+    {
+      "section": "baseline",
+      "index": 62,
+      "language": "verilog",
+      "lines": 16,
+      "sha256": "1493d4de2dbfeb50500fae9776d38681efbda0664d94ba68bf511d9fe7110b67"
+    },
+    {
+      "section": "baseline",
+      "index": 63,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "d7decc2e61c804329f861fba8e7d822727b17b1c90aa3697b974feae9cb03e33"
+    },
+    {
+      "section": "baseline",
+      "index": 64,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "13ec1aa17bfff0a4a656763aecca6ddee87f7ecc436343c4954f209e40a17087"
+    },
+    {
+      "section": "baseline",
+      "index": 65,
+      "language": "verilog",
+      "lines": 3,
+      "sha256": "666f8e10769db1434098816b5f9c40dfd515da9d3ed75de85d9a4e711e97cea8"
+    },
+    {
+      "section": "baseline",
+      "index": 66,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "e96c0d699f7cccbaafdb67e4506e0415bd78173086b6a1246dcebb7ce3aa93cd"
+    },
+    {
+      "section": "baseline",
+      "index": 67,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "a33872e985fbf9633bde8f5f8ec3fab4d473f7e4171e24c5eea6f38d75d70a7c"
+    },
+    {
+      "section": "baseline",
+      "index": 68,
+      "language": "verilog",
+      "lines": 130,
+      "sha256": "641f2c762776213f2c20a27b4004e07218b15693129422f0cf60039e689dc596"
+    },
+    {
+      "section": "baseline",
+      "index": 69,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "71cb96033ed8aa05f333b46ed3b48b87474b6d4898c8de4053726c8dc4ec98a5"
+    },
+    {
+      "section": "baseline",
+      "index": 70,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "0abbfbeb4b42b1aa267c0047195c694f9ae122b180db733bb907ac7711001b9e"
+    },
+    {
+      "section": "baseline",
+      "index": 71,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "cfed6f90aea7815fdc3d95d898e4b104d582c704558c41d0bc85f3f9ad937b06"
+    },
+    {
+      "section": "baseline",
+      "index": 72,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "46b24dc0404d1d05839fa90109f08646b77a400689570f9660861db4ed8192a7"
+    },
+    {
+      "section": "baseline",
+      "index": 73,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "bbd5c60afa6a97d42a43a22811390c4877b4abca82988c0fa017d617bbfbb1dc"
+    },
+    {
+      "section": "baseline",
+      "index": 74,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "d2b2a4f76030ccfb94a9a56befdb1bc64234a2a3f1fbf8b03afde95574327d89"
+    },
+    {
+      "section": "baseline",
+      "index": 75,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "2ac11ae818eebd174990909918eaf649548f1abe5900a0cb6f5eccb43c44800e"
+    },
+    {
+      "section": "baseline",
+      "index": 76,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "ad31f8fb666f814211e6e4a9842fbb2f9e4e2a81c31b6ddc24748439300be7d0"
+    },
+    {
+      "section": "baseline",
+      "index": 77,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "853ccf9d84c46126c5b359faa3c088462919349e36307e8ffe215632bc36a7b3"
+    },
+    {
+      "section": "baseline",
+      "index": 78,
+      "language": "verilog",
+      "lines": 8,
+      "sha256": "bd4bafaca1e26d614e2b1e61b48a5bb48df8c97a845986eaaa42ed1653437c5c"
+    },
+    {
+      "section": "baseline",
+      "index": 79,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "b6286cad79a6ffff67a277f4d5411cf4fd30e722a53b07ad712389bd18cc81ec"
+    },
+    {
+      "section": "baseline",
+      "index": 80,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "dee7e424f9bc9ea521368941fbbc7459b8de3b473f8b8fd7a7d4298993e6c1b7"
+    },
+    {
+      "section": "baseline",
+      "index": 81,
+      "language": "verilog",
+      "lines": 8,
+      "sha256": "ee628803a412e7243bd21d7d26023e57d09444cb214e5e42f415088dbe3107a3"
+    },
+    {
+      "section": "baseline",
+      "index": 82,
+      "language": "verilog",
+      "lines": 12,
+      "sha256": "40e1e448e0e7d3b4c0d74d599a067f8d18b004eebdfc147eb21a28ffc8a38177"
+    },
+    {
+      "section": "baseline",
+      "index": 83,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "b8ba53f593a035d623d84484b67e59ff486226b52fcfc6237e56a850014924d9"
+    },
+    {
+      "section": "baseline",
+      "index": 84,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "e0745e5bfbfa6742216c78a5f4be4c67023f26d5c9b2726360d8c5baf0492018"
+    },
+    {
+      "section": "baseline",
+      "index": 85,
+      "language": "verilog",
+      "lines": 15,
+      "sha256": "43f8132f6089a0d5279af2a29fc167322be41a16cd5f6d7cb121af3e3001a807"
+    },
+    {
+      "section": "baseline",
+      "index": 86,
+      "language": "verilog",
+      "lines": 13,
+      "sha256": "ab5dc8e312878be1867b522eedda957bf5797943aec6a626bdbf66d477832112"
+    },
+    {
+      "section": "baseline",
+      "index": 87,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "0022e7d06f5da951f9ae3b25d39e63785d464ee5d7edf2d63ff292a85ba67e52"
+    },
+    {
+      "section": "baseline",
+      "index": 88,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "95245b65b2c370e3b463b1df38a9e8c5522990a465814fcbeb693ba08450c26b"
+    },
+    {
+      "section": "baseline",
+      "index": 89,
+      "language": "verilog",
+      "lines": 32,
+      "sha256": "28c8241968e688c37c9361bcee8a3a54dc752f5bb6e1cd55dd5888fdd449341d"
+    },
+    {
+      "section": "baseline",
+      "index": 90,
+      "language": "verilog",
+      "lines": 8,
+      "sha256": "272fdad72931aabea50b69b85cbd6d823c1a5140155522f4ac57233c5ead6c24"
+    },
+    {
+      "section": "baseline",
+      "index": 91,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "35730e6571560ec80d38faa4596f18e2984dfbb03d4754b0efc75c9c4cd97857"
+    },
+    {
+      "section": "baseline",
+      "index": 92,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "2b88d5882d20190d2fd9a6bc641d6015bdc562c28b2de499860845e483d35a85"
+    },
+    {
+      "section": "baseline",
+      "index": 93,
+      "language": "verilog",
+      "lines": 7,
+      "sha256": "7e6a629c2f0feecf90170f06a73e6e9ce8f84ac574ada2d78c583b7d0806a02a"
+    },
+    {
+      "section": "baseline",
+      "index": 94,
+      "language": "verilog",
+      "lines": 21,
+      "sha256": "ac5c11e4155b20e0ca7c3f50ecad6d32be252ae575944a00c57c00c27e6ab9f3"
+    },
+    {
+      "section": "baseline",
+      "index": 95,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "f90a1bcd04325d0cebc3befc71e26121d709b0d0257de0fe8b8edb1125bc023d"
+    },
+    {
+      "section": "baseline",
+      "index": 96,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "4c6a0900f64284b1ee9d2b896864a30ec7ac18360ee40ceae0c75fe74f23fd16"
+    },
+    {
+      "section": "baseline",
+      "index": 97,
+      "language": "verilog",
+      "lines": 7,
+      "sha256": "e8f5770063fb3625ae277d22478290fcaf01ec191ee2d17ce62f48956636f6b7"
+    },
+    {
+      "section": "baseline",
+      "index": 98,
+      "language": "verilog",
+      "lines": 15,
+      "sha256": "7028380f6b370f8fe0c270b8e7c81ed1a27854b98f33df0872e592fe04c7be3f"
+    },
+    {
+      "section": "baseline",
+      "index": 99,
+      "language": "",
+      "lines": 15,
+      "sha256": "8fb824f0dac450a8fa7e6a524e1f068319b14c54982e1e9cab0d23e4240a7cbd"
+    },
+    {
+      "section": "baseline",
+      "index": 100,
+      "language": "verilog",
+      "lines": 246,
+      "sha256": "eac7081a0c984d632f10e7163ff51cc6ab474f15c8f4fdc27b0b591f552914a8"
+    },
+    {
+      "section": "baseline",
+      "index": 101,
+      "language": "verilog",
+      "lines": 20,
+      "sha256": "b7f5b4d22a06af766c13a9c08eb55ddee6fcbe107c5c58e527c1df7c271d77b6"
+    },
+    {
+      "section": "baseline",
+      "index": 102,
+      "language": "verilog",
+      "lines": 8,
+      "sha256": "15851a348c9c4d59473bf5aed919e5e3b5fedadbc71da165528cc8b0334d275e"
+    },
+    {
+      "section": "baseline",
+      "index": 103,
+      "language": "verilog",
+      "lines": 15,
+      "sha256": "aab9b7d042202ffc662c0bd8850a562780ca76cdc90b5987984a4865485c655f"
+    },
+    {
+      "section": "baseline",
+      "index": 104,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "1e51172a01d4d7d31bc153552a8a0f4692dc95fa802ccb1616a0cc14b28d5745"
+    },
+    {
+      "section": "baseline",
+      "index": 105,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "429cc90322148e561eab5d3c826ac776263ecbbe2fecba0320554dcaacb40042"
+    },
+    {
+      "section": "baseline",
+      "index": 106,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "cb905ce4f0d6f6b42eb69cb41e4bea48c5ed2539db1bf05da6a43b8b9cf80802"
+    },
+    {
+      "section": "baseline",
+      "index": 107,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "2fe818d64b1deca574aba852a86db55c127fc6f5c59ff79a3a6326146fed991e"
+    },
+    {
+      "section": "baseline",
+      "index": 108,
+      "language": "verilog",
+      "lines": 31,
+      "sha256": "697bea829cfe262f25c6b069b50d38370f2e77f7e305eab5c649b54e28c6bdb7"
+    },
+    {
+      "section": "baseline",
+      "index": 109,
+      "language": "verilog",
+      "lines": 24,
+      "sha256": "4ebed25396eb2c8550de6519825c5b0c4fa99fbc7e6ef19e6eeb278fb09c93dd"
+    },
+    {
+      "section": "baseline",
+      "index": 110,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "07eb694553030762311c0d57d7d904f176acafd91c75c2098ddc28ab80d41d1e"
+    },
+    {
+      "section": "baseline",
+      "index": 111,
+      "language": "verilog",
+      "lines": 8,
+      "sha256": "ea93a15c98c7c75d90618621fefd19b4f6740f5bace058b31e57d684b63c8b71"
+    },
+    {
+      "section": "baseline",
+      "index": 112,
+      "language": "verilog",
+      "lines": 2,
+      "sha256": "d68e487e3c87d6b4f69217e0f4581902a7dadc9745713eb34b3ad458f2d904b9"
+    },
+    {
+      "section": "baseline",
+      "index": 113,
+      "language": "verilog",
+      "lines": 373,
+      "sha256": "ba0e0433afcd4be27fb8d92fee5c22129967a439cfa677e610a999219c3314f6"
+    },
+    {
+      "section": "baseline",
+      "index": 114,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "ad88553a4ede7ebc1962e9dde6ff833ec6c2f5af383503364fcbf7292dfd0c21"
+    },
+    {
+      "section": "baseline",
+      "index": 115,
+      "language": "verilog",
+      "lines": 16,
+      "sha256": "d73280f33091437d6b09d8ff4939eca14da6d7717cec8a41cad84bf607c0316c"
+    },
+    {
+      "section": "baseline",
+      "index": 116,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "65d44408e1268b58c6703daf6234395fe32d22512c3feb3081056c7608b5ae59"
+    },
+    {
+      "section": "baseline",
+      "index": 117,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "395fac299ca334f6528e045fe432dda22307fb3393896d9c47c51afcd0f87c67"
+    },
+    {
+      "section": "baseline",
+      "index": 118,
+      "language": "python",
+      "lines": 95,
+      "sha256": "d4b62466dcd08f3fefb08b677de2465702b9d73edac1de5cd0e0b6ffa37d05a5"
+    },
+    {
+      "section": "baseline",
+      "index": 119,
+      "language": "verilog",
+      "lines": 4,
+      "sha256": "7cad4ec05fe8adb93c9db1157af7058f44c14c7c38c8435d6deebdc4ab2a58aa"
+    },
+    {
+      "section": "baseline",
+      "index": 120,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "9f4fa3634254ce01c915dc020f917a3d4583d05865d0e880c11849319eece1fa"
+    },
+    {
+      "section": "baseline",
+      "index": 121,
+      "language": "verilog",
+      "lines": 7,
+      "sha256": "5b344a082bfa0012a632d28da5a4ee21a6533b2b053b72b4a1c713132f4b51dd"
+    },
+    {
+      "section": "baseline",
+      "index": 122,
+      "language": "verilog",
+      "lines": 5,
+      "sha256": "f652b697fba35d04d9620e869c55c57fe67f9ce59f834a6408b81fbaa8d3b17e"
+    },
+    {
+      "section": "baseline",
+      "index": 123,
+      "language": "verilog",
+      "lines": 1,
+      "sha256": "d634748ce21657d8adaa518dc8cb587e8077d8d27aba353e00ffe23d016f1662"
+    },
+    {
+      "section": "baseline",
+      "index": 124,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "11ed30af2089e6462942b7f9a7e9abb9657d077c9881714189d7de47fb61a265"
+    },
+    {
+      "section": "baseline",
+      "index": 125,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "9252a883c1780d96e531afa8c990826687512a1bfc2f248b2097381d703ec2af"
+    },
+    {
+      "section": "baseline",
+      "index": 126,
+      "language": "verilog",
+      "lines": 3,
+      "sha256": "bf4c86e26604b790368f1f2721f0b5b52df2837d09d335c5777df973c1b5ffe7"
+    },
+    {
+      "section": "baseline",
+      "index": 127,
+      "language": "verilog",
+      "lines": 12,
+      "sha256": "5d4bb84b2258fe13cef769bee3e83edd342d727aedb091ef9355a296191a3a95"
+    },
+    {
+      "section": "baseline",
+      "index": 128,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "cb4b1651e61cc9ff350c14278223f02c5acbe31e60b4531ee9343c5ca5866345"
+    },
+    {
+      "section": "baseline",
+      "index": 129,
+      "language": "verilog",
+      "lines": 6,
+      "sha256": "b5b1f0125dce38d9f79dddd399ecbdc8ba0f45c4fc096aad94766b38900121b4"
+    },
+    {
+      "section": "baseline",
+      "index": 130,
+      "language": "verilog",
+      "lines": 14,
+      "sha256": "428c6ff7c5031e406645a5e4b8ea41ca55967c5077341770d94aaa19d6e4b650"
+    },
+    {
+      "section": "baseline",
+      "index": 131,
+      "language": "verilog",
+      "lines": 41,
+      "sha256": "10434741c589e455d97131f8f385c5449b8f1e7c4336cc745a3e4bc8cd2aace1"
+    },
+    {
+      "section": "baseline",
+      "index": 132,
+      "language": "verilog",
+      "lines": 14,
+      "sha256": "131a852789874d9dbc821ade481123f732f528623dcd00619719624fc95ccbe4"
+    },
+    {
+      "section": "baseline",
+      "index": 133,
+      "language": "bash",
+      "lines": 52,
+      "sha256": "170654eddc7a067677bab56676abec09fd347108c8b3192b58bac46c09157cbb"
+    },
+    {
+      "section": "baseline",
+      "index": 134,
+      "language": "verilog",
+      "lines": 92,
+      "sha256": "68d476bd816c2bd8e47f753fb747f301e705814164e54cb035b854db4ad13916"
+    },
+    {
+      "section": "baseline",
+      "index": 135,
+      "language": "verilog",
+      "lines": 379,
+      "sha256": "8597dfeed73c378fd2360511cfaa7a06097e0ac5579da25f2900dbe249a39882"
+    },
+    {
+      "section": "baseline",
+      "index": 136,
+      "language": "c",
+      "lines": 538,
+      "sha256": "0958ee0db659af2f802065fddafd860c793c40de59e833392ce648d59f36de3c"
+    },
+    {
+      "section": "baseline",
+      "index": 137,
+      "language": "c",
+      "lines": 538,
+      "sha256": "0958ee0db659af2f802065fddafd860c793c40de59e833392ce648d59f36de3c"
+    },
+    {
+      "section": "baseline",
+      "index": 138,
+      "language": "bash",
+      "lines": 47,
+      "sha256": "99ea0a2750ea16e5c7d29de9bed4f2a8a0b75ca4d1df187844103c0506d6ac8c"
+    },
+    {
+      "section": "v2",
+      "index": 1,
+      "language": "",
+      "lines": 9,
+      "sha256": "67431b550bc0eb2925c7f62dbf240e1d11afa7963c40e47bb72b6766567a5db0"
+    },
+    {
+      "section": "v2",
+      "index": 2,
+      "language": "",
+      "lines": 10,
+      "sha256": "12ffc8cc7289220c77f8c9600e3860986622612e2176cb0bb107d35d1509c349"
+    },
+    {
+      "section": "v2",
+      "index": 3,
+      "language": "",
+      "lines": 3,
+      "sha256": "c1d1eb4a2cd345a9ff430681e71c10703c8347f5e1e14792c2f14f92e12fe9e6"
+    },
+    {
+      "section": "v2",
+      "index": 4,
+      "language": "",
+      "lines": 2,
+      "sha256": "47d1017945ec504fc6982741ce5d3d090f794775ff7d364faf0cc5beaffe3fc7"
+    },
+    {
+      "section": "v2",
+      "index": 5,
+      "language": "",
+      "lines": 5,
+      "sha256": "d06aff1cc7eb4e1d75a5d03cbe4ff41b1836960cc365d531192d7cb0776ba74b"
+    },
+    {
+      "section": "v2",
+      "index": 6,
+      "language": "",
+      "lines": 4,
+      "sha256": "179c1266062e648607884b7e3b2b33b7ecd92aeac15397b903ed97bf7eaa1297"
+    },
+    {
+      "section": "v2",
+      "index": 7,
+      "language": "",
+      "lines": 3,
+      "sha256": "db3076b1589aae257b93f829f973fbe4731a62bd6c2830fb660bb3247c6b4e3a"
+    },
+    {
+      "section": "v2",
+      "index": 8,
+      "language": "",
+      "lines": 5,
+      "sha256": "68f22390f7ff0b2f5ef5736551ad132dbf37be0a527d2d483b887c563bc3c2cb"
+    },
+    {
+      "section": "v2",
+      "index": 9,
+      "language": "",
+      "lines": 5,
+      "sha256": "5f75dae010babfb048372f552132ab783cfa0cae0020f993247b66ee2a766c45"
+    },
+    {
+      "section": "v2",
+      "index": 10,
+      "language": "",
+      "lines": 11,
+      "sha256": "be66de2e4e4adb4c6eb0e86f79a9396d975ad8d92e3469d624654f9bafebe1f4"
+    },
+    {
+      "section": "v2",
+      "index": 11,
+      "language": "",
+      "lines": 2,
+      "sha256": "190e902539230b744cd50d220573b197bd44c90f9d252de0fe3fa9291a16f11c"
+    },
+    {
+      "section": "v2",
+      "index": 12,
+      "language": "",
+      "lines": 10,
+      "sha256": "6fb81eb88624692f0238f917cc918e6f3aeb826dfefcdf97bc7d9a3a0c5f0929"
+    },
+    {
+      "section": "v2",
+      "index": 13,
+      "language": "",
+      "lines": 2,
+      "sha256": "bf03099441c7e6ca51cb71451645ef56a13edf00a636a228ad923423e92dab95"
+    },
+    {
+      "section": "v2",
+      "index": 14,
+      "language": "",
+      "lines": 4,
+      "sha256": "5ec19c8c29ef7574dcfa96c341d9dbdde98174e5645e49794e67238aa4246211"
+    },
+    {
+      "section": "v2",
+      "index": 15,
+      "language": "",
+      "lines": 3,
+      "sha256": "7f03a41e5f08e1541fc4ab4a2986b27d0ff0f7534ae85e53917c02d77d6198ff"
+    },
+    {
+      "section": "v2",
+      "index": 16,
+      "language": "",
+      "lines": 3,
+      "sha256": "591f20ae49a0eb3d3ddad236cca8f5a53d60ce15bdd3cadc51e55cd45214385c"
+    },
+    {
+      "section": "v2",
+      "index": 17,
+      "language": "",
+      "lines": 17,
+      "sha256": "052f9817977db9e7b0557ecbb16af6943cf278ce02c4396208da03154db7d583"
+    },
+    {
+      "section": "v2",
+      "index": 18,
+      "language": "",
+      "lines": 2,
+      "sha256": "3678ea7a4dd9e951e3de6dc4cee343546481f93a6060904efcd414e82bc96110"
+    },
+    {
+      "section": "v2",
+      "index": 19,
+      "language": "",
+      "lines": 4,
+      "sha256": "4ea003636526caf217596a5ea01780df8644c06aac6c78a6f8e0afbcf03596dc"
+    },
+    {
+      "section": "v2",
+      "index": 20,
+      "language": "",
+      "lines": 6,
+      "sha256": "e2d96668948554fbb6d751c33be7f5a35c1b0d5c05d919dfc1b9ac55ea2952ee"
+    },
+    {
+      "section": "v2",
+      "index": 21,
+      "language": "",
+      "lines": 3,
+      "sha256": "60e7fc98a3c2a0536d4dd228e3aedab6a9a7952d3939eeb6fd022c2bb71dca55"
+    },
+    {
+      "section": "v2",
+      "index": 22,
+      "language": "",
+      "lines": 2,
+      "sha256": "c9182b2c1feab6cc1d5d2763fb0ce4de47c0d5de6b20a8d404bd24dbdd4d0e6e"
+    },
+    {
+      "section": "v2",
+      "index": 23,
+      "language": "",
+      "lines": 7,
+      "sha256": "cd7561f48017a960e455cc822a4c80f38d4e51a864a83ae026eed42286bb5f98"
+    },
+    {
+      "section": "v2",
+      "index": 24,
+      "language": "",
+      "lines": 7,
+      "sha256": "648cbc30f0b354824f9d993e77e967c6d2e172f3cce96ab279aa77c8656903a3"
+    },
+    {
+      "section": "v2",
+      "index": 25,
+      "language": "",
+      "lines": 3,
+      "sha256": "f7102d8308f7ca6aa923e915cf5aa3ce0569d8f46059b25f4b6c884a9caac7c8"
+    },
+    {
+      "section": "v2",
+      "index": 26,
+      "language": "",
+      "lines": 2,
+      "sha256": "7a943ca4faec5030651b847e440fb167e5f1aa48078e9af6880d077b5123f399"
+    },
+    {
+      "section": "v2",
+      "index": 27,
+      "language": "",
+      "lines": 7,
+      "sha256": "41768af85841a319f790b948de7788934e7a330577b2ff1cb63526b9b70ecae1"
+    },
+    {
+      "section": "v2",
+      "index": 28,
+      "language": "",
+      "lines": 8,
+      "sha256": "802e806e22d3b53bf9a3589a3dc7538a3d348a6fe5bc0302a30971188fe2084f"
+    },
+    {
+      "section": "v2",
+      "index": 29,
+      "language": "",
+      "lines": 2,
+      "sha256": "190e902539230b744cd50d220573b197bd44c90f9d252de0fe3fa9291a16f11c"
+    },
+    {
+      "section": "v2",
+      "index": 30,
+      "language": "",
+      "lines": 4,
+      "sha256": "8f496e2417291ae1ec25bb7c1afba9f07c79d38d3ea553e54bddb17d141b7ead"
+    },
+    {
+      "section": "v2",
+      "index": 31,
+      "language": "",
+      "lines": 6,
+      "sha256": "d6b47b9c18b54629655af48cdef6e1c3e91a3fa2ffe7606e3fcc047aea6ee582"
+    },
+    {
+      "section": "v2",
+      "index": 32,
+      "language": "",
+      "lines": 4,
+      "sha256": "006c74e8fd57396f5a7ac68777956bc1ee2ba77eebd2fefa077f02a1a9d2f77d"
+    },
+    {
+      "section": "v2",
+      "index": 33,
+      "language": "",
+      "lines": 4,
+      "sha256": "d3c76ec6149a8090504fb517665cc17f9fd31b6a7beb8bc017f20867d3cde7f9"
+    },
+    {
+      "section": "v2",
+      "index": 34,
+      "language": "",
+      "lines": 4,
+      "sha256": "398154d27e8f99e77cac20ff4ca81c7d7654a2c05b4d27c1b9b1f09a9cfe1d50"
+    },
+    {
+      "section": "v2",
+      "index": 35,
+      "language": "",
+      "lines": 2,
+      "sha256": "0dedeebeedbb44ce182b90ca43d4404c935a7f0359d8e827de9ebbfb754951fb"
+    },
+    {
+      "section": "v2",
+      "index": 36,
+      "language": "",
+      "lines": 2,
+      "sha256": "dc94149010dca07e15e8d49f50ea2ff389fdae6b71d6a86517110730d76e6ba1"
+    },
+    {
+      "section": "v2",
+      "index": 37,
+      "language": "",
+      "lines": 4,
+      "sha256": "752925fae7f2b2f13de9b05a87d1e1612cc7a9d1b502c817239004d356f97c0f"
+    },
+    {
+      "section": "v2",
+      "index": 38,
+      "language": "",
+      "lines": 3,
+      "sha256": "64ab1e9badc911280075036b9b49bc5b34de187cd61a52f38bda6421233d29f7"
+    },
+    {
+      "section": "v2",
+      "index": 39,
+      "language": "",
+      "lines": 2,
+      "sha256": "bc37b13ea80422e79b29576829a5e27a9d1aeaefc31cd5e94107b738d25fd91b"
+    },
+    {
+      "section": "v2",
+      "index": 40,
+      "language": "",
+      "lines": 2,
+      "sha256": "9cbb91a66abc2606d1be9eda32569b8233e7c238f3e0cde7c6aa8e29dabd30f9"
+    },
+    {
+      "section": "v2",
+      "index": 41,
+      "language": "",
+      "lines": 5,
+      "sha256": "5ec82657d40e3aec17688b175d7d53d237604f5f2e138aea9d4d8f6d6c4766bc"
+    },
+    {
+      "section": "v2",
+      "index": 42,
+      "language": "",
+      "lines": 2,
+      "sha256": "bc8e0c26749db121105ac965b5722394f7bd26f9f8b81a289316c59618ea1d4f"
+    },
+    {
+      "section": "v2",
+      "index": 43,
+      "language": "",
+      "lines": 2,
+      "sha256": "d4ca5802410851764f4c7990ff308e0574be5ed7dc68ddd55c50cfe64b01e532"
+    },
+    {
+      "section": "v2",
+      "index": 44,
+      "language": "",
+      "lines": 2,
+      "sha256": "07fca3cb4e8cd74b853e5d2453b04f1a6bf432a970f469ec4c1e9d9adcabec3e"
+    },
+    {
+      "section": "v2",
+      "index": 45,
+      "language": "",
+      "lines": 5,
+      "sha256": "77ef8c20934e02c6054063bfe56b2d817398f720fdaaffd945f44cf000827565"
+    },
+    {
+      "section": "v2",
+      "index": 46,
+      "language": "",
+      "lines": 3,
+      "sha256": "61e744e6322871d240936d9a0fb7b4838f1a89291c3bccc9e60573f7df0de502"
+    },
+    {
+      "section": "v2",
+      "index": 47,
+      "language": "",
+      "lines": 4,
+      "sha256": "8e6d33bfd1a0f4481555fa690bc4047669ca9d1f8263300554bb336fdf7879b5"
+    },
+    {
+      "section": "v2",
+      "index": 48,
+      "language": "",
+      "lines": 2,
+      "sha256": "3dc76e00648c8be65a47ace7959a7c2e362018a273cb0782ada798f8261842f1"
+    },
+    {
+      "section": "v2",
+      "index": 49,
+      "language": "",
+      "lines": 2,
+      "sha256": "d1b31a5c7be8bcdfa99889cdba7c4c73e8605c30f8921244df5bf161298432c2"
+    },
+    {
+      "section": "v2",
+      "index": 50,
+      "language": "verilog",
+      "lines": 479,
+      "sha256": "5a1b68cef626df81ccb28b136b683a607fe2aeebe19cfc8bd52f55f4ec513d95"
+    },
+    {
+      "section": "v2",
+      "index": 51,
+      "language": "verilog",
+      "lines": 35,
+      "sha256": "09a9f959900f8ba811d8c8c7333012da25244892a8223018d0b68083544cf99e"
+    },
+    {
+      "section": "v2",
+      "index": 52,
+      "language": "verilog",
+      "lines": 52,
+      "sha256": "475809e479c4ca1a2ff532962512f816a05cb987551940632486885396cc4584"
+    },
+    {
+      "section": "v2",
+      "index": 53,
+      "language": "verilog",
+      "lines": 292,
+      "sha256": "0236c32e25058f0b4aa82f9c08f4d2e44b1110b8612a58b3de0db579038f80c3"
+    },
+    {
+      "section": "v2",
+      "index": 54,
+      "language": "verilog",
+      "lines": 82,
+      "sha256": "33c5a626097b86ffaed0db81ad116c6d1ea29c082479ead6a398e053ecda5981"
+    },
+    {
+      "section": "v2",
+      "index": 55,
+      "language": "verilog",
+      "lines": 978,
+      "sha256": "7f6963a1293c5b531ff07ea729a12e1674816db28cdaa37beef3b39c11704aac"
+    },
+    {
+      "section": "v2",
+      "index": 56,
+      "language": "verilog",
+      "lines": 29,
+      "sha256": "e6594ab30ce6d839bc9a5016f19c244e3fe5dfe37e936af50bf86603dfd6fa47"
+    },
+    {
+      "section": "v2",
+      "index": 57,
+      "language": "verilog",
+      "lines": 167,
+      "sha256": "57d2655af62b2fbf02a123ff399446559880f4f3cad28f0e9dfd5fe0671c00ca"
+    },
+    {
+      "section": "v2",
+      "index": 58,
+      "language": "verilog",
+      "lines": 172,
+      "sha256": "2d6d87312517007187231b297096aadef8fc8a6d329f954a78bd9f53dce9c37f"
+    },
+    {
+      "section": "v2",
+      "index": 59,
+      "language": "verilog",
+      "lines": 18,
+      "sha256": "728cda74c041986c679e0c2005595b2bd139d6d76944ec87d022092a93f931a6"
+    },
+    {
+      "section": "v2",
+      "index": 60,
+      "language": "verilog",
+      "lines": 121,
+      "sha256": "1b1191a62608c6b8a1f962eb343c523e0a052ff9ac526c29d07a82254ce6fcdc"
+    },
+    {
+      "section": "v2",
+      "index": 61,
+      "language": "verilog",
+      "lines": 1297,
+      "sha256": "78b2fbd60ea06348aebf0334b9fbe1906ace66cd00dd9f2699c445cfa1ebb181"
+    },
+    {
+      "section": "v2",
+      "index": 62,
+      "language": "verilog",
+      "lines": 81,
+      "sha256": "ae1e1b6187997525e149764491374e7ed8503a5ab8ce56c0ef473b2cbc3a7da8"
+    },
+    {
+      "section": "v2",
+      "index": 63,
+      "language": "verilog",
+      "lines": 358,
+      "sha256": "15b54dd039b72333ffbd597da10c065361e9beb41dbd9b75a6454265066150e5"
+    },
+    {
+      "section": "v2",
+      "index": 64,
+      "language": "verilog",
+      "lines": 20,
+      "sha256": "a15c139a4ed031ecdf9376c765eb384aefbfe0e3fe337120aee490a3eb71c3d7"
+    },
+    {
+      "section": "v2",
+      "index": 65,
+      "language": "verilog",
+      "lines": 103,
+      "sha256": "7807f075b3d40223f3b0c3692eac6aecbdab8d9bee33a833d1b550d5a583b64f"
+    },
+    {
+      "section": "v2",
+      "index": 66,
+      "language": "verilog",
+      "lines": 376,
+      "sha256": "c09e966867654042657d00cbc6c7a66ca3a9842605b02f2798514c6e0c6cb975"
+    },
+    {
+      "section": "v2",
+      "index": 67,
+      "language": "verilog",
+      "lines": 39,
+      "sha256": "d69a0b95e63e9dc228743dd7c2de1b005fbd22af6af33a08a9aa64a105a4cef1"
+    },
+    {
+      "section": "v2",
+      "index": 68,
+      "language": "verilog",
+      "lines": 479,
+      "sha256": "47ff8853df659a3b845171dae59e14c84a4c4474b9b631b83db8b6e2590eaeb2"
+    },
+    {
+      "section": "v2",
+      "index": 69,
+      "language": "bash",
+      "lines": 55,
+      "sha256": "158d4a3eed6e4d5bc4bc2a4f169de677ffaf754406472270258a5a54403b991f"
+    },
+    {
+      "section": "v2",
+      "index": 70,
+      "language": "bash",
+      "lines": 63,
+      "sha256": "f4ad00eeab72423fbbd0f7377714f6188d6ed763cc9f4b5ad8f43d4ed7ef87ca"
+    },
+    {
+      "section": "v2",
+      "index": 71,
+      "language": "c",
+      "lines": 1279,
+      "sha256": "beab08cfa1fa5811cdf3989fa114639efdc3bcaa8d2308c79e241058bf453d8e"
+    },
+    {
+      "section": "v2",
+      "index": 72,
+      "language": "bash",
+      "lines": 69,
+      "sha256": "5e902a23f58d200fbef743aeaed24e2dbf785a7c202d6560a9e7896ddf7d23e1"
+    },
+    {
+      "section": "v3",
+      "index": 1,
+      "language": "powershell",
+      "lines": 51,
+      "sha256": "6759a6f3150b0df20de045244ecaf77f2e94123ef34094298d1894b11c833d96"
+    },
+    {
+      "section": "v3",
+      "index": 2,
+      "language": "powershell",
+      "lines": 104,
+      "sha256": "0228e0eafe94dd6af1ae17fbc0200fe98f7dbb5e2a20b321a6bbcbe1fba39624"
+    }
+  ],
+  "quantization_rows": 450,
+  "quantization_columns": 20
+}

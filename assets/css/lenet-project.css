@@ -1,0 +1,18 @@
+.lenet-project { min-width: 0; }
+.lenet-project .lenet-flow { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 14px; margin: 1.6em 0; }
+.lenet-project .lenet-flow > div { border: 1px solid #7f899880; border-radius: 12px; padding: 18px; background: #78869a0d; }
+.lenet-project .lenet-flow strong,.lenet-project .lenet-flow span { display: block; }
+.lenet-project .lenet-flow span { font-size: .85em; margin-top: .4em; }
+.lenet-project .lenet-flow p { font-size: .8em; margin: 1em 0 0; }
+.lenet-project figure.lenet-figure { display: block; margin: 1.6em 0; width: 100%; }
+.lenet-project .lenet-figure a { display: block; }
+.lenet-project .lenet-figure img { display: block; width: auto; max-width: 100%; height: auto; margin: auto; border: 1px solid #7f899850; border-radius: 6px; background: white; }
+.lenet-project .lenet-figure figcaption { color: inherit; text-align: left; font-size: .75em; margin: .65em 0 0; line-height: 1.6; }
+.lenet-project .lenet-record-nav { display: flex; flex-wrap: wrap; gap: 12px; margin: 2em 0; font-size: .85em; }
+.lenet-project .lenet-record-nav a { padding: 8px 12px; border: 1px solid #7f899880; border-radius: 8px; }
+.lenet-project table { display: block; max-width: 100%; overflow-x: auto; font-size: .73em; }
+.lenet-project table td,.lenet-project table th { min-width: 5em; }
+.lenet-project .lenet-original-heading { margin-top: 1.8em; overflow-wrap: anywhere; }
+.lenet-project .lenet-record-note { border-left: 3px solid #2986c4; padding: .8em 1em; font-size: .85em; background: #78869a0d; }
+.lenet-project a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+@media(max-width:600px) { .lenet-project .lenet-flow { grid-template-columns: 1fr; } }
