@@ -17,7 +17,7 @@
       path: container.dataset.pagePath,
       lang: 'en',
       locale: {
-        nick: '닉네임 / @인스타아이디',
+        nick: '닉네임 (선택)', email: '이메일 (선택)', link: '웹사이트 (선택)',
         nickError: '닉네임을 입력해 주세요.',
         placeholder: '궁금한 점이나 생각을 자유롭게 남겨주세요.',
         sofa: '첫 댓글을 남겨보세요.',
