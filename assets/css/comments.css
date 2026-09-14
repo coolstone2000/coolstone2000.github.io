@@ -22,8 +22,14 @@
   overflow-wrap: anywhere;
 }
 html[data-theme='dark'] #waline {
-  --waline-color: #eaeaea;
+  --waline-color: #e1e7ef;
   --waline-white: #222a34;
+  --waline-active-color: var(--reading-accent-hover, #b7d1f2);
+  --waline-info-font-size: 0.8125em;
+  --waline-disable-color: #b9c4ce;
+  --waline-disable-bg-color: #303946;
+  --waline-warning-color: #f2c58d;
+  --waline-warning-bg-color: #3b352e;
   color-scheme: dark;
 }
 .comments-provider__hint {
@@ -40,8 +46,46 @@ html[data-theme='dark'] #waline {
   outline-offset: 3px;
 }
 #waline .wl-btn { border-radius: 8px; }
-#waline .wl-btn.primary { color: var(--waline-white); }
+#waline .wl-btn.primary:not(:disabled) { color: var(--waline-white); }
+/* Keep disabled labels readable instead of inheriting the primary text color. */
+#waline .wl-btn:disabled {
+  color: var(--waline-disable-color);
+  background: var(--waline-disable-bg-color);
+  border-color: var(--waline-border-color);
+  opacity: 1;
+}
 #waline .wl-content { line-height: 1.8; }
+html[data-theme='dark'] #waline :is(.wl-input, .wl-editor) {
+  color: var(--waline-color);
+  caret-color: var(--waline-theme-color);
+  font-size: 16px;
+}
+html[data-theme='dark'] #waline :is(.wl-input, .wl-editor)::placeholder {
+  color: var(--waline-dark-grey);
+  opacity: 1;
+}
+html[data-theme='dark'] #waline :is(.wl-header label, .wl-btn, .wl-sort li) {
+  font-size: 14px;
+}
+html[data-theme='dark'] #waline .wl-content {
+  color: var(--waline-color);
+  font-size: 16px;
+}
+html[data-theme='dark'] #waline a,
+html[data-theme='dark'] #waline a:visited {
+  color: var(--waline-theme-color);
+}
+html[data-theme='dark'] #waline a:hover,
+html[data-theme='dark'] #waline a:focus-visible {
+  color: var(--waline-active-color);
+}
+html[data-theme='dark'] #waline .wl-card .wl-content.expand::before {
+  background: linear-gradient(180deg, transparent, var(--waline-bg-color));
+}
+html[data-theme='dark'] #waline .wl-card .wl-content.expand::after {
+  color: var(--waline-theme-color);
+  background: var(--waline-bg-color);
+}
 @media (max-width: 480px) {
   #waline { --waline-font-size: 15px; }
   #waline .wl-header { display: block; }

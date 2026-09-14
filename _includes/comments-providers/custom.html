@@ -1,8 +1,8 @@
 <link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
-<link rel="stylesheet" href="{{ '/assets/css/comments.css' | relative_url }}">
+<link rel="stylesheet" href="{{ '/assets/css/comments.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 <div class="comments-wrapper">
   <h4 class="comments-wrapper__title"><i class="fas fa-comment-dots" aria-hidden="true"></i> <span>Comments</span></h4>
-  <p class="comments-provider__hint">로그인 없이 댓글을 남길 수 있습니다. 닉네임이나 @인스타아이디를 자유롭게 적어주세요.</p>
+  <p class="comments-provider__hint">로그인 없이 댓글을 남길 수 있습니다.</p>
   <p class="comments-provider__status" data-comments-status role="status" aria-live="polite">댓글 창을 불러오는 중입니다…</p>
   <div id="waline" data-server-url="{{ site.comments.waline.server_url | escape }}" data-page-path="{{ page.url | escape }}"></div>
   <noscript>댓글을 보거나 작성하려면 JavaScript를 활성화해 주세요.</noscript>
