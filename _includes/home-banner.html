@@ -1,11 +1,37 @@
-<section class="home-banner-slot" aria-labelledby="home-banner-slot-title">
-  <!--
-    홈 배너를 정하면 이 영역 안에 이미지, 링크, 공지, 프로젝트 소개 등을 넣습니다.
-    현재는 위치를 확인할 수 있도록 안내 상태로 두었습니다.
-  -->
-  <div class="home-banner-slot__placeholder">
-    <span class="home-banner-slot__label">HOME BANNER</span>
-    <h2 id="home-banner-slot-title">나중에 원하는 배너를 넣을 수 있는 공간입니다.</h2>
-    <p>이미지·공지·프로젝트 소개처럼 홈에서 먼저 보여주고 싶은 내용을 여기에 배치할 수 있습니다.</p>
-  </div>
-</section>
+{% assign banner = site.data.home_banner %}
+{% if banner.mode == 'random' %}
+  {% assign banner_count = 0 %}
+  {% capture banner_images %}[
+    {% for file in site.static_files %}
+      {% assign extension = file.extname | downcase %}
+      {% if file.path contains '/images/home-banner/' %}
+        {% if extension == '.jpg' or extension == '.jpeg' or extension == '.png' or extension == '.webp' or extension == '.gif' or extension == '.avif' %}
+          {% if banner_count > 0 %},{% endif %}{{ file.path | relative_url | jsonify }}
+          {% assign banner_count = banner_count | plus: 1 %}
+        {% endif %}
+      {% endif %}
+    {% endfor %}
+  ]{% endcapture %}
+  {% if banner_count > 0 %}
+    <section class="home-banner-slot home-banner-photo" aria-label="홈 사진" data-home-banner-images="{{ banner_images | strip | escape }}" hidden>
+      <header class="home-banner-photo__header">
+        <h2>{{ banner.title | default: '일상의 조각' | escape }}</h2>
+        <span>PHOTO JOURNAL</span>
+      </header>
+      <div class="home-banner-photo__gallery" aria-live="polite" aria-label="랜덤 사진" data-photo-gallery></div>
+      <footer class="home-banner-photo__footer">
+        <span data-photo-status role="status"></span>
+        <button type="button" data-photo-shuffle>다른 사진 보기 <span aria-hidden="true">↻</span></button>
+      </footer>
+    </section>
+    <script src="{{ '/assets/js/custom/home-banner.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
+  {% endif %}
+{% elsif banner.mode == 'notice' %}
+  <section class="home-banner-slot home-banner-notice" aria-label="공지사항">
+    {% capture notice %}{% include home-banner-notice.md %}{% endcapture %}
+    {{ notice | markdownify }}
+    {% if banner.image and banner.image != '' %}
+      <img src="{{ banner.image | relative_url }}" alt="{{ banner.image_alt | escape }}" decoding="async">
+    {% endif %}
+  </section>
+{% endif %}

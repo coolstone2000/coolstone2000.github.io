@@ -3,6 +3,11 @@
   --reading-muted: #53616d;
   --reading-border: #cbd2d9;
   --reading-accent: #006c88;
+  // Keep light-mode controls in the same readable teal family as links.
+  // These tokens also provide valid values for components whose hover rules
+  // were previously defined only by the dark theme.
+  --reading-accent-hover: #00566e;
+  --reading-accent-soft: rgba(0, 108, 136, 0.08);
   --masthead-sticky-height: 84px;
 }
 html[data-theme='dark'] {
@@ -11,9 +16,9 @@ html[data-theme='dark'] {
   --reading-border: #505b69;
   // Use one soft blue accent throughout the dark UI. It stays readable on
   // #252a34 without the glare of cyan or the unrelated contrast of gold.
-  --reading-accent: #8fa8d8;
-  --reading-accent-hover: #8eafea;
-  --reading-accent-soft: rgba(143, 168, 216, 0.14);
+  --reading-accent: #9ab8df;
+  --reading-accent-hover: #b7d1f2;
+  --reading-accent-soft: rgba(154, 184, 223, 0.14);
   --reading-accent-surface: #6982b3;
   --reading-accent-surface-hover: #7f90b3;
 }
@@ -237,6 +242,57 @@ html[data-theme='dark'] .masthead {
 // posts. Its contents can be replaced later without changing the archive UI.
 .home-banner-slot {
   margin: clamp(2rem, 5vw, 4rem) 0 clamp(2.25rem, 5vw, 4rem);
+}
+.home-banner-slot[hidden] { display: none !important; }
+.home-banner-notice img {
+  display: block;
+  width: 100%;
+  max-height: clamp(240px, 42vw, 480px);
+  object-fit: contain;
+  border-radius: 12px;
+  margin-inline: auto;
+}
+.home-banner-notice {
+  padding: clamp(16px, 3vw, 28px);
+  border: 1px solid var(--reading-border);
+  border-radius: 12px;
+  line-height: 1.75;
+}
+.home-banner-notice > :first-child { margin-top: 0; }
+.home-banner-notice > :last-child { margin-bottom: 0; }
+.home-banner-photo {
+  margin: 1.25rem 0 2rem;
+  padding: clamp(14px, 2.5vw, 24px);
+  border: 1px solid var(--reading-border);
+  border-radius: 16px;
+  background: #f7fafb;
+}
+html[data-theme='dark'] .home-banner-photo { background: #292f39; border-color: #414b59; }
+.home-banner-photo__header,
+.home-banner-photo__footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.home-banner-photo__header { margin-bottom: 16px; }
+.home-banner-photo__header h2 { margin: 0; font-size: 18px; line-height: 1.5; color: inherit; }
+.home-banner-photo__header > span { font-size: 12px; letter-spacing: .12em; color: var(--reading-muted); }
+.home-banner-photo__gallery { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-items: center; }
+.home-banner-photo__gallery.is-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.home-banner-photo__gallery img {
+  display: block; width: 100%; height: 360px; max-height: 55vh;
+  object-fit: contain; min-width: 0; border-radius: 6px;
+}
+.home-banner-photo__footer { margin-top: 14px; }
+.home-banner-photo__footer > span { font-size: 13px; color: var(--reading-muted); }
+.home-banner-photo__footer button {
+  margin-left: auto; min-height: 44px; padding: 8px 12px;
+  border: 1px solid var(--reading-border); border-radius: 8px;
+  background: transparent; color: var(--reading-accent); font: inherit; font-size: 14px; cursor: pointer;
+}
+.home-banner-photo__footer button:hover { background: var(--reading-accent-soft); border-color: var(--reading-accent); }
+.home-banner-photo__footer button:disabled { opacity: .55; cursor: default; }
+@media (max-width: 600px) {
+  .home-banner-photo__gallery.is-pair { grid-template-columns: minmax(0, 1fr); }
+  .home-banner-photo__gallery img { height: auto; max-height: 380px; }
+  .home-banner-photo__gallery img + img { display: none; }
+  .home-banner-photo__header > span { font-size: 11px; }
 }
 .home-banner-slot__placeholder {
   min-height: clamp(170px, 23vw, 260px);
@@ -569,11 +625,11 @@ html[data-theme='dark'] .pagination a.current:focus-visible {
 }
 html[data-theme='dark'] .presentation-preview__actions .btn:not(.btn--primary),
 html[data-theme='dark'] .presentation-preview__actions .btn:not(.btn--primary):visited {
-  color: #8fa8d8 !important;
+  color: var(--reading-accent) !important;
 }
 html[data-theme='dark'] .presentation-preview__actions .btn:not(.btn--primary):hover,
 html[data-theme='dark'] .presentation-preview__actions .btn:not(.btn--primary):focus-visible {
-  color: #8eafea !important;
+  color: var(--reading-accent-hover) !important;
 }
 html[data-theme='dark'] .pagination li a:not(.current):not(.disabled),
 html[data-theme='dark'] .pagination li a:not(.current):not(.disabled):visited {
@@ -596,6 +652,9 @@ html[data-theme='dark'] .page__share .btn--share:focus-visible {
   color: #fff !important;
 }
 html[data-theme='dark'] .progress-bar {
+  background: var(--reading-accent) !important;
+}
+html[data-theme='light'] .progress-bar {
   background: var(--reading-accent) !important;
 }
 html[data-theme='dark'] #btn-back-to-top svg {
@@ -670,6 +729,108 @@ html[data-theme='dark'] .paper-meta-badge.year {
   background: var(--reading-accent-soft) !important;
   border-color: var(--reading-accent) !important;
   color: var(--reading-accent) !important;
+}
+
+// Light-mode utility controls should sit on the page's soft surface instead
+// of reusing the dark background from the original inline styles.
+html[data-theme='light'] #btn-back-to-top {
+  background: #f7fafb !important;
+  border: 1px solid var(--reading-border) !important;
+  box-shadow: 0 4px 12px rgba(31, 42, 51, 0.16);
+}
+html[data-theme='light'] #btn-back-to-top svg {
+  stroke: var(--reading-accent) !important;
+}
+html[data-theme='light'] #btn-back-to-top:hover {
+  background: var(--reading-accent) !important;
+  border-color: var(--reading-accent) !important;
+  box-shadow: 0 6px 15px rgba(0, 108, 136, 0.28);
+}
+html[data-theme='light'] #btn-back-to-top:hover svg path { stroke: #fff !important; }
+
+// The PDF frame and external-link marker used their own gray/teal values;
+// tie them to the same light border and accent as the surrounding article.
+html[data-theme='light'] .pdf-container,
+html[data-theme='light'] .presentation-preview__frame {
+  border-color: var(--reading-border) !important;
+  box-shadow: 0 4px 15px rgba(31, 42, 51, 0.12);
+}
+html[data-theme='light'] .external-link::after { color: var(--reading-muted); }
+html[data-theme='light'] .external-link:hover::after { color: var(--reading-accent); }
+
+// Match the browser scrollbar to the site's light gray canvas.
+html[data-theme='light'] ::-webkit-scrollbar-track {
+  background: #eeeeee;
+}
+html[data-theme='light'] ::-webkit-scrollbar-thumb {
+  background-color: #cbd2d9;
+  border-color: #eeeeee;
+}
+html[data-theme='light'] ::-webkit-scrollbar-thumb:hover {
+  background-color: var(--reading-accent);
+}
+
+// Details blocks and paper metadata are part of the article surface too.
+html[data-theme='light'] details {
+  border-color: var(--reading-border);
+}
+html[data-theme='light'] details > summary {
+  color: var(--reading-accent);
+  background: var(--reading-accent-soft);
+}
+html[data-theme='light'] details > summary:hover {
+  background: rgba(0, 108, 136, 0.13);
+}
+html[data-theme='light'] .paper-meta-box {
+  border-color: var(--reading-border);
+  border-left-color: var(--reading-accent);
+  background: #f7fafb;
+}
+html[data-theme='light'] .paper-meta-authors,
+html[data-theme='light'] .paper-meta-link {
+  color: var(--reading-muted);
+}
+html[data-theme='light'] .paper-meta-box .paper-meta-badge.year {
+  background: var(--reading-accent-soft);
+  color: var(--reading-accent);
+  border-color: var(--reading-accent);
+}
+
+// Interactive diagrams keep their semantic series colors, but their neutral
+// surfaces should use the same light canvas and border as the rest of the
+// site.
+html[data-theme='light'] .vc-diagram {
+  --vc-bg: #f7fafb;
+  --vc-muted: #53616d;
+  --vc-border: #cbd2d9;
+}
+html[data-theme='light'] .ssv-root {
+  --ss-bg: #f7fafb;
+  --ss-border: #cbd2d9;
+  --ss-muted: #53616d;
+}
+html[data-theme='light'] #linear-system-explorer[data-lse-theme='light'] {
+  --lse-bg: #f7fafb;
+  --lse-bg-2: #eef4f6;
+  --lse-border: #cbd2d9;
+  --lse-border-strong: #aebbc5;
+  --lse-text: #222831;
+  --lse-muted: #53616d;
+  --lse-heading-soft: #34434e;
+  --lse-strong: #222831;
+  --lse-control-bg: #fff;
+  --lse-box-bg: #f7fafb;
+  --lse-button-bg: #f7fafb;
+  --lse-soft-bg: #f7fafb;
+  --lse-rule-bg: #eef4f6;
+  --lse-canvas-bg: #f7fafb;
+}
+html[data-theme='light'] #phase-plane-stability-explorer:not(.pp-dark) {
+  --pp-bg: #f7fafb;
+  --pp-border: #cbd2d9;
+  --pp-border-strong: #aebbc5;
+  --pp-text: #222831;
+  --pp-muted: #53616d;
 }
 
 // A few older posts carry the former teal as an inline text color. Limit the

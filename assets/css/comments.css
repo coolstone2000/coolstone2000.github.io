@@ -7,12 +7,12 @@
 
 html:root {
   color-scheme: light;
-  --background: #eeeeee;
+  --background: #f7fafb;
   --text: #222831;
-  --muted: #626870;
-  --field: #f7f7f7;
-  --border: #cdd0d3;
-  --accent: #007eae;
+  --muted: #53616d;
+  --field: #eef4f6;
+  --border: #cbd2d9;
+  --accent: #006c88;
   --button-text: #fff;
 }
 html:root[data-theme='dark'] {

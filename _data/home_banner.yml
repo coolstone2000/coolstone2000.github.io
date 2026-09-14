@@ -1,0 +1,6 @@
+# random: 랜덤 사진 / notice: 고정 공지 / hidden: 배너 숨김
+mode: random
+title: "일상의 조각"
+# notice 모드에서 고정할 이미지. 글만 표시하려면 빈 문자열로 둡니다.
+image: ""
+image_alt: "홈 배너 사진"
