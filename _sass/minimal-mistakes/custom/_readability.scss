@@ -843,9 +843,9 @@ html[data-theme='dark'] .page__content [style*='color: #8cced2'] {
   color: var(--reading-accent) !important;
 }
 
-// Turn the Cusdis loading state into a calm, contained comment panel.
+// Keep the external comment provider inside a calm, contained comment panel.
 .page__comments { margin-top: clamp(3rem, 6vw, 5rem); }
-.cusdis-wrapper {
+.comments-wrapper {
   --comments-panel: #f7fafb;
   --comments-state: #eef4f6;
   margin-top: 0;
@@ -855,7 +855,7 @@ html[data-theme='dark'] .page__content [style*='color: #8cced2'] {
   background: var(--comments-panel);
   box-shadow: 0 10px 28px rgba(31, 42, 51, 0.08);
 }
-.cusdis-wrapper__title {
+.comments-wrapper__title {
   margin: 0 0 1rem;
   padding: 0;
   border: 0;
@@ -863,7 +863,7 @@ html[data-theme='dark'] .page__content [style*='color: #8cced2'] {
   font-size: clamp(1.05rem, 2vw, 1.35rem);
   letter-spacing: 0.1em;
 }
-.cusdis-wrapper__title i { font-size: 0.9em; }
+.comments-wrapper__title i { font-size: 0.9em; }
 .comments-provider__status {
   display: flex;
   min-height: 5.5rem;
@@ -888,7 +888,7 @@ html[data-theme='dark'] .page__content [style*='color: #8cced2'] {
   content: '';
   animation: comments-status-spin 800ms linear infinite;
 }
-html[data-theme='dark'] .cusdis-wrapper {
+html[data-theme='dark'] .comments-wrapper {
   --comments-panel: #2b333e;
   --comments-state: #222a34;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);

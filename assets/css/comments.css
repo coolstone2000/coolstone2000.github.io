@@ -1,79 +1,48 @@
-@font-face {
-  font-family: Pretendard;
-  src: url('https://fastly.jsdelivr.net/gh/Project-Noonnu/noonfonts_2107@1.1/Pretendard-Light.woff') format('woff');
-  font-weight: 200 500;
-  font-display: swap;
+/* Scoped to Waline: loaded in the blog document, not a Cusdis iframe. */
+#waline {
+  --waline-font-size: 16px;
+  --waline-color: var(--reading-text, #222831);
+  --waline-theme-color: var(--reading-accent, #006c88);
+  --waline-active-color: var(--reading-accent, #006c88);
+  --waline-white: #fff;
+  --waline-bg-color: var(--comments-panel, #f7fafb);
+  --waline-bg-color-light: var(--comments-state, #eef4f6);
+  --waline-bg-color-hover: var(--comments-state, #eef4f6);
+  --waline-border-color: var(--reading-border, #cbd2d9);
+  --waline-dark-grey: var(--reading-muted, #53616d);
+  --waline-light-grey: var(--reading-muted, #53616d);
+  --waline-info-color: var(--reading-muted, #53616d);
+  --waline-info-bg-color: var(--comments-state, #eef4f6);
+  --waline-disable-color: var(--reading-muted, #53616d);
+  --waline-disable-bg-color: var(--comments-state, #eef4f6);
+  --waline-bq-color: var(--reading-border, #cbd2d9);
+  --waline-box-shadow: none;
+  font-family: inherit;
+  color: var(--waline-color);
+  overflow-wrap: anywhere;
 }
-
-html:root {
-  color-scheme: light;
-  --background: #f7fafb;
-  --text: #222831;
-  --muted: #53616d;
-  --field: #eef4f6;
-  --border: #cbd2d9;
-  --accent: #006c88;
-  --button-text: #fff;
-}
-html:root[data-theme='dark'] {
+html[data-theme='dark'] #waline {
+  --waline-color: #eaeaea;
+  --waline-white: #222a34;
   color-scheme: dark;
-  --background: #252a34;
-  --text: #eaeaea;
-  --muted: #a6abb4;
-  --field: #20242c;
-  --border: #454a53;
-  --accent: #8fa8d8;
-  --button-text: #20242c;
 }
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--background) !important;
-  color: var(--text) !important;
-  font-family: Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 15px;
-  line-height: 1.65;
+.comments-provider__hint {
+  color: var(--reading-muted, #53616d);
+  font-size: 0.8rem;
+  line-height: 1.7;
 }
-#root { padding: 4px 2px 8px; }
-#root *, #root *::before, #root *::after { box-sizing: border-box; }
-#root .px-1 { padding-left: 0; padding-right: 0; }
-#root .gap-4 { gap: 16px; }
-#root label { color: var(--muted) !important; font-size: 13px; margin-bottom: 6px; }
-#root input, #root textarea {
-  color: var(--text) !important;
-  background: var(--field) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 7px;
-  padding: 10px 12px;
-  font: inherit;
-  transition: border-color .15s;
+#waline .wl-panel { border-radius: 12px; }
+#waline .wl-header label { white-space: normal; min-width: 8em; }
+#waline .wl-input, #waline .wl-editor { font-family: inherit; box-shadow: none; }
+#waline .wl-editor { min-height: 120px; }
+#waline :is(input, textarea, button, a):focus-visible {
+  outline: 2px solid var(--waline-theme-color);
+  outline-offset: 3px;
 }
-#root textarea { min-height: 112px; height: 112px; resize: vertical; }
-#root input:focus-visible, #root textarea:focus-visible, #root button:focus-visible, #root a:focus-visible {
-  outline: 2px solid var(--accent) !important;
-  outline-offset: 2px;
-}
-#root button {
-  border: 1px solid var(--accent) !important;
-  border-radius: 7px;
-  background: var(--accent) !important;
-  color: var(--button-text) !important;
-  padding: 8px 18px;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-}
-#root button:hover { filter: brightness(.93); }
-#root button:disabled, #root .cusdis-disabled { opacity: .55; cursor: wait; }
-#root a { color: var(--muted); text-underline-offset: 3px; }
-#root a:hover { color: var(--accent); }
-#root [class*='text-gray-'] { color: var(--muted) !important; }
-#root [class*='border-gray-'] { border-color: var(--border) !important; }
-#root .prose { color: var(--text) !important; overflow-wrap: anywhere; }
-#root .prose a { color: var(--accent); }
-#root .prose pre { white-space: pre-wrap; }
-#root a[href*='cusdis.com'] { font-size: 12px; }
+#waline .wl-btn { border-radius: 8px; }
+#waline .wl-btn.primary { color: var(--waline-white); }
+#waline .wl-content { line-height: 1.8; }
 @media (max-width: 480px) {
-  #root .grid-cols-2 { grid-template-columns: minmax(0, 1fr); }
+  #waline { --waline-font-size: 15px; }
+  #waline .wl-header { display: block; }
 }

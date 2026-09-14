@@ -1,18 +1,10 @@
-<div class="cusdis-wrapper">
-  <h4 class="cusdis-wrapper__title">
-    <i class="fas fa-comment-dots" aria-hidden="true"></i>
-    <span>Comments</span>
-  </h4>
-
-  <p class="comments-provider__status" data-cusdis-status role="status" aria-live="polite">댓글 창을 불러오는 중입니다…</p>
-  <div id="cusdis_thread"
-    data-host="https://cusdis.com"
-    data-app-id="db03d51a-2972-422f-ad0a-e9c1760dc064"
-    data-page-id="{{ page.url }}"
-    data-page-url="{{ page.url | absolute_url }}"
-    data-page-title="{{ page.title | escape }}">
-  </div>
+<link rel="stylesheet" href="https://unpkg.com/@waline/client@v3/dist/waline.css">
+<link rel="stylesheet" href="{{ '/assets/css/comments.css' | relative_url }}">
+<div class="comments-wrapper">
+  <h4 class="comments-wrapper__title"><i class="fas fa-comment-dots" aria-hidden="true"></i> <span>Comments</span></h4>
+  <p class="comments-provider__hint">로그인 없이 댓글을 남길 수 있습니다. 닉네임이나 @인스타아이디를 자유롭게 적어주세요.</p>
+  <p class="comments-provider__status" data-comments-status role="status" aria-live="polite">댓글 창을 불러오는 중입니다…</p>
+  <div id="waline" data-server-url="{{ site.comments.waline.server_url | escape }}" data-page-path="{{ page.url | escape }}"></div>
+  <noscript>댓글을 보거나 작성하려면 JavaScript를 활성화해 주세요.</noscript>
 </div>
-
-<script src="{{ '/assets/js/custom/comments.js' | relative_url }}" data-stylesheet="{{ '/assets/css/comments.css' | relative_url }}"></script>
-<script async defer src="https://cusdis.com/js/cusdis.es.js" onerror="window.__showCusdisUnavailable && window.__showCusdisUnavailable();"></script>
+<script defer src="{{ '/assets/js/custom/comments.js' | relative_url }}"></script>
