@@ -671,7 +671,7 @@
     #linear-system-explorer .lse-dot-green { background: var(--lse-green) !important; }
     @media (max-width: 700px) {
       #linear-system-explorer { padding: 12px; }
-      #linear-system-explorer canvas.lse-canvas { aspect-ratio: 4 / 3; }
+      #linear-system-explorer canvas.lse-canvas { aspect-ratio: 16 / 9; }
     }
   </style>
 
@@ -713,16 +713,16 @@
 
             <div class="lse-input-wrap">
               <span class="lse-input-label">\(a_{11}\)</span>
-              <input type="number" id="lse-a" step="0.1" value="0">
+              <input type="number" id="lse-a" aria-label="행렬 a11" step="0.1" value="0">
               <span class="lse-input-label">\(a_{21}\)</span>
-              <input type="number" id="lse-c" step="0.1" value="-4">
+              <input type="number" id="lse-c" aria-label="행렬 a21" step="0.1" value="-4">
             </div>
 
             <div class="lse-input-wrap">
               <span class="lse-input-label">\(a_{12}\)</span>
-              <input type="number" id="lse-b" step="0.1" value="1">
+              <input type="number" id="lse-b" aria-label="행렬 a12" step="0.1" value="1">
               <span class="lse-input-label">\(a_{22}\)</span>
-              <input type="number" id="lse-d" step="0.1" value="-1">
+              <input type="number" id="lse-d" aria-label="행렬 a22" step="0.1" value="-1">
             </div>
 
             <div class="lse-bracket right"></div>
@@ -791,7 +791,7 @@
 
         <div class="lse-eig-box">
           <div class="lse-eig-title">고유값 평면 · \(\operatorname{Re}\lambda\)-\(\operatorname{Im}\lambda\)</div>
-          <canvas id="lse-eig-plane" width="260" height="120"></canvas>
+          <canvas id="lse-eig-plane" width="260" height="120" role="img" aria-label="고유값의 실수부와 허수부 위치"></canvas>
           <div id="lse-eigs" style="text-align:center; font-size:.78rem; margin-top:4px;"></div>
         </div>
       </div>
@@ -814,7 +814,7 @@
           <span><i class="lse-dot lse-dot-green"></i>초기점</span>
         </div>
       </div>
-      <canvas class="lse-canvas" id="lse-phase" width="640" height="360"></canvas>
+      <canvas class="lse-canvas" id="lse-phase" width="640" height="360" role="img" aria-label="연립선형계 위상평면과 선택한 초기조건의 궤적"></canvas>
       <p class="lse-caption">
         화살표는 각 점에서의 \(\dot{\mathbf{x}}=A\mathbf{x}\) 방향이다.
         실수 고유벡터가 존재하면 그 방향을 점선으로 함께 표시한다.
@@ -829,7 +829,7 @@
           <span><i class="lse-dot lse-dot-amber"></i>\(x_2(t)\)</span>
         </div>
       </div>
-      <canvas class="lse-canvas" id="lse-time" width="640" height="360"></canvas>
+      <canvas class="lse-canvas" id="lse-time" width="640" height="360" role="img" aria-label="시간에 따른 두 상태 변수의 변화"></canvas>
       <p class="lse-caption">
         위상평면의 수렴·발산·회전이 시간축에서는 감쇠, 성장, 진동으로 나타난다.
       </p>
@@ -1145,16 +1145,21 @@
       }
 
       function clear(ctx, canvas) {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const width = Math.max(1, canvas.clientWidth);
+        const height = Math.max(1, canvas.clientHeight);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr,0,0,dpr,0,0);
         ctx.fillStyle = cssVar("--lse-canvas-bg", "#0b1220");
-        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillRect(0,0,width,height);
       }
 
       function drawEigenPlane(e) {
         clear(ectx, eigCanvas);
 
-        const w = eigCanvas.width;
-        const h = eigCanvas.height;
+        const w = eigCanvas.clientWidth;
+        const h = eigCanvas.clientHeight;
         const cx = w/2;
         const cy = h/2;
         const reMax = Math.max(2, Math.abs(e.l1.re), Math.abs(e.l2.re)) * 1.35;
@@ -1192,8 +1197,8 @@
       function drawPhase(A, x0, tmax, ntraj, frac=1) {
         clear(pctx, phase);
 
-        const w = phase.width;
-        const h = phase.height;
+        const w = phase.clientWidth;
+        const h = phase.clientHeight;
         const pad = 38;
         const xmin = -4, xmax = 4, ymin = -4, ymax = 4;
         const X = x => pad + (x-xmin)/(xmax-xmin)*(w-2*pad);
@@ -1309,8 +1314,8 @@
       function drawTime(A, x0, tmax) {
         clear(tctx, time);
 
-        const w = time.width;
-        const h = time.height;
+        const w = time.clientWidth;
+        const h = time.clientHeight;
         const padL=46, padR=24, padT=26, padB=38;
         const tr = rk4(A,x0,tmax,420);
 
@@ -1497,6 +1502,13 @@
       window.addEventListener("storage", queueThemeSync);
 
       setPreset("circuit");
+      // Redraw only when width changes; MathJax updates can change height.
+      let previousWidth = root.clientWidth;
+      new ResizeObserver(() => {
+        if (root.clientWidth === previousWidth) return;
+        previousWidth = root.clientWidth;
+        render();
+      }).observe(root);
     })();
   </script>
 </div>

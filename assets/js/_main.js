@@ -53,9 +53,15 @@ $(function() {
     }, 400);
   });
 
+  // Read the current header height, including mobile and font-size changes.
+  var navigationOffset = function() {
+    var header = document.querySelector('.masthead');
+    return (header ? header.getBoundingClientRect().height : 0) + 16;
+  };
+
   // Smooth scrolling
   var scroll = new SmoothScroll('a[href*="#"]', {
-    offset: 20,
+    offset: navigationOffset,
     speed: 400,
     speedAsDuration: true,
     durationMax: 500
@@ -73,7 +79,7 @@ $(function() {
       nestedClass: "active", // applied to the parent items
 
       // Offset & reflow
-      offset: 20, // how far from the top of the page to activate a content area
+      offset: navigationOffset,
       reflow: true, // if true, listen for reflows
 
       // Event support

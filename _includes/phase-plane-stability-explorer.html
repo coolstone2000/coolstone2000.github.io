@@ -171,7 +171,7 @@
       width:7px; height:7px; border-radius:999px; display:inline-block;
     }
     #phase-plane-stability-explorer canvas{
-      width:100%; display:block; border:1px solid var(--pp-border); border-radius:10px; background:var(--pp-bg);
+      width:100%; height:auto; aspect-ratio:16 / 9; display:block; border:1px solid var(--pp-border); border-radius:10px; background:var(--pp-bg);
     }
     #phase-plane-stability-explorer .pp-cap{
       margin:8px 2px 0; color:var(--pp-muted); font-size:.74rem; line-height:1.58;
@@ -479,7 +479,7 @@
           <span><i class="dot dot-green"></i>초기점</span>
         </div>
       </div>
-      <canvas id="pp-phase" width="640" height="360"></canvas>
+      <canvas id="pp-phase" width="640" height="360" role="img" aria-label="선택한 시스템의 위상평면과 초기조건에서 출발하는 궤적"></canvas>
       <p class="pp-cap">평면의 각 점에서 화살표는 그 자리에서 상태가 어느 방향으로 움직이는지 뜻한다. 선형계는 원점 중심의 형태를, 비선형계는 여러 임계점 주변의 서로 다른 거동을 보여 준다.</p>
     </section>
 
@@ -491,7 +491,7 @@
           <span><i class="dot dot-amber"></i>x<sub>2</sub>(t)</span>
         </div>
       </div>
-      <canvas id="pp-time" width="640" height="360"></canvas>
+      <canvas id="pp-time" width="640" height="360" role="img" aria-label="시간에 따른 두 상태 변수의 변화"></canvas>
       <p class="pp-cap">위상평면에서 원점으로 감기면 시간응답에서는 감쇠 진동이 나타난다. 바깥으로 벌어지면 성장, 닫힌 곡선이면 주기적인 응답으로 읽으면 된다.</p>
     </section>
   </div>
@@ -720,15 +720,20 @@
       }
 
       function clear(ctx, canvas, colors){
-        ctx.clearRect(0,0,canvas.width,canvas.height);
+        const width = Math.max(1, canvas.clientWidth);
+        const height = Math.max(1, canvas.clientHeight);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.round(width * dpr);
+        canvas.height = Math.round(height * dpr);
+        ctx.setTransform(dpr,0,0,dpr,0,0);
         ctx.fillStyle = colors.bg;
-        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillRect(0,0,width,height);
       }
 
       function drawPhase(sys, x0, tmax, nSeeds){
         const colors = palette();
         clear(pctx, phase, colors);
-        const w=phase.width, h=phase.height, pad=38;
+        const w=phase.clientWidth, h=phase.clientHeight, pad=38;
         const xmin=-3.5, xmax=3.5, ymin=-3.5, ymax=3.5;
         const X = x => pad + (x-xmin)/(xmax-xmin)*(w-2*pad);
         const Y = y => h-pad - (y-ymin)/(ymax-ymin)*(h-2*pad);
@@ -830,7 +835,7 @@
       function drawTime(sys, x0, tmax){
         const colors = palette();
         clear(tctx, time, colors);
-        const w=time.width, h=time.height, padL=46, padR=22, padT=22, padB=38;
+        const w=time.clientWidth, h=time.clientHeight, padL=46, padR=22, padT=22, padB=38;
         const tr = rk4(sys, x0, tmax, 420);
         let vals = [];
         tr.forEach(p => { vals.push(p.x, p.y); });
@@ -943,6 +948,7 @@
       });
 
       // default
+      new ResizeObserver(() => render()).observe(root);
       root.querySelector('[data-key="stableNode"]').classList.add("is-active");
       applyTheme();
     })();
