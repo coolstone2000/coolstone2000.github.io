@@ -13,7 +13,7 @@ excerpt: "BCQ가 필요한 이유와 양자화·LUT 구현 원리를 정리하�
 
 BCQ(Binary-Coded Quantization)는 하나의 가중치를 **여러 이진 부호와 스케일의 합**으로 표현하는 양자화 방식이다. 저장할 때는 이진 코드를 사용하고, 계산할 때는 그 코드가 지정하는 덧셈·뺄셈 패턴을 이용한다.
 
-이 글에서는 BCQ의 공통 원리를 먼저 설명한 뒤, **ShiftAddLLM, AnyBCQ, LUT-GEMM, FIGLUT** 네 논문을 연결해서 살펴본다. 네 연구가 공유하는 것은 가중치 표현이지만, 실제로 해결하려는 병목과 구현하는 시스템은 서로 다르다.
+이 글에서는 BCQ의 공통 원리를 먼저 설명한 뒤, **ShiftAddLLM, AnyBCQ, LUT-GEMM, FIGLUT** 네 논문을 연결해서 살펴본다. 더 자세한 정리본은 [BCQ](https://app.notion.com/p/BCQ-3d66df6cdff9803f899afbb68a70b1b4) 여기 있다.네 연구가 공유하는 것은 가중치 표현이지만, 실제로 해결하려는 병목과 구현하는 시스템은 서로 다르다.
 
 ## 1. 왜 BCQ가 필요했는가?
 
