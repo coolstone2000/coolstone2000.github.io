@@ -3,10 +3,11 @@ layout: none
 ---
 
 var idx = lunr(function () {
-  this.field('title')
+  // Full-content excerpts are long, so weight title/category/tag matches up.
+  this.field('title', { boost: 10 })
   this.field('excerpt')
-  this.field('categories')
-  this.field('tags')
+  this.field('categories', { boost: 3 })
+  this.field('tags', { boost: 3 })
   this.ref('id')
 
   this.pipeline.remove(lunr.trimmer)

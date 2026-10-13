@@ -85,11 +85,17 @@ layout: default
               {% endunless %}
             {% endif %}
           {% endfor %}
+          {% assign series_posts = cat_posts | reverse %}
+          {% assign series_index = 0 %}
+          {% for p in series_posts %}
+            {% if p.id == page.id %}{% assign series_index = forloop.index %}{% endif %}
+          {% endfor %}
           {% if prev_post or next_post %}
-          <nav class="category-pagination">
+          <nav class="category-pagination" aria-label="{{ current_category }} 시리즈">
             <div class="category-pagination__label">
               <i class="fas fa-layer-group" aria-hidden="true"></i>
               <span>{{ current_category }} 시리즈</span>
+              <span class="category-pagination__count">{{ cat_size }}편 중 {{ series_index }}번째</span>
             </div>
             <div class="category-pagination__links">
               {% if prev_post %}
@@ -115,6 +121,16 @@ layout: default
                 </span>
               {% endif %}
             </div>
+            <details class="category-pagination__all">
+              <summary>시리즈 전체 목록</summary>
+              <ol>
+                {% for p in series_posts %}
+                  <li{% if p.id == page.id %} class="is-current"{% endif %}>
+                    {% if p.id == page.id %}<span aria-current="page">{{ p.title }}</span>{% else %}<a href="{{ p.url | relative_url }}">{{ p.title }}</a>{% endif %}
+                  </li>
+                {% endfor %}
+              </ol>
+            </details>
           </nav>
           {% endif %}
         {% endif %}

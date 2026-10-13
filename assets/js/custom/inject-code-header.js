@@ -50,18 +50,60 @@ document.addEventListener("DOMContentLoaded", () => {
     header.appendChild(langTag);
 
     block.insertBefore(header, block.firstChild);
-    
+
+    addCollapseToggle(block);
   });
 });
 
-async function copyCode(button) {
-  const block = button.closest('.highlight');
+// Long code blocks start collapsed so they don't push the article down.
+const CODE_COLLAPSE_MIN_LINES = 25;
+
+function addCollapseToggle(block) {
+  const pre = block.querySelector(':scope > pre');
+  const text = getCodeText(block);
+  if (!pre || text === null) return;
+  const lineCount = text.replace(/\n$/, '').split('\n').length;
+  if (lineCount <= CODE_COLLAPSE_MIN_LINES) return;
+
+  if (!pre.id) pre.id = `code-${Math.random().toString(36).slice(2, 9)}`;
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'code-toggle';
+  toggle.setAttribute('aria-controls', pre.id);
+
+  const setCollapsed = (collapsed) => {
+    block.classList.toggle('is-collapsed', collapsed);
+    toggle.setAttribute('aria-expanded', String(!collapsed));
+    toggle.textContent = collapsed ? `전체 보기 (${lineCount}줄)` : '접기';
+  };
+
+  toggle.addEventListener('click', () => {
+    const collapse = !block.classList.contains('is-collapsed');
+    setCollapsed(collapse);
+    // After collapsing, keep the block's header in view instead of leaving the reader far below it.
+    if (collapse && block.getBoundingClientRect().top < 0) {
+      block.scrollIntoView({ block: 'start' });
+    }
+  });
+
+  block.classList.add('is-collapsible');
+  setCollapsed(true);
+  pre.after(toggle);
+}
+
+function getCodeText(block) {
   const codeElement = block.querySelector('pre code');
-  if (!codeElement) return;
+  if (!codeElement) return null;
   const codeCells = codeElement.querySelectorAll('td.rouge-code');
-  const text = codeCells.length
+  return codeCells.length
     ? Array.from(codeCells, cell => cell.textContent).join('')
     : codeElement.textContent;
+}
+
+async function copyCode(button) {
+  const block = button.closest('.highlight');
+  const text = getCodeText(block);
+  if (text === null) return;
   const originalIcon = button.innerHTML;
   try {
     await navigator.clipboard.writeText(text);
